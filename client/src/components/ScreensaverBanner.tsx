@@ -54,12 +54,11 @@ export default function ScreensaverBanner({
 
   return (
     <div 
-      className={`flex items-center text-white relative overflow-hidden ${
-        isVertical ? 'w-12 h-full' : 'h-12 w-full'
-      }`}
+      className="flex items-center justify-center text-white relative overflow-hidden h-12"
       style={{ 
         backgroundColor,
         position: 'absolute',
+        width: isVertical ? '400px' : '100%',
         ...getPositionStyles()
       }}
       data-testid="screensaver-banner"
