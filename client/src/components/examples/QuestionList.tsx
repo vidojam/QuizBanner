@@ -12,6 +12,7 @@ export default function QuestionListExample() {
       <QuestionList 
         questions={mockQuestions} 
         onDelete={(id) => console.log('Delete:', id)}
+        onEdit={(id, q, a) => console.log('Edit:', id, q, a)}
       />
     </div>
   );

@@ -40,6 +40,12 @@ export default function Home() {
     setQuestions(prev => prev.filter(q => q.id !== id));
   };
 
+  const handleEditQuestion = (id: string, question: string, answer: string) => {
+    setQuestions(prev => 
+      prev.map(q => q.id === id ? { ...q, question, answer } : q)
+    );
+  };
+
   return (
     <>
       <div className="min-h-screen bg-background">
@@ -76,6 +82,7 @@ export default function Home() {
             <QuestionList
               questions={questions}
               onDelete={handleDeleteQuestion}
+              onEdit={handleEditQuestion}
             />
           </div>
         </div>
