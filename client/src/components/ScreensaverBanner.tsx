@@ -16,23 +16,26 @@ export default function ScreensaverBanner({
   answerDelay = 15000
 }: ScreensaverBannerProps) {
   const [showAnswer, setShowAnswer] = useState(false);
+  const scrollDuration = 15000; // 15 seconds for scrolling
 
   useEffect(() => {
     setShowAnswer(false);
 
+    // Show answer after question finishes scrolling
     const answerTimer = setTimeout(() => {
       setShowAnswer(true);
-    }, 2000);
+    }, scrollDuration);
 
+    // Complete after both question and answer have scrolled
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, answerDelay);
+    }, scrollDuration * 2);
 
     return () => {
       clearTimeout(answerTimer);
       clearTimeout(completeTimer);
     };
-  }, [question, answer, answerDelay, onComplete]);
+  }, [question, answer, onComplete]);
 
   return (
     <div 
