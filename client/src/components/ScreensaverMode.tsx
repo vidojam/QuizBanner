@@ -31,7 +31,8 @@ function shuffleArray<T>(array: T[]): T[] {
 export default function ScreensaverMode({ questions, onExit }: ScreensaverModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledQuestions] = useState(() => shuffleArray(questions));
-  const [backgroundColor] = useState(() => getRandomColor());
+  const [bannerPosition, setBannerPosition] = useState(() => Math.random() * 80);
+  const [backgroundColor, setBackgroundColor] = useState(() => getRandomColor());
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -45,6 +46,9 @@ export default function ScreensaverMode({ questions, onExit }: ScreensaverModePr
   }, [onExit]);
 
   const handleComplete = () => {
+    setBannerPosition(Math.random() * 80);
+    setBackgroundColor(getRandomColor());
+    
     if (currentIndex < shuffledQuestions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
@@ -73,7 +77,10 @@ export default function ScreensaverMode({ questions, onExit }: ScreensaverModePr
         <X className="w-6 h-6" />
       </Button>
 
-      <div className="h-full flex items-center justify-center">
+      <div 
+        className="absolute left-0 right-0"
+        style={{ top: `${bannerPosition}%` }}
+      >
         <ScreensaverBanner
           key={currentQuestion.id}
           question={currentQuestion.question}
