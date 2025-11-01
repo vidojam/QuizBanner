@@ -51,10 +51,10 @@ export default function ScreensaverBanner({
             }
           }
           .scroll-question {
-            animation: scroll-left-to-right 15s linear infinite;
+            animation: scroll-left-to-right 15s linear forwards;
           }
           .scroll-answer {
-            animation: scroll-left-to-right 15s linear infinite;
+            animation: scroll-left-to-right 15s linear forwards;
           }
         `}
       </style>
@@ -75,7 +75,6 @@ export default function ScreensaverBanner({
         <div 
           className="absolute whitespace-nowrap scroll-answer"
           data-testid="answer-section"
-          style={{ animationDelay: '0s' }}
         >
           <span 
             className="text-xl font-bold px-8"
