@@ -95,10 +95,6 @@ export default function ScreensaverBanner({
           isHorizontal ? 'scroll-question-horizontal' : 'scroll-question-vertical'
         }`}
         data-testid="text-question-display"
-        style={isVertical ? { 
-          writingMode: 'vertical-rl',
-          textOrientation: 'mixed'
-        } : {}}
       >
         <span 
           className="text-xl font-bold px-8"
@@ -114,10 +110,6 @@ export default function ScreensaverBanner({
             isHorizontal ? 'scroll-answer-horizontal' : 'scroll-answer-vertical'
           }`}
           data-testid="answer-section"
-          style={isVertical ? { 
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed'
-          } : {}}
         >
           <span 
             className="text-xl font-bold px-8"
