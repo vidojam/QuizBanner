@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
 
+export type BannerPosition = 'bottom' | 'top' | 'left' | 'right' | 'random';
+
 interface ScreensaverBannerProps {
   question: string;
   answer: string;
   backgroundColor: string;
+  position: BannerPosition;
+  randomOffset?: number;
   onComplete: () => void;
-  answerDelay?: number;
 }
 
 export default function ScreensaverBanner({ 
   question, 
   answer, 
   backgroundColor,
-  onComplete,
-  answerDelay = 15000
+  position,
+  randomOffset = 50,
+  onComplete
 }: ScreensaverBannerProps) {
   const [showAnswer, setShowAnswer] = useState(false);
   const scrollDuration = 15000; // 15 seconds for scrolling
@@ -37,34 +41,64 @@ export default function ScreensaverBanner({
     };
   }, [question, answer, onComplete]);
 
+  const isHorizontal = position === 'bottom' || position === 'top' || position === 'random';
+  const isVertical = position === 'left' || position === 'right';
+
+  const getPositionStyles = () => {
+    if (position === 'bottom') return { bottom: 0, left: 0, right: 0 };
+    if (position === 'top') return { top: 0, left: 0, right: 0 };
+    if (position === 'left') return { left: 0, top: 0, bottom: 0 };
+    if (position === 'right') return { right: 0, top: 0, bottom: 0 };
+    if (position === 'random') return { top: `${randomOffset}%`, left: 0, right: 0 };
+    return {};
+  };
+
   return (
     <div 
-      className="h-12 w-full flex items-center text-white relative overflow-hidden"
-      style={{ backgroundColor }}
+      className={`flex items-center text-white relative overflow-hidden ${
+        isHorizontal ? 'h-12 w-full' : 'w-12 h-full'
+      }`}
+      style={{ 
+        backgroundColor,
+        position: 'absolute',
+        ...getPositionStyles()
+      }}
       data-testid="screensaver-banner"
     >
       <style>
         {`
-          @keyframes scroll-left-to-right {
-            from {
-              transform: translateX(-100%);
-            }
-            to {
-              transform: translateX(100vw);
-            }
+          @keyframes scroll-horizontal {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100vw); }
           }
-          .scroll-question {
-            animation: scroll-left-to-right 15s linear forwards;
+          @keyframes scroll-vertical {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100vh); }
           }
-          .scroll-answer {
-            animation: scroll-left-to-right 15s linear forwards;
+          .scroll-question-horizontal {
+            animation: scroll-horizontal 15s linear forwards;
+          }
+          .scroll-answer-horizontal {
+            animation: scroll-horizontal 15s linear forwards;
+          }
+          .scroll-question-vertical {
+            animation: scroll-vertical 15s linear forwards;
+          }
+          .scroll-answer-vertical {
+            animation: scroll-vertical 15s linear forwards;
           }
         `}
       </style>
       
       <div 
-        className="absolute whitespace-nowrap scroll-question"
+        className={`absolute whitespace-nowrap ${
+          isHorizontal ? 'scroll-question-horizontal' : 'scroll-question-vertical'
+        }`}
         data-testid="text-question-display"
+        style={isVertical ? { 
+          writingMode: 'vertical-rl',
+          textOrientation: 'mixed'
+        } : {}}
       >
         <span 
           className="text-xl font-bold px-8"
@@ -76,8 +110,14 @@ export default function ScreensaverBanner({
 
       {showAnswer && (
         <div 
-          className="absolute whitespace-nowrap scroll-answer"
+          className={`absolute whitespace-nowrap ${
+            isHorizontal ? 'scroll-answer-horizontal' : 'scroll-answer-vertical'
+          }`}
           data-testid="answer-section"
+          style={isVertical ? { 
+            writingMode: 'vertical-rl',
+            textOrientation: 'mixed'
+          } : {}}
         >
           <span 
             className="text-xl font-bold px-8"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import ScreensaverBanner from "./ScreensaverBanner";
+import ScreensaverBanner, { type BannerPosition } from "./ScreensaverBanner";
 import type { QuestionAnswer } from "@shared/schema";
 
 interface ScreensaverModeProps {
@@ -28,10 +28,13 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+const POSITION_CYCLE: BannerPosition[] = ['bottom', 'top', 'left', 'right', 'random'];
+
 export default function ScreensaverMode({ questions, onExit }: ScreensaverModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledQuestions] = useState(() => shuffleArray(questions));
-  const [bannerPosition, setBannerPosition] = useState(() => Math.random() * 80);
+  const [positionIndex, setPositionIndex] = useState(0);
+  const [randomOffset, setRandomOffset] = useState(() => Math.random() * 80);
   const [backgroundColor, setBackgroundColor] = useState(() => getRandomColor());
 
   useEffect(() => {
@@ -46,9 +49,13 @@ export default function ScreensaverMode({ questions, onExit }: ScreensaverModePr
   }, [onExit]);
 
   const handleComplete = () => {
-    setBannerPosition(Math.random() * 80);
+    setRandomOffset(Math.random() * 80);
     setBackgroundColor(getRandomColor());
     
+    // Move to next position in cycle
+    setPositionIndex(prev => (prev + 1) % POSITION_CYCLE.length);
+    
+    // Move to next question
     if (currentIndex < shuffledQuestions.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
@@ -61,6 +68,7 @@ export default function ScreensaverMode({ questions, onExit }: ScreensaverModePr
   }
 
   const currentQuestion = shuffledQuestions[currentIndex];
+  const currentPosition = POSITION_CYCLE[positionIndex];
 
   return (
     <div 
@@ -77,18 +85,15 @@ export default function ScreensaverMode({ questions, onExit }: ScreensaverModePr
         <X className="w-6 h-6" />
       </Button>
 
-      <div 
-        className="absolute left-0 right-0"
-        style={{ top: `${bannerPosition}%` }}
-      >
-        <ScreensaverBanner
-          key={currentQuestion.id}
-          question={currentQuestion.question}
-          answer={currentQuestion.answer}
-          backgroundColor={backgroundColor}
-          onComplete={handleComplete}
-        />
-      </div>
+      <ScreensaverBanner
+        key={currentQuestion.id}
+        question={currentQuestion.question}
+        answer={currentQuestion.answer}
+        backgroundColor={backgroundColor}
+        position={currentPosition}
+        randomOffset={randomOffset}
+        onComplete={handleComplete}
+      />
     </div>
   );
 }
