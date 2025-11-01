@@ -41,23 +41,18 @@ export default function ScreensaverBanner({
     };
   }, [question, answer, onComplete]);
 
-  const isHorizontal = position === 'bottom' || position === 'top' || position === 'random';
-  const isVertical = position === 'left' || position === 'right';
-
   const getPositionStyles = () => {
     if (position === 'bottom') return { bottom: 0, left: 0, right: 0 };
     if (position === 'top') return { top: 0, left: 0, right: 0 };
-    if (position === 'left') return { left: 0, top: 0, bottom: 0 };
-    if (position === 'right') return { right: 0, top: 0, bottom: 0 };
+    if (position === 'left') return { left: 0, top: '45%' };
+    if (position === 'right') return { right: 0, top: '45%' };
     if (position === 'random') return { top: `${randomOffset}%`, left: 0, right: 0 };
     return {};
   };
 
   return (
     <div 
-      className={`flex items-center text-white relative overflow-hidden ${
-        isHorizontal ? 'h-12 w-full' : 'w-12 h-full'
-      }`}
+      className="h-12 w-full flex items-center text-white relative overflow-hidden"
       style={{ 
         backgroundColor,
         position: 'absolute',
@@ -71,29 +66,17 @@ export default function ScreensaverBanner({
             from { transform: translateX(-100%); }
             to { transform: translateX(100vw); }
           }
-          @keyframes scroll-vertical {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(100vh); }
-          }
           .scroll-question-horizontal {
             animation: scroll-horizontal 15s linear forwards;
           }
           .scroll-answer-horizontal {
             animation: scroll-horizontal 15s linear forwards;
           }
-          .scroll-question-vertical {
-            animation: scroll-vertical 15s linear forwards;
-          }
-          .scroll-answer-vertical {
-            animation: scroll-vertical 15s linear forwards;
-          }
         `}
       </style>
       
       <div 
-        className={`absolute whitespace-nowrap ${
-          isHorizontal ? 'scroll-question-horizontal' : 'scroll-question-vertical'
-        }`}
+        className="absolute whitespace-nowrap scroll-question-horizontal"
         data-testid="text-question-display"
       >
         <span 
@@ -106,9 +89,7 @@ export default function ScreensaverBanner({
 
       {showAnswer && (
         <div 
-          className={`absolute whitespace-nowrap ${
-            isHorizontal ? 'scroll-answer-horizontal' : 'scroll-answer-vertical'
-          }`}
+          className="absolute whitespace-nowrap scroll-answer-horizontal"
           data-testid="answer-section"
         >
           <span 
