@@ -1,16 +1,21 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Play, Square } from "lucide-react";
 import QuestionForm from "@/components/QuestionForm";
 import QuestionList from "@/components/QuestionList";
 import ScreensaverMode from "@/components/ScreensaverMode";
 import type { QuestionAnswer } from "@shared/schema";
 
 const STORAGE_KEY = "learning-questions";
+const MODE_STORAGE_KEY = "display-mode";
+
+export type DisplayMode = 'screensaver' | 'overlay';
 
 export default function Home() {
   const [questions, setQuestions] = useState<QuestionAnswer[]>([]);
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('screensaver');
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -21,11 +26,20 @@ export default function Home() {
         console.error("Failed to load questions:", error);
       }
     }
+
+    const storedMode = localStorage.getItem(MODE_STORAGE_KEY);
+    if (storedMode === 'screensaver' || storedMode === 'overlay') {
+      setDisplayMode(storedMode);
+    }
   }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
   }, [questions]);
+
+  useEffect(() => {
+    localStorage.setItem(MODE_STORAGE_KEY, displayMode);
+  }, [displayMode]);
 
   const handleAddQuestion = (question: string, answer: string) => {
     const newQuestion: QuestionAnswer = {
@@ -59,16 +73,59 @@ export default function Home() {
                 Create questions to reinforce your learning with timed screensavers
               </p>
             </div>
-            <Button
-              size="lg"
-              data-testid="button-start-screensaver"
-              onClick={() => setIsScreensaverActive(true)}
-              disabled={questions.length === 0}
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Start Screensaver
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="lg"
+                variant={isScreensaverActive ? "destructive" : "default"}
+                data-testid="button-start-screensaver"
+                onClick={() => setIsScreensaverActive(!isScreensaverActive)}
+                disabled={questions.length === 0}
+              >
+                {isScreensaverActive ? (
+                  <>
+                    <Square className="w-5 h-5 mr-2" />
+                    Stop
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5 mr-2" />
+                    Start
+                  </>
+                )}
+              </Button>
+            </div>
           </header>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Display Mode</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex gap-4">
+                <Button
+                  variant={displayMode === 'screensaver' ? 'default' : 'outline'}
+                  onClick={() => setDisplayMode('screensaver')}
+                  data-testid="button-mode-screensaver"
+                  className="flex-1"
+                >
+                  Screensaver Only
+                </Button>
+                <Button
+                  variant={displayMode === 'overlay' ? 'default' : 'outline'}
+                  onClick={() => setDisplayMode('overlay')}
+                  data-testid="button-mode-overlay"
+                  className="flex-1"
+                >
+                  Always On Top
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {displayMode === 'screensaver' 
+                  ? 'Fullscreen mode with black background - blocks your view completely'
+                  : 'Overlay mode - banners appear on top of your work, allowing you to continue working while learning'}
+              </p>
+            </CardContent>
+          </Card>
 
           <QuestionForm
             onAdd={handleAddQuestion}
@@ -91,6 +148,7 @@ export default function Home() {
       {isScreensaverActive && questions.length > 0 && (
         <ScreensaverMode
           questions={questions}
+          mode={displayMode}
           onExit={() => setIsScreensaverActive(false)}
         />
       )}

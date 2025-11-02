@@ -15,6 +15,7 @@ export default function ScreensaverModeExample() {
     return (
       <ScreensaverMode 
         questions={mockQuestions}
+        mode="screensaver"
         onExit={() => setIsActive(false)}
       />
     );

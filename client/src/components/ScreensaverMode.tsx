@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import ScreensaverBanner, { type BannerPosition } from "./ScreensaverBanner";
 import type { QuestionAnswer } from "@shared/schema";
+import type { DisplayMode } from "@/pages/Home";
 
 interface ScreensaverModeProps {
   questions: QuestionAnswer[];
+  mode: DisplayMode;
   onExit: () => void;
 }
 
@@ -30,7 +32,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const POSITION_CYCLE: BannerPosition[] = ['bottom', 'top', 'left', 'right', 'random'];
 
-export default function ScreensaverMode({ questions, onExit }: ScreensaverModeProps) {
+export default function ScreensaverMode({ questions, mode, onExit }: ScreensaverModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledQuestions] = useState(() => shuffleArray(questions));
   const [positionIndex, setPositionIndex] = useState(0);
@@ -72,18 +74,20 @@ export default function ScreensaverMode({ questions, onExit }: ScreensaverModePr
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black"
+      className={`fixed inset-0 z-50 ${mode === 'screensaver' ? 'bg-black' : 'pointer-events-none'}`}
       data-testid="screensaver-mode"
     >
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onExit}
-        data-testid="button-exit-screensaver"
-        className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
-      >
-        <X className="w-6 h-6" />
-      </Button>
+      {mode === 'screensaver' && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onExit}
+          data-testid="button-exit-screensaver"
+          className="absolute top-4 right-4 z-10 text-white hover:bg-white/20 pointer-events-auto"
+        >
+          <X className="w-6 h-6" />
+        </Button>
+      )}
 
       <ScreensaverBanner
         key={currentQuestion.id}
