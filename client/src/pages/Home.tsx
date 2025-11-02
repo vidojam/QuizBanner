@@ -122,8 +122,16 @@ export default function Home() {
               <p className="text-sm text-muted-foreground">
                 {displayMode === 'screensaver' 
                   ? 'Fullscreen mode with black background - blocks your view completely'
-                  : 'Overlay mode - banners appear on top of your work, allowing you to continue working while learning'}
+                  : 'Overlay mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.'}
               </p>
+              {displayMode === 'overlay' && (
+                <div className="mt-3 p-3 bg-muted rounded-md">
+                  <p className="text-sm font-medium mb-1">💡 Pro Tip:</p>
+                  <p className="text-sm text-muted-foreground">
+                    For best results, resize your browser window to take up half your screen, then position your work (documents, email, etc.) on the other half. The banners will scroll within this window while you work elsewhere.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
