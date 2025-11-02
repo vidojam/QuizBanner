@@ -54,11 +54,12 @@ export default function ScreensaverBanner({
 
   return (
     <div 
-      className="flex items-center justify-center text-white relative overflow-hidden h-12"
+      className={`flex items-center text-white relative overflow-hidden ${
+        isVertical ? 'w-12 h-full' : 'h-12 w-full'
+      }`}
       style={{ 
         backgroundColor,
         position: 'absolute',
-        width: isVertical ? '400px' : '100%',
         ...getPositionStyles()
       }}
       data-testid="screensaver-banner"
@@ -93,6 +94,10 @@ export default function ScreensaverBanner({
           isVertical ? 'scroll-question-vertical' : 'scroll-question-horizontal'
         }`}
         data-testid="text-question-display"
+        style={isVertical ? {
+          writingMode: 'vertical-lr',
+          textOrientation: 'upright'
+        } : {}}
       >
         <span 
           className="text-xl font-bold px-8"
@@ -108,6 +113,10 @@ export default function ScreensaverBanner({
             isVertical ? 'scroll-answer-vertical' : 'scroll-answer-horizontal'
           }`}
           data-testid="answer-section"
+          style={isVertical ? {
+            writingMode: 'vertical-lr',
+            textOrientation: 'upright'
+          } : {}}
         >
           <span 
             className="text-xl font-bold px-8"
