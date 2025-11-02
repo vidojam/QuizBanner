@@ -67,12 +67,12 @@ export default function ScreensaverBanner({
       <style>
         {`
           @keyframes scroll-horizontal {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(100vw); }
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-100%); }
           }
           @keyframes scroll-vertical {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(100vh); }
+            from { transform: translateY(100vh); }
+            to { transform: translateY(-100%); }
           }
           .scroll-question-horizontal {
             animation: scroll-horizontal 15s linear forwards;
