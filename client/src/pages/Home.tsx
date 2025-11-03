@@ -279,14 +279,14 @@ export default function Home() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <Label>Default Duration (seconds)</Label>
-                      <span className="text-sm font-medium">{preferences?.defaultDuration || 15}s</span>
+                      <span className="text-sm font-medium">{preferences?.defaultDuration || 5}s</span>
                     </div>
                     <Slider
-                      value={[preferences?.defaultDuration || 15]}
+                      value={[preferences?.defaultDuration || 5]}
                       onValueChange={([value]) => updatePreferencesMutation.mutate({ defaultDuration: value })}
-                      min={5}
-                      max={60}
-                      step={5}
+                      min={1}
+                      max={10}
+                      step={1}
                       data-testid="slider-duration"
                     />
                     <p className="text-xs text-muted-foreground">

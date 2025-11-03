@@ -10,7 +10,7 @@ export const questions = pgTable("questions", {
   answer: text("answer").notNull(),
   category: text("category"),
   tags: json("tags").$type<string[]>().default([]),
-  duration: integer("duration").notNull().default(15),
+  duration: integer("duration").notNull().default(5),
   customColor: text("custom_color"),
   timesReviewed: integer("times_reviewed").notNull().default(0),
   lastReviewed: timestamp("last_reviewed"),
@@ -20,7 +20,7 @@ export const questions = pgTable("questions", {
 
 export const preferences = pgTable("preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  defaultDuration: integer("default_duration").notNull().default(15),
+  defaultDuration: integer("default_duration").notNull().default(5),
   bannerHeight: integer("banner_height").notNull().default(48),
   fontSize: integer("font_size").notNull().default(24),
   enableSoundNotifications: integer("enable_sound_notifications").notNull().default(0), // 0 = false, 1 = true

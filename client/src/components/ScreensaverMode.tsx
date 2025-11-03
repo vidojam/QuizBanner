@@ -36,7 +36,7 @@ export default function ScreensaverMode({
   questions, 
   mode, 
   onExit,
-  defaultDuration = 15,
+  defaultDuration = 5,
   bannerHeight = 48,
   fontSize = 48,
   enableSoundNotifications = false
@@ -107,22 +107,22 @@ export default function ScreensaverMode({
     // Play notification sound
     playNotificationSound();
     
-    // Move to next position in the cycle
-    const nextPositionIndex = (positionIndex + 1) % POSITION_CYCLE.length;
+    // Move to next question
+    const nextQuestionIndex = (currentIndex + 1) % shuffledQuestions.length;
     
-    if (nextPositionIndex === 0) {
-      // Completed full position cycle, move to next question
-      setCompletedCount(prev => prev + 1);
+    if (nextQuestionIndex === 0) {
+      // Completed all questions at current position, move to next position
+      const nextPositionIndex = (positionIndex + 1) % POSITION_CYCLE.length;
+      setPositionIndex(nextPositionIndex);
       
-      if (currentIndex < shuffledQuestions.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-      } else {
-        setCurrentIndex(0);
+      if (nextPositionIndex === 0) {
+        // Completed full cycle (all questions at all positions)
+        setCompletedCount(prev => prev + 1);
       }
     }
     
-    // Update position
-    setPositionIndex(nextPositionIndex);
+    // Update to next question
+    setCurrentIndex(nextQuestionIndex);
     
     // Generate new colors and random offset for next iteration
     const newBgColor = getRandomAccessibleColor();

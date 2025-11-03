@@ -10,7 +10,7 @@ interface ScreensaverBannerProps {
   position: BannerPosition;
   randomOffset?: number;
   onComplete: () => void;
-  duration?: number; // in seconds, default 15
+  duration?: number; // in seconds, default 5
   isPaused?: boolean;
   bannerHeight?: number; // in pixels, default 48
   fontSize?: number; // in pixels, default 48
@@ -24,7 +24,7 @@ export default function ScreensaverBanner({
   position,
   randomOffset = 50,
   onComplete,
-  duration = 15,
+  duration = 5,
   isPaused = false,
   bannerHeight = 48,
   fontSize = 48
