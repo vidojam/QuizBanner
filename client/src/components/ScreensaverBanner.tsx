@@ -47,10 +47,10 @@ export default function ScreensaverBanner({
     }
   };
 
-  // Reset state when question/answer changes
+  // Reset state when question/answer/duration changes
   useEffect(() => {
     setShowAnswer(false);
-  }, [question, answer]);
+  }, [question, answer, duration]);
 
   const isVertical = position === 'left' || position === 'right';
 

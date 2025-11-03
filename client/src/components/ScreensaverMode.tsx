@@ -191,7 +191,7 @@ export default function ScreensaverMode({
       </div>
 
       <ScreensaverBanner
-        key={`${shuffledQuestions[currentIndex].id}-${currentIndex}-${positionIndex}`}
+        key={`${shuffledQuestions[currentIndex].id}-${currentIndex}-${positionIndex}-${defaultDuration}-${bannerHeight}-${fontSize}`}
         question={shuffledQuestions[currentIndex].question}
         answer={shuffledQuestions[currentIndex].answer}
         backgroundColor={backgroundColor}
