@@ -41,9 +41,13 @@ export default function ScreensaverMode({
   fontSize = 48,
   enableSoundNotifications = false
 }: ScreensaverModeProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleArray(questions));
+  const [positionIndex, setPositionIndex] = useState(0);
+  const [randomOffset, setRandomOffset] = useState(() => Math.random() * 80);
   const initialColors = getInitialColors();
-  const [backgroundColor] = useState(initialColors.bgColor);
+  const [backgroundColor, setBackgroundColor] = useState(initialColors.bgColor);
+  const [textColor, setTextColor] = useState(initialColors.txtColor);
   const [isPaused, setIsPaused] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
 
@@ -103,9 +107,29 @@ export default function ScreensaverMode({
     // Play notification sound
     playNotificationSound();
     
-    // Increment completed count (tracks total cycles)
-    setCompletedCount(prev => prev + 1);
-  }, [playNotificationSound]);
+    // Move to next position in the cycle
+    const nextPositionIndex = (positionIndex + 1) % POSITION_CYCLE.length;
+    
+    if (nextPositionIndex === 0) {
+      // Completed full position cycle, move to next question
+      setCompletedCount(prev => prev + 1);
+      
+      if (currentIndex < shuffledQuestions.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+      } else {
+        setCurrentIndex(0);
+      }
+    }
+    
+    // Update position
+    setPositionIndex(nextPositionIndex);
+    
+    // Generate new colors and random offset for next iteration
+    const newBgColor = getRandomAccessibleColor();
+    setRandomOffset(Math.random() * 80);
+    setBackgroundColor(newBgColor);
+    setTextColor(getAccessibleTextColor(newBgColor));
+  }, [currentIndex, positionIndex, shuffledQuestions.length, playNotificationSound]);
 
   const handleSkip = () => {
     handleComplete();
@@ -158,38 +182,28 @@ export default function ScreensaverMode({
       <div className="absolute top-4 left-4 z-10 pointer-events-auto">
         <div className={mode === 'screensaver' ? 'bg-black/60 text-white px-4 py-2 rounded-md backdrop-blur-sm' : 'bg-black/80 text-white px-4 py-2 rounded-md backdrop-blur-sm'}>
           <div className="text-sm font-medium">
-            {shuffledQuestions.length} questions scrolling
+            Q{currentIndex + 1}/{shuffledQuestions.length} • {POSITION_CYCLE[positionIndex]}
           </div>
           <div className="text-xs text-white/70 mt-1">
-            {completedCount} cycles completed
+            Position {positionIndex + 1}/5 • {completedCount} completed
           </div>
         </div>
       </div>
 
-      {/* Show ALL questions simultaneously, each with a different position */}
-      {shuffledQuestions.map((q, index) => {
-        const position = POSITION_CYCLE[index % POSITION_CYCLE.length];
-        const offset = (index * 20) % 80; // Stagger them
-        const bgColor = index === 0 ? backgroundColor : getRandomAccessibleColor();
-        const txtColor = getAccessibleTextColor(bgColor);
-        
-        return (
-          <ScreensaverBanner
-            key={`${q.id}-${index}`}
-            question={q.question}
-            answer={q.answer}
-            backgroundColor={bgColor}
-            textColor={txtColor}
-            position={position}
-            randomOffset={offset}
-            onComplete={handleComplete}
-            duration={q.duration || defaultDuration}
-            isPaused={isPaused}
-            bannerHeight={bannerHeight}
-            fontSize={fontSize}
-          />
-        );
-      })}
+      <ScreensaverBanner
+        key={`${shuffledQuestions[currentIndex].id}-${currentIndex}-${positionIndex}`}
+        question={shuffledQuestions[currentIndex].question}
+        answer={shuffledQuestions[currentIndex].answer}
+        backgroundColor={backgroundColor}
+        textColor={textColor}
+        position={POSITION_CYCLE[positionIndex]}
+        randomOffset={randomOffset}
+        onComplete={handleComplete}
+        duration={shuffledQuestions[currentIndex].duration || defaultDuration}
+        isPaused={isPaused}
+        bannerHeight={bannerHeight}
+        fontSize={fontSize}
+      />
     </div>
   );
 }

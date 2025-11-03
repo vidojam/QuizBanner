@@ -30,83 +30,27 @@ export default function ScreensaverBanner({
   fontSize = 48
 }: ScreensaverBannerProps) {
   const [showAnswer, setShowAnswer] = useState(false);
-  const [questionElapsed, setQuestionElapsed] = useState(0);
-  const [answerElapsed, setAnswerElapsed] = useState(0);
-  const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const completeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const questionStartTimeRef = useRef<number>(0);
-  const answerStartTimeRef = useRef<number>(0);
+  const questionRef = useRef<HTMLDivElement>(null);
+  const answerRef = useRef<HTMLDivElement>(null);
 
-  const scrollDuration = duration * 1000; // convert to milliseconds
+  // When question animation ends, show answer
+  const handleQuestionAnimationEnd = () => {
+    if (!isPaused) {
+      setShowAnswer(true);
+    }
+  };
 
+  // When answer animation ends, complete and move to next position
+  const handleAnswerAnimationEnd = () => {
+    if (!isPaused) {
+      onComplete();
+    }
+  };
+
+  // Reset state when question/answer changes
   useEffect(() => {
     setShowAnswer(false);
-    setQuestionElapsed(0);
-    setAnswerElapsed(0);
-    
-    // Start question timer
-    questionStartTimeRef.current = Date.now();
-    questionTimerRef.current = setTimeout(() => {
-      setShowAnswer(true);
-      answerStartTimeRef.current = Date.now();
-    }, scrollDuration);
-
-    // Complete after both question and answer have scrolled
-    completeTimerRef.current = setTimeout(() => {
-      onComplete();
-    }, scrollDuration * 2);
-
-    return () => {
-      if (questionTimerRef.current) clearTimeout(questionTimerRef.current);
-      if (completeTimerRef.current) clearTimeout(completeTimerRef.current);
-    };
   }, [question, answer]);
-
-  // Handle pause/resume
-  useEffect(() => {
-    if (isPaused) {
-      // Pause: clear all timers and record elapsed time
-      if (questionTimerRef.current) {
-        clearTimeout(questionTimerRef.current);
-        questionTimerRef.current = null;
-        if (!showAnswer) {
-          setQuestionElapsed(Date.now() - questionStartTimeRef.current);
-        }
-      }
-      if (completeTimerRef.current) {
-        clearTimeout(completeTimerRef.current);
-        completeTimerRef.current = null;
-        if (showAnswer) {
-          setAnswerElapsed(Date.now() - answerStartTimeRef.current);
-        }
-      }
-    } else {
-      // Resume: restart timers with remaining time
-      if (!showAnswer && questionElapsed > 0) {
-        const remainingTime = scrollDuration - questionElapsed;
-        questionStartTimeRef.current = Date.now() - questionElapsed;
-        questionTimerRef.current = setTimeout(() => {
-          setShowAnswer(true);
-          answerStartTimeRef.current = Date.now();
-        }, remainingTime);
-
-        completeTimerRef.current = setTimeout(() => {
-          onComplete();
-        }, remainingTime + scrollDuration);
-      } else if (showAnswer && answerElapsed > 0) {
-        const remainingTime = scrollDuration - answerElapsed;
-        answerStartTimeRef.current = Date.now() - answerElapsed;
-        completeTimerRef.current = setTimeout(() => {
-          onComplete();
-        }, remainingTime);
-      }
-    }
-
-    return () => {
-      if (questionTimerRef.current) clearTimeout(questionTimerRef.current);
-      if (completeTimerRef.current) clearTimeout(completeTimerRef.current);
-    };
-  }, [isPaused, questionElapsed, answerElapsed, showAnswer, scrollDuration, onComplete]);
 
   const isVertical = position === 'left' || position === 'right';
 
@@ -135,8 +79,10 @@ export default function ScreensaverBanner({
       data-testid="screensaver-banner"
     >
       <div 
+        ref={questionRef}
         className={`absolute whitespace-nowrap banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}`}
         data-testid="text-question-display"
+        onAnimationEnd={handleQuestionAnimationEnd}
         style={{
           ['--animation-duration' as any]: `${duration}s`,
           animationPlayState: isPaused ? 'paused' : 'running',
@@ -160,8 +106,10 @@ export default function ScreensaverBanner({
 
       {showAnswer && (
         <div 
+          ref={answerRef}
           className={`absolute whitespace-nowrap banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}`}
           data-testid="answer-section"
+          onAnimationEnd={handleAnswerAnimationEnd}
           style={{
             ['--animation-duration' as any]: `${duration}s`,
             animationPlayState: isPaused ? 'paused' : 'running',
