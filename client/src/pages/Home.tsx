@@ -274,6 +274,9 @@ export default function Home() {
               <Card>
                 <CardHeader>
                   <CardTitle>Banner Appearance</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Changes apply immediately while screensaver is running
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
@@ -393,10 +396,11 @@ export default function Home() {
 
       {isScreensaverActive && questions.length > 0 && (
         <ScreensaverMode
+          key={`screensaver-${preferences?.defaultDuration}-${preferences?.bannerHeight}-${preferences?.fontSize}`}
           questions={questions}
           mode={displayMode}
           onExit={() => setIsScreensaverActive(false)}
-          defaultDuration={preferences?.defaultDuration || 15}
+          defaultDuration={preferences?.defaultDuration || 5}
           bannerHeight={preferences?.bannerHeight || 48}
           fontSize={preferences?.fontSize || 48}
           enableSoundNotifications={Boolean(preferences?.enableSoundNotifications)}
