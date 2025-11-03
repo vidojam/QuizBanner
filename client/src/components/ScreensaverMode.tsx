@@ -143,64 +143,51 @@ export default function ScreensaverMode({
       className={`fixed inset-0 z-50 ${mode === 'screensaver' ? 'bg-black' : 'pointer-events-none'}`}
       data-testid="screensaver-mode"
     >
-      {/* Controls - only in screensaver mode */}
-      {mode === 'screensaver' && (
-        <div className="absolute top-4 right-4 z-10 flex gap-2 pointer-events-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsPaused(!isPaused)}
-            data-testid="button-pause-resume"
-            className="text-white hover:bg-white/20"
-            title={isPaused ? "Resume (Space)" : "Pause (Space)"}
-          >
-            {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSkip}
-            data-testid="button-skip"
-            className="text-white hover:bg-white/20"
-            title="Skip to next question"
-          >
-            <SkipForward className="w-6 h-6" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onExit}
-            data-testid="button-exit-screensaver"
-            className="text-white hover:bg-white/20"
-            title="Exit (ESC)"
-          >
-            <X className="w-6 h-6" />
-          </Button>
-        </div>
-      )}
+      {/* Controls - visible in both modes */}
+      <div className="absolute top-4 right-4 z-10 flex gap-2 pointer-events-auto">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsPaused(!isPaused)}
+          data-testid="button-pause-resume"
+          className={mode === 'screensaver' ? 'text-white hover:bg-white/20' : 'bg-black/80 text-white hover:bg-black/90 backdrop-blur-sm'}
+          title={isPaused ? "Resume (Space)" : "Pause (Space)"}
+        >
+          {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleSkip}
+          data-testid="button-skip"
+          className={mode === 'screensaver' ? 'text-white hover:bg-white/20' : 'bg-black/80 text-white hover:bg-black/90 backdrop-blur-sm'}
+          title="Skip to next question"
+        >
+          <SkipForward className="w-6 h-6" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onExit}
+          data-testid="button-exit-screensaver"
+          className={mode === 'screensaver' ? 'text-white hover:bg-white/20' : 'bg-black/80 text-white hover:bg-black/90 backdrop-blur-sm'}
+          title="Exit (ESC)"
+        >
+          <X className="w-6 h-6" />
+        </Button>
+      </div>
 
-      {/* Progress Indicator */}
-      {mode === 'screensaver' && (
-        <div className="absolute top-4 left-4 z-10 pointer-events-auto">
-          <div className="bg-black/60 text-white px-4 py-2 rounded-md backdrop-blur-sm">
-            <div className="text-sm font-medium">
-              Question {currentIndex + 1} of {shuffledQuestions.length}
-            </div>
-            <div className="text-xs text-white/70 mt-1">
-              {completedCount} completed • {POSITION_CYCLE[positionIndex]} position
-            </div>
+      {/* Progress Indicator - visible in both modes */}
+      <div className="absolute top-4 left-4 z-10 pointer-events-auto">
+        <div className={mode === 'screensaver' ? 'bg-black/60 text-white px-4 py-2 rounded-md backdrop-blur-sm' : 'bg-black/80 text-white px-4 py-2 rounded-md backdrop-blur-sm'}>
+          <div className="text-sm font-medium">
+            Question {currentIndex + 1} of {shuffledQuestions.length}
+          </div>
+          <div className="text-xs text-white/70 mt-1">
+            {completedCount} completed • {POSITION_CYCLE[positionIndex]} position
           </div>
         </div>
-      )}
-
-      {/* ESC Key Hint - only show in overlay mode */}
-      {mode === 'overlay' && (
-        <div className="absolute bottom-4 right-4 z-10 pointer-events-none">
-          <div className="bg-black/60 text-white px-3 py-1.5 rounded-md backdrop-blur-sm text-sm">
-            Press ESC to exit
-          </div>
-        </div>
-      )}
+      </div>
 
       <ScreensaverBanner
         key={`${currentQuestion.id}-${currentIndex}-${positionIndex}`}
