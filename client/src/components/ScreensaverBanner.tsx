@@ -84,13 +84,13 @@ export default function ScreensaverBanner({
         data-testid="text-question-display"
         onAnimationEnd={handleQuestionAnimationEnd}
         style={{
-          ['--animation-duration' as any]: `${duration}s`,
+          '--animation-duration': `${duration}s`,
           animationPlayState: isPaused ? 'paused' : 'running',
           ...(isVertical ? {
             writingMode: 'vertical-lr',
             textOrientation: 'upright'
           } : {})
-        }}
+        } as React.CSSProperties}
       >
         <span 
           className="font-bold px-8"
@@ -111,13 +111,13 @@ export default function ScreensaverBanner({
           data-testid="answer-section"
           onAnimationEnd={handleAnswerAnimationEnd}
           style={{
-            ['--animation-duration' as any]: `${duration}s`,
+            '--animation-duration': `${duration}s`,
             animationPlayState: isPaused ? 'paused' : 'running',
             ...(isVertical ? {
               writingMode: 'vertical-lr',
               textOrientation: 'upright'
             } : {})
-          }}
+          } as React.CSSProperties}
         >
           <span 
             className="font-bold px-8"
