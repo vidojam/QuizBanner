@@ -1,24 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Pause, Play, SkipForward } from "lucide-react";
 import ScreensaverBanner, { type BannerPosition } from "./ScreensaverBanner";
 import type { QuestionAnswer } from "@shared/schema";
 import type { DisplayMode } from "@/pages/Home";
+import { getRandomAccessibleColor, getAccessibleTextColor } from "@/utils/colorContrast";
 
 interface ScreensaverModeProps {
   questions: QuestionAnswer[];
   mode: DisplayMode;
   onExit: () => void;
-}
-
-function getRandomColor(): string {
-  const vibrantColors = [
-    '#e74c3c', '#3498db', '#2ecc71', '#f39c12', 
-    '#9b59b6', '#1abc9c', '#e67e22', '#16a085',
-    '#27ae60', '#2980b9', '#8e44ad', '#c0392b',
-    '#d35400', '#2c3e50', '#7f8c8d', '#f1c40f'
-  ];
-  return vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
+  defaultDuration?: number;
+  bannerHeight?: number;
+  fontSize?: number;
+  enableSoundNotifications?: boolean;
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -32,12 +27,34 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const POSITION_CYCLE: BannerPosition[] = ['bottom', 'top', 'left', 'right', 'random'];
 
-export default function ScreensaverMode({ questions, mode, onExit }: ScreensaverModeProps) {
+const getInitialColors = () => {
+  const bgColor = getRandomAccessibleColor();
+  return { bgColor, txtColor: getAccessibleTextColor(bgColor) };
+};
+
+export default function ScreensaverMode({ 
+  questions, 
+  mode, 
+  onExit,
+  defaultDuration = 15,
+  bannerHeight = 48,
+  fontSize = 48,
+  enableSoundNotifications = false
+}: ScreensaverModeProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [shuffledQuestions] = useState(() => shuffleArray(questions));
+  const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleArray(questions));
   const [positionIndex, setPositionIndex] = useState(0);
   const [randomOffset, setRandomOffset] = useState(() => Math.random() * 80);
-  const [backgroundColor, setBackgroundColor] = useState(() => getRandomColor());
+  const initialColors = getInitialColors();
+  const [backgroundColor, setBackgroundColor] = useState(initialColors.bgColor);
+  const [textColor, setTextColor] = useState(initialColors.txtColor);
+  const [isPaused, setIsPaused] = useState(false);
+  const [completedCount, setCompletedCount] = useState(0);
+
+  // Update shuffledQuestions when questions prop changes (fixes live updates bug)
+  useEffect(() => {
+    setShuffledQuestions(shuffleArray(questions));
+  }, [questions]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -46,16 +63,60 @@ export default function ScreensaverMode({ questions, mode, onExit }: Screensaver
       }
     };
 
+    const handleSpace = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setIsPaused(prev => !prev);
+      }
+    };
+
     window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', handleSpace);
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      window.removeEventListener('keydown', handleSpace);
+    };
   }, [onExit]);
 
-  const handleComplete = () => {
+  const playNotificationSound = useCallback(() => {
+    if (enableSoundNotifications) {
+      // Create a simple beep sound using Web Audio API
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800; // Frequency in Hz
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+      } catch (error) {
+        console.warn('Sound notification failed:', error);
+      }
+    }
+  }, [enableSoundNotifications]);
+
+  const handleComplete = useCallback(() => {
+    const newBgColor = getRandomAccessibleColor();
     setRandomOffset(Math.random() * 80);
-    setBackgroundColor(getRandomColor());
+    setBackgroundColor(newBgColor);
+    setTextColor(getAccessibleTextColor(newBgColor));
+    
+    // Play notification sound
+    playNotificationSound();
     
     // Move to next position in cycle
     setPositionIndex(prev => (prev + 1) % POSITION_CYCLE.length);
+    
+    // Increment completed count
+    setCompletedCount(prev => prev + 1);
     
     // Move to next question
     if (currentIndex < shuffledQuestions.length - 1) {
@@ -63,6 +124,10 @@ export default function ScreensaverMode({ questions, mode, onExit }: Screensaver
     } else {
       setCurrentIndex(0);
     }
+  }, [currentIndex, shuffledQuestions.length, playNotificationSound]);
+
+  const handleSkip = () => {
+    handleComplete();
   };
 
   if (shuffledQuestions.length === 0) {
@@ -71,32 +136,85 @@ export default function ScreensaverMode({ questions, mode, onExit }: Screensaver
 
   const currentQuestion = shuffledQuestions[currentIndex];
   const currentPosition = POSITION_CYCLE[positionIndex];
+  const questionDuration = currentQuestion.duration || defaultDuration;
 
   return (
     <div 
       className={`fixed inset-0 z-50 ${mode === 'screensaver' ? 'bg-black' : 'pointer-events-none'}`}
       data-testid="screensaver-mode"
     >
+      {/* Controls - only in screensaver mode */}
       {mode === 'screensaver' && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onExit}
-          data-testid="button-exit-screensaver"
-          className="absolute top-4 right-4 z-10 text-white hover:bg-white/20 pointer-events-auto"
-        >
-          <X className="w-6 h-6" />
-        </Button>
+        <div className="absolute top-4 right-4 z-10 flex gap-2 pointer-events-auto">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsPaused(!isPaused)}
+            data-testid="button-pause-resume"
+            className="text-white hover:bg-white/20"
+            title={isPaused ? "Resume (Space)" : "Pause (Space)"}
+          >
+            {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSkip}
+            data-testid="button-skip"
+            className="text-white hover:bg-white/20"
+            title="Skip to next question"
+          >
+            <SkipForward className="w-6 h-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onExit}
+            data-testid="button-exit-screensaver"
+            className="text-white hover:bg-white/20"
+            title="Exit (ESC)"
+          >
+            <X className="w-6 h-6" />
+          </Button>
+        </div>
+      )}
+
+      {/* Progress Indicator */}
+      {mode === 'screensaver' && (
+        <div className="absolute top-4 left-4 z-10 pointer-events-auto">
+          <div className="bg-black/60 text-white px-4 py-2 rounded-md backdrop-blur-sm">
+            <div className="text-sm font-medium">
+              Question {currentIndex + 1} of {shuffledQuestions.length}
+            </div>
+            <div className="text-xs text-white/70 mt-1">
+              {completedCount} completed • {POSITION_CYCLE[positionIndex]} position
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ESC Key Hint - only show in overlay mode */}
+      {mode === 'overlay' && (
+        <div className="absolute bottom-4 right-4 z-10 pointer-events-none">
+          <div className="bg-black/60 text-white px-3 py-1.5 rounded-md backdrop-blur-sm text-sm">
+            Press ESC to exit
+          </div>
+        </div>
       )}
 
       <ScreensaverBanner
-        key={currentQuestion.id}
+        key={`${currentQuestion.id}-${currentIndex}-${positionIndex}`}
         question={currentQuestion.question}
         answer={currentQuestion.answer}
         backgroundColor={backgroundColor}
+        textColor={textColor}
         position={currentPosition}
         randomOffset={randomOffset}
         onComplete={handleComplete}
+        duration={questionDuration}
+        isPaused={isPaused}
+        bannerHeight={bannerHeight}
+        fontSize={fontSize}
       />
     </div>
   );
