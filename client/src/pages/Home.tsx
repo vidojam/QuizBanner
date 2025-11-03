@@ -81,7 +81,15 @@ export default function Home() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/preferences'] });
-      toast({ title: "Settings saved successfully" });
+      
+      // Auto-restart screensaver when settings change to apply new values
+      if (isScreensaverActive) {
+        setIsScreensaverActive(false);
+        // Restart after a brief delay
+        setTimeout(() => setIsScreensaverActive(true), 100);
+      }
+      
+      toast({ title: "Settings saved - Screensaver restarted" });
     },
     onError: (error: any) => {
       toast({ title: "Failed to save settings", description: error.message, variant: "destructive" });
