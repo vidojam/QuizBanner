@@ -134,44 +134,17 @@ export default function ScreensaverBanner({
       }}
       data-testid="screensaver-banner"
     >
-      <style>
-        {`
-          @keyframes scroll-horizontal {
-            from { transform: translateX(100vw); }
-            to { transform: translateX(-100%); }
-          }
-          @keyframes scroll-vertical {
-            from { transform: translateY(100vh); }
-            to { transform: translateY(-100%); }
-          }
-          .scroll-question-horizontal {
-            animation: scroll-horizontal ${duration}s linear forwards;
-            animation-play-state: ${isPaused ? 'paused' : 'running'};
-          }
-          .scroll-answer-horizontal {
-            animation: scroll-horizontal ${duration}s linear forwards;
-            animation-play-state: ${isPaused ? 'paused' : 'running'};
-          }
-          .scroll-question-vertical {
-            animation: scroll-vertical ${duration}s linear forwards;
-            animation-play-state: ${isPaused ? 'paused' : 'running'};
-          }
-          .scroll-answer-vertical {
-            animation: scroll-vertical ${duration}s linear forwards;
-            animation-play-state: ${isPaused ? 'paused' : 'running'};
-          }
-        `}
-      </style>
-      
       <div 
-        className={`absolute whitespace-nowrap ${
-          isVertical ? 'scroll-question-vertical' : 'scroll-question-horizontal'
-        }`}
+        className={`absolute whitespace-nowrap banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}`}
         data-testid="text-question-display"
-        style={isVertical ? {
-          writingMode: 'vertical-lr',
-          textOrientation: 'upright'
-        } : {}}
+        style={{
+          ['--animation-duration' as any]: `${duration}s`,
+          animationPlayState: isPaused ? 'paused' : 'running',
+          ...(isVertical ? {
+            writingMode: 'vertical-lr',
+            textOrientation: 'upright'
+          } : {})
+        }}
       >
         <span 
           className="font-bold px-8"
@@ -187,14 +160,16 @@ export default function ScreensaverBanner({
 
       {showAnswer && (
         <div 
-          className={`absolute whitespace-nowrap ${
-            isVertical ? 'scroll-answer-vertical' : 'scroll-answer-horizontal'
-          }`}
+          className={`absolute whitespace-nowrap banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}`}
           data-testid="answer-section"
-          style={isVertical ? {
-            writingMode: 'vertical-lr',
-            textOrientation: 'upright'
-          } : {}}
+          style={{
+            ['--animation-duration' as any]: `${duration}s`,
+            animationPlayState: isPaused ? 'paused' : 'running',
+            ...(isVertical ? {
+              writingMode: 'vertical-lr',
+              textOrientation: 'upright'
+            } : {})
+          }}
         >
           <span 
             className="font-bold px-8"

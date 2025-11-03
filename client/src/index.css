@@ -325,4 +325,23 @@
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
   }
+
+  /* Banner scroll animations */
+  @keyframes scroll-horizontal {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(-100%); }
+  }
+
+  @keyframes scroll-vertical {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-100%); }
+  }
+
+  .banner-scroll-horizontal {
+    animation: scroll-horizontal var(--animation-duration, 15s) linear forwards;
+  }
+
+  .banner-scroll-vertical {
+    animation: scroll-vertical var(--animation-duration, 15s) linear forwards;
+  }
 }
