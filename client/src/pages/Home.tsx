@@ -140,7 +140,7 @@ export default function Home() {
               answer: q.answer,
               category: q.category,
               tags: q.tags || [],
-              duration: q.duration || 15,
+              duration: q.duration || 5,
               customColor: q.customColor,
               order: q.order || 0,
             });
