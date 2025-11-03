@@ -50,6 +50,12 @@ export default function ScreensaverMode({
   const [textColor, setTextColor] = useState(initialColors.txtColor);
   const [isPaused, setIsPaused] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
+  const [mountKey, setMountKey] = useState(Date.now());
+  
+  // Force remount when duration/height/fontSize changes
+  useEffect(() => {
+    setMountKey(Date.now());
+  }, [defaultDuration, bannerHeight, fontSize]);
 
   // Update shuffledQuestions when questions prop changes (fixes live updates bug)
   useEffect(() => {
@@ -191,7 +197,7 @@ export default function ScreensaverMode({
       </div>
 
       <ScreensaverBanner
-        key={`${shuffledQuestions[currentIndex].id}-${currentIndex}-${positionIndex}-${defaultDuration}-${bannerHeight}-${fontSize}`}
+        key={`${shuffledQuestions[currentIndex].id}-${currentIndex}-${positionIndex}-${mountKey}`}
         question={shuffledQuestions[currentIndex].question}
         answer={shuffledQuestions[currentIndex].answer}
         backgroundColor={backgroundColor}
