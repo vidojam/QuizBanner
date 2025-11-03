@@ -41,13 +41,9 @@ export default function ScreensaverMode({
   fontSize = 48,
   enableSoundNotifications = false
 }: ScreensaverModeProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleArray(questions));
-  const [positionIndex, setPositionIndex] = useState(0);
-  const [randomOffset, setRandomOffset] = useState(() => Math.random() * 80);
   const initialColors = getInitialColors();
-  const [backgroundColor, setBackgroundColor] = useState(initialColors.bgColor);
-  const [textColor, setTextColor] = useState(initialColors.txtColor);
+  const [backgroundColor] = useState(initialColors.bgColor);
   const [isPaused, setIsPaused] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
 
@@ -104,27 +100,12 @@ export default function ScreensaverMode({
   }, [enableSoundNotifications]);
 
   const handleComplete = useCallback(() => {
-    const newBgColor = getRandomAccessibleColor();
-    setRandomOffset(Math.random() * 80);
-    setBackgroundColor(newBgColor);
-    setTextColor(getAccessibleTextColor(newBgColor));
-    
     // Play notification sound
     playNotificationSound();
     
-    // Move to next position in cycle
-    setPositionIndex(prev => (prev + 1) % POSITION_CYCLE.length);
-    
-    // Increment completed count
+    // Increment completed count (tracks total cycles)
     setCompletedCount(prev => prev + 1);
-    
-    // Move to next question
-    if (currentIndex < shuffledQuestions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else {
-      setCurrentIndex(0);
-    }
-  }, [currentIndex, shuffledQuestions.length, playNotificationSound]);
+  }, [playNotificationSound]);
 
   const handleSkip = () => {
     handleComplete();
@@ -133,10 +114,6 @@ export default function ScreensaverMode({
   if (shuffledQuestions.length === 0) {
     return null;
   }
-
-  const currentQuestion = shuffledQuestions[currentIndex];
-  const currentPosition = POSITION_CYCLE[positionIndex];
-  const questionDuration = currentQuestion.duration || defaultDuration;
 
   return (
     <div 
@@ -181,28 +158,38 @@ export default function ScreensaverMode({
       <div className="absolute top-4 left-4 z-10 pointer-events-auto">
         <div className={mode === 'screensaver' ? 'bg-black/60 text-white px-4 py-2 rounded-md backdrop-blur-sm' : 'bg-black/80 text-white px-4 py-2 rounded-md backdrop-blur-sm'}>
           <div className="text-sm font-medium">
-            Question {currentIndex + 1} of {shuffledQuestions.length}
+            {shuffledQuestions.length} questions scrolling
           </div>
           <div className="text-xs text-white/70 mt-1">
-            {completedCount} completed • {POSITION_CYCLE[positionIndex]} position
+            {completedCount} cycles completed
           </div>
         </div>
       </div>
 
-      <ScreensaverBanner
-        key={`${currentQuestion.id}-${currentIndex}-${positionIndex}`}
-        question={currentQuestion.question}
-        answer={currentQuestion.answer}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        position={currentPosition}
-        randomOffset={randomOffset}
-        onComplete={handleComplete}
-        duration={questionDuration}
-        isPaused={isPaused}
-        bannerHeight={bannerHeight}
-        fontSize={fontSize}
-      />
+      {/* Show ALL questions simultaneously, each with a different position */}
+      {shuffledQuestions.map((q, index) => {
+        const position = POSITION_CYCLE[index % POSITION_CYCLE.length];
+        const offset = (index * 20) % 80; // Stagger them
+        const bgColor = index === 0 ? backgroundColor : getRandomAccessibleColor();
+        const txtColor = getAccessibleTextColor(bgColor);
+        
+        return (
+          <ScreensaverBanner
+            key={`${q.id}-${index}`}
+            question={q.question}
+            answer={q.answer}
+            backgroundColor={bgColor}
+            textColor={txtColor}
+            position={position}
+            randomOffset={offset}
+            onComplete={handleComplete}
+            duration={q.duration || defaultDuration}
+            isPaused={isPaused}
+            bannerHeight={bannerHeight}
+            fontSize={fontSize}
+          />
+        );
+      })}
     </div>
   );
 }
