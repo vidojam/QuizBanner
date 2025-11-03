@@ -205,7 +205,7 @@ export default function ScreensaverMode({
         position={POSITION_CYCLE[positionIndex]}
         randomOffset={randomOffset}
         onComplete={handleComplete}
-        duration={shuffledQuestions[currentIndex].duration || defaultDuration}
+        duration={defaultDuration}
         isPaused={isPaused}
         bannerHeight={bannerHeight}
         fontSize={fontSize}
