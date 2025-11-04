@@ -10,7 +10,7 @@ interface ScreensaverBannerProps {
   position: BannerPosition;
   randomOffset?: number;
   onComplete: () => void;
-  duration?: number; // in seconds, default 5
+  duration?: number; // in seconds, base duration for speed calculation
   isPaused?: boolean;
   bannerHeight?: number; // in pixels, default 48
   fontSize?: number; // in pixels, default 48
@@ -30,6 +30,9 @@ export default function ScreensaverBanner({
   fontSize = 48
 }: ScreensaverBannerProps) {
   const [showAnswer, setShowAnswer] = useState(false);
+  const [questionDuration, setQuestionDuration] = useState(duration);
+  const [answerDuration, setAnswerDuration] = useState(duration);
+  const [isReady, setIsReady] = useState(false);
   const questionRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +49,69 @@ export default function ScreensaverBanner({
       onComplete();
     }
   };
+
+  // Calculate durations based on text width to ensure constant scroll speed
+  useEffect(() => {
+    setIsReady(false);
+    
+    const calculateDuration = (textWidth: number, viewportSize: number) => {
+      // Total distance = viewport + text width + viewport
+      const totalDistance = viewportSize * 2 + textWidth;
+      // Base speed: distance per base duration
+      const baseDistance = viewportSize * 2 + (viewportSize * 0.5); // Approximate average text width
+      const speed = baseDistance / duration; // pixels per second
+      // Calculate actual duration for this text
+      return totalDistance / speed;
+    };
+
+    const measureAndSetDurations = () => {
+      const isVertical = position === 'left' || position === 'right';
+      const viewportSize = isVertical ? window.innerHeight : window.innerWidth;
+
+      if (questionRef.current) {
+        const questionWidth = isVertical 
+          ? questionRef.current.scrollHeight 
+          : questionRef.current.scrollWidth;
+        const calculatedDuration = calculateDuration(questionWidth, viewportSize);
+        setQuestionDuration(calculatedDuration);
+      }
+
+      // Set ready to start animation
+      setIsReady(true);
+    };
+
+    // Measure after a short delay to ensure fonts are loaded
+    const timer = setTimeout(measureAndSetDurations, 50);
+    return () => clearTimeout(timer);
+  }, [question, answer, duration, position, fontSize]);
+
+  // Update answer duration when answer becomes visible
+  useEffect(() => {
+    if (!showAnswer || !answerRef.current) return;
+
+    const calculateDuration = (textWidth: number, viewportSize: number) => {
+      const totalDistance = viewportSize * 2 + textWidth;
+      const baseDistance = viewportSize * 2 + (viewportSize * 0.5);
+      const speed = baseDistance / duration;
+      return totalDistance / speed;
+    };
+
+    const measureAnswerDuration = () => {
+      const isVertical = position === 'left' || position === 'right';
+      const viewportSize = isVertical ? window.innerHeight : window.innerWidth;
+
+      if (answerRef.current) {
+        const answerWidth = isVertical 
+          ? answerRef.current.scrollHeight 
+          : answerRef.current.scrollWidth;
+        const calculatedDuration = calculateDuration(answerWidth, viewportSize);
+        setAnswerDuration(calculatedDuration);
+      }
+    };
+
+    const timer = setTimeout(measureAnswerDuration, 50);
+    return () => clearTimeout(timer);
+  }, [showAnswer, answer, duration, position, fontSize]);
 
   // Reset state when question/answer/duration changes
   useEffect(() => {
@@ -80,12 +146,13 @@ export default function ScreensaverBanner({
     >
       <div 
         ref={questionRef}
-        className={`absolute whitespace-nowrap banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}`}
+        className={`absolute whitespace-nowrap ${isReady ? `banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}` : ''}`}
         data-testid="text-question-display"
         onAnimationEnd={handleQuestionAnimationEnd}
         style={{
-          '--animation-duration': `${duration}s`,
+          '--animation-duration': `${questionDuration}s`,
           animationPlayState: isPaused ? 'paused' : 'running',
+          opacity: isReady ? 1 : 0,
           ...(isVertical ? {
             writingMode: 'vertical-lr',
             textOrientation: 'upright'
@@ -107,11 +174,12 @@ export default function ScreensaverBanner({
       {showAnswer && (
         <div 
           ref={answerRef}
+          key={`answer-${showAnswer}`}
           className={`absolute whitespace-nowrap banner-scroll ${isVertical ? 'banner-scroll-vertical' : 'banner-scroll-horizontal'}`}
           data-testid="answer-section"
           onAnimationEnd={handleAnswerAnimationEnd}
           style={{
-            '--animation-duration': `${duration}s`,
+            '--animation-duration': `${answerDuration}s`,
             animationPlayState: isPaused ? 'paused' : 'running',
             ...(isVertical ? {
               writingMode: 'vertical-lr',
