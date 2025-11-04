@@ -54,6 +54,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/questions", async (req, res) => {
+    try {
+      const count = await storage.deleteAllQuestions();
+      res.json({ count });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.delete("/api/questions/:id", async (req, res) => {
     try {
       const id = req.params.id;

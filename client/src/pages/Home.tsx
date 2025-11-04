@@ -13,6 +13,7 @@ import type { QuestionAnswer, Preferences } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 
 const MODE_STORAGE_KEY = "display-mode";
@@ -63,6 +64,19 @@ export default function Home() {
     },
     onError: (error: any) => {
       toast({ title: "Failed to delete question", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const clearAllQuestionsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('DELETE', '/api/questions');
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/questions'] });
+      toast({ title: "All questions cleared", description: `Deleted ${data.count} questions` });
+    },
+    onError: (error: any) => {
+      toast({ title: "Failed to clear questions", description: error.message, variant: "destructive" });
     },
   });
 
@@ -679,6 +693,49 @@ export default function Home() {
                   <p className="text-sm text-muted-foreground">
                     Your questions are automatically saved to the cloud. Access them from any device by logging into your account.
                   </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-destructive">
+                <CardHeader>
+                  <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          className="w-full"
+                          disabled={questions.length === 0 || clearAllQuestionsMutation.isPending}
+                          data-testid="button-clear-all"
+                        >
+                          {clearAllQuestionsMutation.isPending ? "Clearing..." : "Clear All Questions"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent data-testid="dialog-clear-all-confirm">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete all {questions.length} questions from your account.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel data-testid="button-cancel-clear">Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => clearAllQuestionsMutation.mutate()}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            data-testid="button-confirm-clear"
+                          >
+                            Delete All Questions
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Permanently removes all questions from your database. This cannot be undone.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

@@ -15,6 +15,7 @@ export interface IStorage {
   createQuestion(question: InsertQuestion): Promise<Question>;
   updateQuestion(id: string, question: Partial<InsertQuestion>): Promise<Question | undefined>;
   deleteQuestion(id: string): Promise<boolean>;
+  deleteAllQuestions(): Promise<number>;
   reorderQuestions(questionIds: string[]): Promise<void>;
 
   // Preferences
@@ -61,6 +62,11 @@ export class DatabaseStorage implements IStorage {
   async deleteQuestion(id: string): Promise<boolean> {
     const result = await db.delete(questions).where(eq(questions.id, id)).returning();
     return result.length > 0;
+  }
+
+  async deleteAllQuestions(): Promise<number> {
+    const result = await db.delete(questions).returning();
+    return result.length;
   }
 
   async reorderQuestions(questionIds: string[]): Promise<void> {
