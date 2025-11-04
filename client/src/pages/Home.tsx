@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Play, Square, Settings as SettingsIcon, Download, Upload } from "lucide-react";
+import { Play, Square, Settings as SettingsIcon, Download, Upload, FileText, Type } from "lucide-react";
 import QuestionForm from "@/components/QuestionForm";
 import QuestionList from "@/components/QuestionList";
 import ScreensaverMode from "@/components/ScreensaverMode";
 import type { QuestionAnswer, Preferences } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const MODE_STORAGE_KEY = "display-mode";
 
@@ -23,6 +25,8 @@ export default function Home() {
     const stored = localStorage.getItem(MODE_STORAGE_KEY);
     return (stored === 'overlay' || stored === 'screensaver') ? stored : 'screensaver';
   });
+  const [pasteDialogOpen, setPasteDialogOpen] = useState(false);
+  const [pasteText, setPasteText] = useState("");
   const { toast } = useToast();
 
   // Fetch questions from database
@@ -154,6 +158,109 @@ export default function Home() {
     };
     reader.readAsText(file);
     event.target.value = ''; // Reset input
+  };
+
+  const handleCSVImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const text = e.target?.result as string;
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+        
+        // Skip header row if it exists
+        const startIndex = lines[0]?.toLowerCase().includes('question') ? 1 : 0;
+        const questionsToImport = [];
+
+        for (let i = startIndex; i < lines.length; i++) {
+          const line = lines[i];
+          // Parse CSV (handle quoted fields with commas)
+          const match = line.match(/^"?([^"]*)"?,\s*"?([^"]*)"?$/);
+          if (match) {
+            const [, question, answer] = match;
+            if (question && answer) {
+              questionsToImport.push({ question: question.trim(), answer: answer.trim() });
+            }
+          }
+        }
+
+        if (questionsToImport.length === 0) {
+          toast({ title: "No valid questions found", description: "Make sure your CSV has 'question,answer' format", variant: "destructive" });
+          return;
+        }
+
+        // Import all questions
+        for (const qa of questionsToImport) {
+          await apiRequest('POST', '/api/questions', {
+            question: qa.question,
+            answer: qa.answer,
+            order: questions.length,
+          });
+        }
+
+        queryClient.invalidateQueries({ queryKey: ['/api/questions'] });
+        toast({ title: "CSV Import successful", description: `Imported ${questionsToImport.length} questions` });
+      } catch (error: any) {
+        toast({ title: "CSV Import failed", description: error.message, variant: "destructive" });
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  };
+
+  const handlePasteImport = async () => {
+    try {
+      const lines = pasteText.split('\n').map(line => line.trim()).filter(line => line);
+      const questionsToImport = [];
+      
+      let currentQuestion = '';
+      let currentAnswer = '';
+
+      for (const line of lines) {
+        if (line.match(/^Q:\s*/i)) {
+          // Save previous Q&A if exists
+          if (currentQuestion && currentAnswer) {
+            questionsToImport.push({ question: currentQuestion, answer: currentAnswer });
+          }
+          currentQuestion = line.replace(/^Q:\s*/i, '').trim();
+          currentAnswer = '';
+        } else if (line.match(/^A:\s*/i)) {
+          currentAnswer = line.replace(/^A:\s*/i, '').trim();
+        }
+      }
+
+      // Save last Q&A
+      if (currentQuestion && currentAnswer) {
+        questionsToImport.push({ question: currentQuestion, answer: currentAnswer });
+      }
+
+      if (questionsToImport.length === 0) {
+        toast({ 
+          title: "No valid questions found", 
+          description: "Use format: Q: Your question? A: Your answer", 
+          variant: "destructive" 
+        });
+        return;
+      }
+
+      // Import all questions
+      for (const qa of questionsToImport) {
+        await apiRequest('POST', '/api/questions', {
+          question: qa.question,
+          answer: qa.answer,
+          order: questions.length,
+        });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['/api/questions'] });
+      toast({ title: "Paste Import successful", description: `Imported ${questionsToImport.length} questions` });
+      setPasteDialogOpen(false);
+      setPasteText("");
+    } catch (error: any) {
+      toast({ title: "Paste Import failed", description: error.message, variant: "destructive" });
+    }
   };
 
   const handleModeChange = (mode: DisplayMode) => {
@@ -347,7 +454,7 @@ export default function Home() {
             <TabsContent value="data" className="space-y-6 mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Import & Export</CardTitle>
+                  <CardTitle>Export</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -365,6 +472,97 @@ export default function Home() {
                       Save all your questions and settings to a JSON file for backup or sharing
                     </p>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Import Questions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Button
+                      onClick={() => document.getElementById('csv-import-file')?.click()}
+                      variant="outline"
+                      className="w-full"
+                      data-testid="button-import-csv"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Import from CSV File
+                    </Button>
+                    <input
+                      id="csv-import-file"
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCSVImport}
+                      className="hidden"
+                      data-testid="input-import-csv"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Import from Excel or Google Sheets. Format: <code className="bg-muted px-1 rounded">question,answer</code>
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Dialog open={pasteDialogOpen} onOpenChange={setPasteDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          data-testid="button-import-paste"
+                        >
+                          <Type className="w-4 h-4 mr-2" />
+                          Paste Questions as Text
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Paste Questions</DialogTitle>
+                          <DialogDescription>
+                            Paste your questions in this format:
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="bg-muted p-3 rounded-md text-sm font-mono">
+                            Q: What is 2+2?<br />
+                            A: 4<br />
+                            <br />
+                            Q: What is the capital of France?<br />
+                            A: Paris
+                          </div>
+                          <Textarea
+                            placeholder="Q: Your question here?&#10;A: Your answer here&#10;&#10;Q: Another question?&#10;A: Another answer"
+                            value={pasteText}
+                            onChange={(e) => setPasteText(e.target.value)}
+                            className="min-h-[200px] font-mono"
+                            data-testid="textarea-paste-questions"
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={handlePasteImport}
+                              disabled={!pasteText.trim()}
+                              data-testid="button-confirm-paste"
+                            >
+                              Import Questions
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                setPasteDialogOpen(false);
+                                setPasteText("");
+                              }}
+                              variant="outline"
+                              data-testid="button-cancel-paste"
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <p className="text-xs text-muted-foreground">
+                      Copy and paste questions directly - no file needed!
+                    </p>
+                  </div>
 
                   <div className="space-y-2">
                     <Button
@@ -374,7 +572,7 @@ export default function Home() {
                       data-testid="button-import"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Import Questions from JSON
+                      Import from JSON File
                     </Button>
                     <input
                       id="import-file"
@@ -388,13 +586,17 @@ export default function Home() {
                       Load questions from a previously exported JSON file
                     </p>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div className="mt-6 p-4 bg-muted rounded-md">
-                    <h4 className="font-medium mb-2">Cloud Sync Active</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Your questions are automatically saved to the cloud. Access them from any device by logging into your account.
-                    </p>
-                  </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cloud Sync</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Your questions are automatically saved to the cloud. Access them from any device by logging into your account.
+                  </p>
                 </CardContent>
               </Card>
             </TabsContent>
