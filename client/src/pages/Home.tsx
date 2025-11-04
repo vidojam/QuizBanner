@@ -168,40 +168,97 @@ export default function Home() {
     reader.onload = async (e) => {
       try {
         const text = e.target?.result as string;
-        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
         
-        // Skip header row if it exists
-        const startIndex = lines[0]?.toLowerCase().includes('question') ? 1 : 0;
-        const questionsToImport = [];
-
-        for (let i = startIndex; i < lines.length; i++) {
-          const line = lines[i];
-          // Parse CSV (handle quoted fields with commas)
-          const match = line.match(/^"?([^"]*)"?,\s*"?([^"]*)"?$/);
-          if (match) {
-            const [, question, answer] = match;
-            if (question && answer) {
-              questionsToImport.push({ question: question.trim(), answer: answer.trim() });
+        // Proper CSV parser that handles multi-line quoted fields
+        const rows: string[][] = [];
+        let currentRow: string[] = [];
+        let currentField = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const nextChar = text[i + 1];
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote ("")
+              currentField += '"';
+              i++; // Skip next quote
+            } else {
+              // Toggle quote mode
+              inQuotes = !inQuotes;
             }
+          } else if (char === ',' && !inQuotes) {
+            // End of field
+            currentRow.push(currentField);
+            currentField = '';
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            // End of row (handle \r\n and \n)
+            if (char === '\r' && nextChar === '\n') {
+              i++; // Skip \n in \r\n
+            }
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField);
+              if (currentRow.some(f => f.trim())) {
+                rows.push(currentRow);
+              }
+              currentRow = [];
+              currentField = '';
+            }
+          } else {
+            currentField += char;
+          }
+        }
+        
+        // Add last row if exists
+        if (currentField || currentRow.length > 0) {
+          currentRow.push(currentField);
+          if (currentRow.some(f => f.trim())) {
+            rows.push(currentRow);
+          }
+        }
+
+        // Skip header row if it exists
+        const startIndex = rows[0]?.[0]?.toLowerCase().includes('question') ? 1 : 0;
+        const questionsToImport = [];
+        const errors: string[] = [];
+
+        for (let i = startIndex; i < rows.length; i++) {
+          const row = rows[i];
+          const question = row[0]?.trim() || '';
+          const answer = row[1]?.trim() || '';
+
+          if (question && answer) {
+            questionsToImport.push({ question, answer });
+          } else if (question || answer) {
+            errors.push(`Row ${i + 1}: Missing ${question ? 'answer' : 'question'}`);
           }
         }
 
         if (questionsToImport.length === 0) {
-          toast({ title: "No valid questions found", description: "Make sure your CSV has 'question,answer' format", variant: "destructive" });
+          const errorMsg = errors.length > 0 
+            ? `Errors found:\n${errors.slice(0, 3).join('\n')}` 
+            : "Make sure your CSV has 'question,answer' format";
+          toast({ title: "No valid questions found", description: errorMsg, variant: "destructive" });
           return;
         }
 
-        // Import all questions
-        for (const qa of questionsToImport) {
+        // Import all questions with incremental order
+        const baseOrder = questions.length;
+        for (let i = 0; i < questionsToImport.length; i++) {
+          const qa = questionsToImport[i];
           await apiRequest('POST', '/api/questions', {
             question: qa.question,
             answer: qa.answer,
-            order: questions.length,
+            order: baseOrder + i,
           });
         }
 
         queryClient.invalidateQueries({ queryKey: ['/api/questions'] });
-        toast({ title: "CSV Import successful", description: `Imported ${questionsToImport.length} questions` });
+        const message = errors.length > 0 
+          ? `Imported ${questionsToImport.length} questions (${errors.length} skipped)`
+          : `Imported ${questionsToImport.length} questions`;
+        toast({ title: "CSV Import successful", description: message });
       } catch (error: any) {
         toast({ title: "CSV Import failed", description: error.message, variant: "destructive" });
       }
@@ -212,50 +269,75 @@ export default function Home() {
 
   const handlePasteImport = async () => {
     try {
-      const lines = pasteText.split('\n').map(line => line.trim()).filter(line => line);
+      const lines = pasteText.split('\n');
       const questionsToImport = [];
+      const errors: string[] = [];
       
       let currentQuestion = '';
       let currentAnswer = '';
+      let collectingAnswer = false;
 
-      for (const line of lines) {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
         if (line.match(/^Q:\s*/i)) {
           // Save previous Q&A if exists
-          if (currentQuestion && currentAnswer) {
-            questionsToImport.push({ question: currentQuestion, answer: currentAnswer });
+          if (currentQuestion) {
+            if (currentAnswer) {
+              questionsToImport.push({ question: currentQuestion, answer: currentAnswer });
+            } else {
+              errors.push(`Question missing answer: "${currentQuestion}"`);
+            }
           }
           currentQuestion = line.replace(/^Q:\s*/i, '').trim();
           currentAnswer = '';
+          collectingAnswer = false;
         } else if (line.match(/^A:\s*/i)) {
           currentAnswer = line.replace(/^A:\s*/i, '').trim();
+          collectingAnswer = true;
+        } else if (collectingAnswer && line) {
+          // Multi-line answer continuation
+          currentAnswer += '\n' + line;
         }
       }
 
       // Save last Q&A
-      if (currentQuestion && currentAnswer) {
-        questionsToImport.push({ question: currentQuestion, answer: currentAnswer });
+      if (currentQuestion) {
+        if (currentAnswer) {
+          questionsToImport.push({ question: currentQuestion, answer: currentAnswer });
+        } else {
+          errors.push(`Question missing answer: "${currentQuestion}"`);
+        }
       }
 
       if (questionsToImport.length === 0) {
+        const errorMsg = errors.length > 0 
+          ? `Errors found:\n${errors.slice(0, 3).join('\n')}` 
+          : "Use format: Q: Your question? A: Your answer";
         toast({ 
           title: "No valid questions found", 
-          description: "Use format: Q: Your question? A: Your answer", 
+          description: errorMsg, 
           variant: "destructive" 
         });
         return;
       }
 
-      // Import all questions
-      for (const qa of questionsToImport) {
+      // Import all questions with incremental order
+      const baseOrder = questions.length;
+      for (let i = 0; i < questionsToImport.length; i++) {
+        const qa = questionsToImport[i];
         await apiRequest('POST', '/api/questions', {
           question: qa.question,
           answer: qa.answer,
-          order: questions.length,
+          order: baseOrder + i,
         });
       }
 
       queryClient.invalidateQueries({ queryKey: ['/api/questions'] });
-      toast({ title: "Paste Import successful", description: `Imported ${questionsToImport.length} questions` });
+      const message = errors.length > 0 
+        ? `Imported ${questionsToImport.length} questions (${errors.length} had errors)`
+        : `Imported ${questionsToImport.length} questions`;
+      toast({ title: "Paste Import successful", description: message });
       setPasteDialogOpen(false);
       setPasteText("");
     } catch (error: any) {
