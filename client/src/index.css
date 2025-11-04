@@ -329,12 +329,12 @@
   /* Banner scroll animations */
   @keyframes scroll-horizontal {
     from { transform: translateX(100vw); }
-    to { transform: translateX(-100vw); }
+    to { transform: translateX(calc(-100vw - 100%)); }
   }
 
   @keyframes scroll-vertical {
     from { transform: translateY(100vh); }
-    to { transform: translateY(-100vh); }
+    to { transform: translateY(calc(-100vh - 100%)); }
   }
 
   .banner-scroll-horizontal {
