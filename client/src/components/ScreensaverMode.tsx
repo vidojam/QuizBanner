@@ -25,7 +25,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-const POSITION_CYCLE: BannerPosition[] = ['bottom', 'top', 'left', 'right', 'random'];
+const POSITION_CYCLE: BannerPosition[] = ['bottom', 'top', 'left', 'right'];
 
 const getInitialColors = () => {
   const bgColor = getRandomAccessibleColor();
@@ -44,7 +44,6 @@ export default function ScreensaverMode({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shuffledQuestions, setShuffledQuestions] = useState(() => shuffleArray(questions));
   const [positionIndex, setPositionIndex] = useState(0);
-  const [randomOffset, setRandomOffset] = useState(() => Math.random() * 80);
   const initialColors = getInitialColors();
   const [backgroundColor, setBackgroundColor] = useState(initialColors.bgColor);
   const [textColor, setTextColor] = useState(initialColors.txtColor);
@@ -130,9 +129,8 @@ export default function ScreensaverMode({
     // Update to next question
     setCurrentIndex(nextQuestionIndex);
     
-    // Generate new colors and random offset for next iteration
+    // Generate new colors for next iteration
     const newBgColor = getRandomAccessibleColor();
-    setRandomOffset(Math.random() * 80);
     setBackgroundColor(newBgColor);
     setTextColor(getAccessibleTextColor(newBgColor));
   }, [currentIndex, positionIndex, shuffledQuestions.length, playNotificationSound]);
@@ -191,7 +189,7 @@ export default function ScreensaverMode({
             Q{currentIndex + 1}/{shuffledQuestions.length} • {POSITION_CYCLE[positionIndex]}
           </div>
           <div className="text-xs text-white/70 mt-1">
-            Position {positionIndex + 1}/5 • {completedCount} completed
+            Position {positionIndex + 1}/{POSITION_CYCLE.length} • {completedCount} completed
           </div>
         </div>
       </div>
@@ -203,7 +201,6 @@ export default function ScreensaverMode({
         backgroundColor={backgroundColor}
         textColor={textColor}
         position={POSITION_CYCLE[positionIndex]}
-        randomOffset={randomOffset}
         onComplete={handleComplete}
         duration={defaultDuration}
         isPaused={isPaused}

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
-export type BannerPosition = 'bottom' | 'top' | 'left' | 'right' | 'random';
+export type BannerPosition = 'bottom' | 'top' | 'left' | 'right';
 
 interface ScreensaverBannerProps {
   question: string;
@@ -8,7 +8,6 @@ interface ScreensaverBannerProps {
   backgroundColor: string;
   textColor?: string;
   position: BannerPosition;
-  randomOffset?: number;
   onComplete: () => void;
   duration?: number; // in seconds, base duration for speed calculation
   isPaused?: boolean;
@@ -22,7 +21,6 @@ export default function ScreensaverBanner({
   backgroundColor,
   textColor = '#ffffff',
   position,
-  randomOffset = 50,
   onComplete,
   duration = 5,
   isPaused = false,
@@ -125,7 +123,6 @@ export default function ScreensaverBanner({
     if (position === 'top') return { top: 0, left: 0, right: 0 };
     if (position === 'left') return { left: 0, top: 0, bottom: 0 };
     if (position === 'right') return { right: 0, top: 0, bottom: 0 };
-    if (position === 'random') return { top: `${randomOffset}%`, left: 0, right: 0 };
     return {};
   };
 
