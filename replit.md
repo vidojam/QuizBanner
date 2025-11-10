@@ -4,9 +4,13 @@
 
 This is a learning reinforcement application that helps users memorize information through timed screensaver banners. Users create question-answer pairs that are displayed in full-screen, vibrant banners with configurable durations and positions. The application supports both a traditional screensaver mode and an overlay mode, with features like shuffling, playback controls, and comprehensive customization.
 
-### Current Status (November 3, 2025)
+### Current Status (November 10, 2025)
 
 **Production Ready Features:**
+- ✅ User authentication with Replit Auth (OpenID Connect)
+- ✅ Two-tier system: Free (10 questions) and Premium (50 questions)
+- ✅ Server-side tier limit enforcement with helpful error messages
+- ✅ User-specific questions and preferences with data isolation
 - ✅ PostgreSQL database with full CRUD operations
 - ✅ Pause/resume controls (Space key)
 - ✅ Skip button to advance questions
@@ -20,7 +24,10 @@ This is a learning reinforcement application that helps users memorize informati
 - ✅ Larger default text (48px) for better visibility
 - ✅ ESC key hint in overlay mode
 
-**Planned Features:**
+**Pending Features:**
+- ⏳ Stripe integration for $0.99 premium upgrade
+- ⏳ Premium upgrade UI showing feature comparison
+- ⏳ Restrict import features to premium users
 - ⏳ Spaced repetition algorithm
 - ⏳ Category/tag filtering
 - ⏳ Quiz template system
@@ -28,35 +35,53 @@ This is a learning reinforcement application that helps users memorize informati
 - ⏳ Study history analytics
 - ⏳ Preview mode for banner animations
 
-### Recent Changes (November 3, 2025)
+### Recent Changes (November 10, 2025)
 
-**Critical Fixes:**
-1. **Initial Banner Color Contrast Bug** (architect-reviewed, production-ready)
-   - Problem: First banner could render dark text on dark background or light on light
-   - Root cause: `backgroundColor` and `textColor` were seeded from different random values
-   - Solution: Created `getInitialColors()` helper to seed both states from same random color
-   - Impact: First banner now guaranteed WCAG AA compliant from first render
+**Major Features Added:**
+1. **User Authentication System** (architect-reviewed, production-ready)
+   - Replit Auth integration with OpenID Connect
+   - Secure session management with PostgreSQL storage
+   - Environment-aware cookie security (dev/prod)
+   - Landing page for unauthenticated users
+   - User avatar, email, and tier status display
 
-2. **Unused Timer Reference Cleanup** (architect-reviewed, production-ready)
-   - Removed dead `answerTimerRef` logic from ScreensaverBanner component
-   - Timer was being cleared but never assigned, creating confusing code
-   - Cleanup ensures maintenance clarity without functional impact
+2. **Two-Tier System with Question Limits** (architect-reviewed, production-ready)
+   - Free tier: 10 questions maximum
+   - Premium tier: 50 questions maximum (requires $0.99 upgrade)
+   - Server-side limit enforcement prevents bypassing via API
+   - Clear error messages when limit reached
+   - Upgrade prompts for free users
 
-**Enhancements Implemented:**
-- Migrated from localStorage to PostgreSQL database for cloud sync
-- Added comprehensive playback controls (pause/resume with Space, skip button)
-- Implemented adjustable settings via sliders (duration, height, font size)
-- Created import/export functionality for JSON backup/sharing
-- Added progress indicator showing question number and position cycle
-- Implemented sound notifications using Web Audio API
-- Increased default font size from 20px to 48px for better visibility
-- Added ESC key hint in overlay mode for better UX
-- Fixed live updates: banners now react when questions are added/deleted
+3. **User Data Isolation** (architect-reviewed, production-ready)
+   - Questions and preferences are user-specific
+   - Foreign keys with cascade delete on user removal
+   - All API endpoints protected with authentication
+   - Proper userId scoping in all database queries
+
+**Security Enhancements:**
+- All question/preference endpoints require authentication
+- Server-side tier limit enforcement (403 on quota exceeded)
+- Insert schemas omit server-managed fields (userId)
+- No cross-user data leakage possible
+- Direct API calls properly validated and scoped
+
+**Previous Enhancements (November 3, 2025):**
+- Migrated from localStorage to PostgreSQL database
+- Comprehensive playback controls (pause/resume with Space, skip button)
+- Adjustable settings via sliders (duration, height, font size)
+- Import/export functionality for JSON backup/sharing
+- Progress indicator with position tracking
+- Sound notifications using Web Audio API
+- Increased default font size to 48px
+- ESC key hint in overlay mode
+- Real-time banner updates when questions change
+- WCAG AA color contrast compliance from first render
 
 **Testing:**
-- End-to-end tests passed successfully (playwright-based validation)
-- All core features verified: CRUD, playback controls, settings persistence
-- Color contrast compliance confirmed from first render through all transitions
+- Architect-reviewed for security and correctness
+- Authentication flow verified (login/logout/session)
+- Tier limits tested with proper 403 responses
+- User data isolation confirmed
 
 ## User Preferences
 
