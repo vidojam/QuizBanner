@@ -13,14 +13,23 @@ export default function Landing() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Reinforce your knowledge with beautiful, customizable scrolling banners that keep your Q&A pairs top of mind.
           </p>
-          <div className="pt-4">
+          <div className="pt-4 flex flex-wrap gap-4 justify-center">
             <Button 
               size="lg" 
+              variant="outline"
               onClick={() => window.location.href = "/api/login"}
-              data-testid="button-login"
+              data-testid="button-login-free"
               className="text-lg px-8 py-6"
             >
               Get Started Free
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => window.location.href = "/api/login"}
+              data-testid="button-login-premium"
+              className="text-lg px-8 py-6"
+            >
+              Upgrade to Premium
             </Button>
           </div>
         </div>
@@ -74,8 +83,8 @@ export default function Landing() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
-                <div className="text-3xl font-bold">$0.99</div>
-                <div className="text-sm text-muted-foreground">one-time payment</div>
+                <div className="text-3xl font-bold">$1.99</div>
+                <div className="text-sm text-muted-foreground">one-time payment for 12 months</div>
               </div>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2">

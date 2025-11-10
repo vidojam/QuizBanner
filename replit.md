@@ -25,7 +25,7 @@ This is a learning reinforcement application that helps users memorize informati
 - ✅ ESC key hint in overlay mode
 
 **Pending Features:**
-- ⏳ Stripe integration for $0.99 premium upgrade
+- ⏳ Stripe integration for $1.99 premium upgrade (12-month subscription)
 - ⏳ Premium upgrade UI showing feature comparison
 - ⏳ Restrict import features to premium users
 - ⏳ Spaced repetition algorithm
@@ -47,7 +47,7 @@ This is a learning reinforcement application that helps users memorize informati
 
 2. **Two-Tier System with Question Limits** (architect-reviewed, production-ready)
    - Free tier: 10 questions maximum
-   - Premium tier: 50 questions maximum (requires $0.99 upgrade)
+   - Premium tier: 50 questions maximum (requires $1.99 for 12 months)
    - Server-side limit enforcement prevents bypassing via API
    - Clear error messages when limit reached
    - Upgrade prompts for free users
