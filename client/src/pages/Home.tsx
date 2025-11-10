@@ -441,16 +441,18 @@ export default function Home() {
           </header>
 
           <Tabs defaultValue="questions" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className={`grid w-full ${user?.tier === 'premium' ? 'grid-cols-3' : 'grid-cols-2'}`}>
               <TabsTrigger value="questions">Questions</TabsTrigger>
               <TabsTrigger value="settings">
                 <SettingsIcon className="w-4 h-4 mr-2" />
-                Settings
+                Banner Settings
               </TabsTrigger>
-              <TabsTrigger value="data">
-                <Upload className="w-4 h-4 mr-2" />
-                Import/Export
-              </TabsTrigger>
+              {user?.tier === 'premium' && (
+                <TabsTrigger value="data">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Import/Export
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="questions" className="space-y-6 mt-6">
@@ -592,10 +594,10 @@ export default function Home() {
                       disabled={questions.length === 0}
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Export Questions to JSON
+                      Export Questions
                     </Button>
                     <p className="text-xs text-muted-foreground">
-                      Save all your questions and settings to a JSON file for backup or sharing
+                      Save all your questions and settings for backup or sharing
                     </p>
                   </div>
                 </CardContent>
@@ -698,7 +700,7 @@ export default function Home() {
                       data-testid="button-import"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Import from JSON File
+                      Import from File
                     </Button>
                     <input
                       id="import-file"
@@ -709,7 +711,7 @@ export default function Home() {
                       data-testid="input-import-file"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Load questions from a previously exported JSON file
+                      Load questions from a previously exported file
                     </p>
                   </div>
                 </CardContent>
