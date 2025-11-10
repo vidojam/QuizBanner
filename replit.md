@@ -25,9 +25,9 @@ This is a learning reinforcement application that helps users memorize informati
 - ✅ ESC key hint in overlay mode
 
 **Pending Features:**
-- ⏳ Stripe integration for $1.99 premium upgrade (12-month subscription)
-- ⏳ Premium upgrade UI showing feature comparison
-- ⏳ Restrict import features to premium users
+- ⏳ Stripe integration for $1.99 premium upgrade (12-month subscription) - Awaiting API keys
+- ✅ Premium upgrade UI showing feature comparison
+- ✅ Restrict import features to premium users (frontend only - backend validation pending)
 - ⏳ Spaced repetition algorithm
 - ⏳ Category/tag filtering
 - ⏳ Quiz template system
@@ -36,6 +36,12 @@ This is a learning reinforcement application that helps users memorize informati
 - ⏳ Preview mode for banner animations
 
 ### Recent Changes (November 10, 2025)
+
+**Latest UI Improvements:**
+1. **Tab Renaming** - "Settings" renamed to "Banner Settings" for clarity
+2. **Tier-Based Feature Access** - Import/Export tab only visible to premium users
+3. **Simplified Labels** - Removed ".json" from import/export button labels
+4. **Credit Card Payments** - Stripe integration supports all major credit cards automatically
 
 **Major Features Added:**
 1. **User Authentication System** (architect-reviewed, production-ready)
