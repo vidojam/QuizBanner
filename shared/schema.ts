@@ -1,7 +1,33 @@
 import { z } from "zod";
-import { pgTable, text, integer, real, timestamp, json, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, real, timestamp, json, varchar, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { sql } from "drizzle-orm";
+
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User table with tier tracking
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  tier: varchar("tier").notNull().default("free"), // "free" or "premium"
+  stripeCustomerId: varchar("stripe_customer_id"),
+  stripePaymentIntentId: varchar("stripe_payment_intent_id"),
+  upgradedAt: timestamp("upgraded_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
 // Drizzle Tables
 export const questions = pgTable("questions", {
@@ -66,6 +92,10 @@ export const selectTemplateSchema = createSelectSchema(templates);
 export const insertStudySessionSchema = createInsertSchema(studySessions).omit({ id: true });
 export const selectStudySessionSchema = createSelectSchema(studySessions);
 
+// User schemas
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+
 // Types
 export type Question = typeof questions.$inferSelect;
 export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
@@ -82,3 +112,11 @@ export type InsertStudySession = z.infer<typeof insertStudySessionSchema>;
 // Legacy type aliases for backward compatibility
 export type QuestionAnswer = Question;
 export type InsertQuestionAnswer = InsertQuestion;
+
+// Tier constants and helpers
+export const TIER_LIMITS = {
+  free: 10,
+  premium: 50,
+} as const;
+
+export type UserTier = "free" | "premium";

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Play, Square, Settings as SettingsIcon, Download, Upload, FileText, Type } from "lucide-react";
+import { Play, Square, Settings as SettingsIcon, Download, Upload, FileText, Type, LogOut } from "lucide-react";
 import QuestionForm from "@/components/QuestionForm";
 import QuestionList from "@/components/QuestionList";
 import ScreensaverMode from "@/components/ScreensaverMode";
@@ -15,12 +16,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const MODE_STORAGE_KEY = "display-mode";
 
 export type DisplayMode = 'screensaver' | 'overlay';
 
 export default function Home() {
+  const { user } = useAuth();
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(() => {
     const stored = localStorage.getItem(MODE_STORAGE_KEY);
@@ -379,35 +382,60 @@ export default function Home() {
     <>
       <div className="min-h-screen bg-background">
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
-          <header className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold">
-                Learning Reinforcement
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Create questions to reinforce your learning with timed screensavers
-              </p>
-            </div>
-            <div className="flex gap-2">
+          <header className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.email || "User"} />
+                  <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="text-sm font-medium">{user?.email}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
+                  </div>
+                </div>
+              </div>
               <Button
-                size="lg"
-                variant={isScreensaverActive ? "destructive" : "default"}
-                data-testid="button-start-screensaver"
-                onClick={() => setIsScreensaverActive(!isScreensaverActive)}
-                disabled={questions.length === 0}
+                variant="ghost"
+                size="sm"
+                onClick={() => window.location.href = "/api/logout"}
+                data-testid="button-logout"
               >
-                {isScreensaverActive ? (
-                  <>
-                    <Square className="w-5 h-5 mr-2" />
-                    Stop
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-5 h-5 mr-2" />
-                    Start
-                  </>
-                )}
+                <LogOut className="w-4 h-4 mr-2" />
+                Log Out
               </Button>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold">
+                  Learning Reinforcement
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  Create questions to reinforce your learning with timed screensavers
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="lg"
+                  variant={isScreensaverActive ? "destructive" : "default"}
+                  data-testid="button-start-screensaver"
+                  onClick={() => setIsScreensaverActive(!isScreensaverActive)}
+                  disabled={questions.length === 0}
+                >
+                  {isScreensaverActive ? (
+                    <>
+                      <Square className="w-5 h-5 mr-2" />
+                      Stop
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-5 h-5 mr-2" />
+                      Start
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </header>
 

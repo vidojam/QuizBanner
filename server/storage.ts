@@ -4,11 +4,16 @@ import type {
   Question, InsertQuestion,
   Preferences, InsertPreferences,
   Template, InsertTemplate,
-  StudySession, InsertStudySession
+  StudySession, InsertStudySession,
+  User, UpsertUser
 } from "@shared/schema";
-import { questions, preferences, templates, studySessions } from "@shared/schema";
+import { questions, preferences, templates, studySessions, users } from "@shared/schema";
 
 export interface IStorage {
+  // User operations (required for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  
   // Questions
   getQuestions(): Promise<Question[]>;
   getQuestion(id: string): Promise<Question | undefined>;
@@ -35,6 +40,27 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // User operations (required for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
   // Questions
   async getQuestions(): Promise<Question[]> {
     return await db.select().from(questions).orderBy(questions.order);
