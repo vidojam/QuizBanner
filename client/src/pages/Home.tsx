@@ -11,6 +11,7 @@ import QuestionForm from "@/components/QuestionForm";
 import QuestionList from "@/components/QuestionList";
 import ScreensaverMode from "@/components/ScreensaverMode";
 import type { QuestionAnswer, Preferences } from "@shared/schema";
+import { TIER_LIMITS } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -495,6 +496,7 @@ export default function Home() {
               <QuestionForm
                 onAdd={handleAddQuestion}
                 questionsCount={questions.length}
+                maxQuestions={user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free}
               />
 
               <div className="space-y-4">

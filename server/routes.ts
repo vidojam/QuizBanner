@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertQuestionSchema, insertPreferencesSchema, insertTemplateSchema, insertStudySessionSchema } from "@shared/schema";
+import { insertQuestionSchema, insertPreferencesSchema, insertTemplateSchema, insertStudySessionSchema, TIER_LIMITS } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -21,20 +21,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Questions CRUD
-  app.get("/api/questions", async (req, res) => {
+  // Questions CRUD (all protected)
+  app.get("/api/questions", isAuthenticated, async (req: any, res) => {
     try {
-      const questions = await storage.getQuestions();
+      const userId = req.user.claims.sub;
+      const questions = await storage.getQuestions(userId);
       res.json(questions);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.get("/api/questions/:id", async (req, res) => {
+  app.get("/api/questions/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const id = req.params.id;
-      const question = await storage.getQuestion(id);
+      const question = await storage.getQuestion(id, userId);
       if (!question) {
         return res.status(404).json({ error: "Question not found" });
       }
@@ -44,10 +46,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/questions", async (req, res) => {
+  app.post("/api/questions", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      // Enforce tier limits
+      const currentCount = await storage.getQuestionCount(userId);
+      const limit = TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS];
+      
+      if (currentCount >= limit) {
+        return res.status(403).json({ 
+          error: `Question limit reached. ${user.tier === 'free' ? 'Upgrade to premium for up to 50 questions.' : 'Maximum of 50 questions reached.'}`,
+          currentCount,
+          limit,
+          tier: user.tier
+        });
+      }
+
       const validatedData = insertQuestionSchema.parse(req.body);
-      const question = await storage.createQuestion(validatedData);
+      const question = await storage.createQuestion(validatedData, userId);
       res.status(201).json(question);
     } catch (error: any) {
       if (error instanceof z.ZodError) {
@@ -57,10 +79,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/questions/:id", async (req, res) => {
+  app.patch("/api/questions/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const id = req.params.id;
-      const question = await storage.updateQuestion(id, req.body);
+      const question = await storage.updateQuestion(id, req.body, userId);
       if (!question) {
         return res.status(404).json({ error: "Question not found" });
       }
@@ -70,19 +93,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/questions", async (req, res) => {
+  app.delete("/api/questions", isAuthenticated, async (req: any, res) => {
     try {
-      const count = await storage.deleteAllQuestions();
+      const userId = req.user.claims.sub;
+      const count = await storage.deleteAllQuestions(userId);
       res.json({ count });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.delete("/api/questions/:id", async (req, res) => {
+  app.delete("/api/questions/:id", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const id = req.params.id;
-      const success = await storage.deleteQuestion(id);
+      const success = await storage.deleteQuestion(id, userId);
       if (!success) {
         return res.status(404).json({ error: "Question not found" });
       }
@@ -92,32 +117,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/questions/reorder", async (req, res) => {
+  app.post("/api/questions/reorder", isAuthenticated, async (req: any, res) => {
     try {
+      const userId = req.user.claims.sub;
       const { questionIds } = req.body;
       if (!Array.isArray(questionIds)) {
         return res.status(400).json({ error: "questionIds must be an array" });
       }
-      await storage.reorderQuestions(questionIds);
+      await storage.reorderQuestions(questionIds, userId);
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Preferences
-  app.get("/api/preferences", async (req, res) => {
+  // Preferences (protected)
+  app.get("/api/preferences", isAuthenticated, async (req: any, res) => {
     try {
-      const prefs = await storage.getPreferences();
+      const userId = req.user.claims.sub;
+      const prefs = await storage.getPreferences(userId);
       res.json(prefs);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.patch("/api/preferences", async (req, res) => {
+  app.patch("/api/preferences", isAuthenticated, async (req: any, res) => {
     try {
-      const prefs = await storage.updatePreferences(req.body);
+      const userId = req.user.claims.sub;
+      const prefs = await storage.updatePreferences(req.body, userId);
       res.json(prefs);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

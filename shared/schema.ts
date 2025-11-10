@@ -32,6 +32,7 @@ export const users = pgTable("users", {
 // Drizzle Tables
 export const questions = pgTable("questions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
   category: text("category"),
@@ -46,6 +47,7 @@ export const questions = pgTable("questions", {
 
 export const preferences = pgTable("preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
   defaultDuration: integer("default_duration").notNull().default(5),
   bannerHeight: integer("banner_height").notNull().default(48),
   fontSize: integer("font_size").notNull().default(24),
@@ -76,6 +78,7 @@ export const studySessions = pgTable("study_sessions", {
 // Zod Schemas from Drizzle
 export const insertQuestionSchema = createInsertSchema(questions).omit({
   id: true,
+  userId: true, // Server-managed
   timesReviewed: true,
   lastReviewed: true,
   performanceScore: true,
@@ -83,7 +86,10 @@ export const insertQuestionSchema = createInsertSchema(questions).omit({
 
 export const selectQuestionSchema = createSelectSchema(questions);
 
-export const insertPreferencesSchema = createInsertSchema(preferences).omit({ id: true });
+export const insertPreferencesSchema = createInsertSchema(preferences).omit({ 
+  id: true,
+  userId: true, // Server-managed
+});
 export const selectPreferencesSchema = createSelectSchema(preferences);
 
 export const insertTemplateSchema = createInsertSchema(templates).omit({ id: true });

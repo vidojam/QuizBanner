@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, inArray, and } from "drizzle-orm";
 import type { 
   Question, InsertQuestion,
   Preferences, InsertPreferences,
@@ -14,18 +14,19 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   
-  // Questions
-  getQuestions(): Promise<Question[]>;
-  getQuestion(id: string): Promise<Question | undefined>;
-  createQuestion(question: InsertQuestion): Promise<Question>;
-  updateQuestion(id: string, question: Partial<InsertQuestion>): Promise<Question | undefined>;
-  deleteQuestion(id: string): Promise<boolean>;
-  deleteAllQuestions(): Promise<number>;
-  reorderQuestions(questionIds: string[]): Promise<void>;
+  // Questions (user-specific)
+  getQuestions(userId: string): Promise<Question[]>;
+  getQuestion(id: string, userId: string): Promise<Question | undefined>;
+  createQuestion(question: InsertQuestion, userId: string): Promise<Question>;
+  updateQuestion(id: string, question: Partial<InsertQuestion>, userId: string): Promise<Question | undefined>;
+  deleteQuestion(id: string, userId: string): Promise<boolean>;
+  deleteAllQuestions(userId: string): Promise<number>;
+  reorderQuestions(questionIds: string[], userId: string): Promise<void>;
+  getQuestionCount(userId: string): Promise<number>;
 
-  // Preferences
-  getPreferences(): Promise<Preferences | undefined>;
-  updatePreferences(prefs: Partial<InsertPreferences>): Promise<Preferences>;
+  // Preferences (user-specific)
+  getPreferences(userId: string): Promise<Preferences | undefined>;
+  updatePreferences(prefs: Partial<InsertPreferences>, userId: string): Promise<Preferences>;
 
   // Templates
   getTemplates(): Promise<Template[]>;
@@ -61,63 +62,94 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Questions
-  async getQuestions(): Promise<Question[]> {
-    return await db.select().from(questions).orderBy(questions.order);
+  // Questions (user-specific)
+  async getQuestions(userId: string): Promise<Question[]> {
+    return await db.select().from(questions)
+      .where(eq(questions.userId, userId))
+      .orderBy(questions.order);
   }
 
-  async getQuestion(id: string): Promise<Question | undefined> {
-    const [question] = await db.select().from(questions).where(eq(questions.id, id));
+  async getQuestion(id: string, userId: string): Promise<Question | undefined> {
+    const [question] = await db.select().from(questions)
+      .where(and(
+        eq(questions.id, id),
+        eq(questions.userId, userId)
+      ));
     return question || undefined;
   }
 
-  async createQuestion(question: InsertQuestion): Promise<Question> {
-    const [created] = await db.insert(questions).values(question as any).returning();
+  async createQuestion(question: InsertQuestion, userId: string): Promise<Question> {
+    const [created] = await db.insert(questions)
+      .values({ ...question, userId } as any)
+      .returning();
     return created;
   }
 
-  async updateQuestion(id: string, question: Partial<InsertQuestion>): Promise<Question | undefined> {
+  async updateQuestion(id: string, question: Partial<InsertQuestion>, userId: string): Promise<Question | undefined> {
     const [updated] = await db
       .update(questions)
       .set(question as any)
-      .where(eq(questions.id, id))
+      .where(and(
+        eq(questions.id, id),
+        eq(questions.userId, userId)
+      ))
       .returning();
     return updated || undefined;
   }
 
-  async deleteQuestion(id: string): Promise<boolean> {
-    const result = await db.delete(questions).where(eq(questions.id, id)).returning();
+  async deleteQuestion(id: string, userId: string): Promise<boolean> {
+    const result = await db.delete(questions)
+      .where(and(
+        eq(questions.id, id),
+        eq(questions.userId, userId)
+      ))
+      .returning();
     return result.length > 0;
   }
 
-  async deleteAllQuestions(): Promise<number> {
-    const result = await db.delete(questions).returning();
+  async deleteAllQuestions(userId: string): Promise<number> {
+    const result = await db.delete(questions)
+      .where(eq(questions.userId, userId))
+      .returning();
     return result.length;
   }
 
-  async reorderQuestions(questionIds: string[]): Promise<void> {
+  async reorderQuestions(questionIds: string[], userId: string): Promise<void> {
     // Update order based on position in array
     for (let i = 0; i < questionIds.length; i++) {
       await db
         .update(questions)
         .set({ order: i })
-        .where(eq(questions.id, questionIds[i]));
+        .where(and(
+          eq(questions.id, questionIds[i]),
+          eq(questions.userId, userId)
+        ));
     }
   }
 
-  // Preferences
-  async getPreferences(): Promise<Preferences | undefined> {
-    const [prefs] = await db.select().from(preferences).limit(1);
+  async getQuestionCount(userId: string): Promise<number> {
+    const result = await db.select().from(questions)
+      .where(eq(questions.userId, userId));
+    return result.length;
+  }
+
+  // Preferences (user-specific)
+  async getPreferences(userId: string): Promise<Preferences | undefined> {
+    const [prefs] = await db.select().from(preferences)
+      .where(eq(preferences.userId, userId))
+      .limit(1);
     if (!prefs) {
       // Create default preferences if none exist
-      const [created] = await db.insert(preferences).values({}).returning();
+      const [created] = await db.insert(preferences)
+        .values({ userId })
+        .returning();
       return created;
     }
     return prefs;
   }
 
-  async updatePreferences(prefs: Partial<InsertPreferences>): Promise<Preferences> {
-    const existing = await this.getPreferences();
+  async updatePreferences(prefs: Partial<InsertPreferences>, userId: string): Promise<Preferences> {
+    const existing = await this.getPreferences(userId);
     if (existing) {
       const [updated] = await db
         .update(preferences)
@@ -126,7 +158,9 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return updated;
     } else {
-      const [created] = await db.insert(preferences).values(prefs as any).returning();
+      const [created] = await db.insert(preferences)
+        .values({ ...prefs, userId } as any)
+        .returning();
       return created;
     }
   }
