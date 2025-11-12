@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
+import logoImage from "@assets/image_1762971225686.png";
 
 const MODE_STORAGE_KEY = "display-mode";
 
@@ -385,8 +386,12 @@ export default function Home() {
           <header className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-xl">V</span>
+                <div className="h-10 w-10 rounded-full overflow-hidden bg-[#0a1929] flex items-center justify-center">
+                  <img 
+                    src={logoImage} 
+                    alt="QuizBanner Logo" 
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">
