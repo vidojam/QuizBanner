@@ -413,7 +413,7 @@ export default function Home() {
                   Learning Reinforcement
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Create questions to reinforce your learning with timed screensavers
+                  Create questions to reinforce your learning with timed screensaver scrolling banners
                 </p>
               </div>
               <div className="flex gap-2">
