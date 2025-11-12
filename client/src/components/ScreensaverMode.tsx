@@ -155,7 +155,7 @@ export default function ScreensaverMode({
           size="icon"
           onClick={() => setIsPaused(!isPaused)}
           data-testid="button-pause-resume"
-          className={mode === 'screensaver' ? 'text-white hover:bg-white/20' : 'bg-black/80 text-white hover:bg-black/90 backdrop-blur-sm'}
+          className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm"
           title={isPaused ? "Resume (Space)" : "Pause (Space)"}
         >
           {isPaused ? <Play className="w-6 h-6" /> : <Pause className="w-6 h-6" />}
@@ -165,7 +165,7 @@ export default function ScreensaverMode({
           size="icon"
           onClick={handleSkip}
           data-testid="button-skip"
-          className={mode === 'screensaver' ? 'text-white hover:bg-white/20' : 'bg-black/80 text-white hover:bg-black/90 backdrop-blur-sm'}
+          className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm"
           title="Skip to next question"
         >
           <SkipForward className="w-6 h-6" />
@@ -175,23 +175,11 @@ export default function ScreensaverMode({
           size="icon"
           onClick={onExit}
           data-testid="button-exit-screensaver"
-          className={mode === 'screensaver' ? 'text-white hover:bg-white/20' : 'bg-black/80 text-white hover:bg-black/90 backdrop-blur-sm'}
+          className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm"
           title="Exit (ESC)"
         >
           <X className="w-6 h-6" />
         </Button>
-      </div>
-
-      {/* Progress Indicator - visible in both modes */}
-      <div className="absolute top-4 left-4 z-10 pointer-events-auto">
-        <div className={mode === 'screensaver' ? 'bg-black/60 text-white px-4 py-2 rounded-md backdrop-blur-sm' : 'bg-black/80 text-white px-4 py-2 rounded-md backdrop-blur-sm'}>
-          <div className="text-sm font-medium">
-            Q{currentIndex + 1}/{shuffledQuestions.length} • {POSITION_CYCLE[positionIndex]}
-          </div>
-          <div className="text-xs text-white/70 mt-1">
-            Position {positionIndex + 1}/{POSITION_CYCLE.length} • {completedCount} completed
-          </div>
-        </div>
       </div>
 
       <ScreensaverBanner
