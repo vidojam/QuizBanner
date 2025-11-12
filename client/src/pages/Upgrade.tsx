@@ -74,15 +74,6 @@ export default function Upgrade() {
                     <Check className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="font-semibold">JSON Import/Export</div>
-                    <div className="text-sm text-muted-foreground">Backup and share your question sets</div>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="mt-0.5">
-                    <Check className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
                     <div className="font-semibold">Paste Text Import</div>
                     <div className="text-sm text-muted-foreground">Copy & paste questions directly</div>
                   </div>

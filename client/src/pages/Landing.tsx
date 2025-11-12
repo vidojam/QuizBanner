@@ -108,10 +108,6 @@ export default function Landing() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
-                  <span className="font-semibold">JSON import/export</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
                   <span className="font-semibold">Paste text import</span>
                 </li>
                 <li className="flex items-center gap-2">
