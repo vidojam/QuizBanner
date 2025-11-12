@@ -386,11 +386,12 @@ export default function Home() {
           <header className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-20 w-20 rounded-full overflow-hidden bg-[#0a1929] flex items-center justify-center">
+                <div className="h-20 w-20 rounded-full overflow-hidden flex items-center justify-center">
                   <img 
                     src={logoImage} 
                     alt="QuizBanner Logo" 
-                    className="h-full w-full object-contain brightness-0 invert"
+                    className="h-full w-full object-contain"
+                    style={{ filter: 'brightness(1.8) saturate(0.3)' }}
                   />
                 </div>
                 <div>
