@@ -394,10 +394,22 @@ export default function Home() {
                     style={{ filter: 'brightness(1.8) saturate(0.3)' }}
                   />
                 </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">
-                    {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
+                <div className="flex items-center gap-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">
+                      {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
+                    </div>
                   </div>
+                  {user?.tier === "free" && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => window.location.href = "/upgrade"}
+                      data-testid="button-upgrade"
+                    >
+                      Upgrade to Premium
+                    </Button>
+                  )}
                 </div>
               </div>
               <Button
