@@ -1,12 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import logoImage from "@assets/image_1762971225686.png";
 
 export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
       <div className="max-w-4xl w-full space-y-8">
         <div className="text-center space-y-4">
+          <div className="flex justify-center mb-6">
+            <div className="h-24 w-24 rounded-full overflow-hidden flex items-center justify-center">
+              <img 
+                src={logoImage} 
+                alt="QuizBanner Logo" 
+                className="h-full w-full object-contain"
+                style={{ filter: 'brightness(1.8) saturate(0.3)' }}
+              />
+            </div>
+          </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
             Learn Smarter with Banner Q&A
           </h1>
