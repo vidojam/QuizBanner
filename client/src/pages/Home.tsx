@@ -17,7 +17,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const MODE_STORAGE_KEY = "display-mode";
 
@@ -386,12 +385,10 @@ export default function Home() {
           <header className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.email || "User"} />
-                  <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-                </Avatar>
+                <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-xl">V</span>
+                </div>
                 <div>
-                  <div className="text-sm font-medium">{user?.email}</div>
                   <div className="text-xs text-muted-foreground">
                     {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
                   </div>
