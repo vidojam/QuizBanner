@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
+import Footer from "@/components/Footer";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
       <div className="max-w-4xl w-full space-y-8">
         <div className="text-center space-y-4">
           <div className="flex justify-center mb-6">
@@ -123,6 +125,8 @@ export default function Landing() {
           Sign in to get started with your free account
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

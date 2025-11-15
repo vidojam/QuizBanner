@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
+import Footer from "@/components/Footer";
 
 const MODE_STORAGE_KEY = "display-mode";
 
@@ -381,7 +382,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
           <header className="space-y-4">
             <div className="flex items-center justify-between">
@@ -789,6 +790,7 @@ export default function Home() {
             </TabsContent>
           </Tabs>
         </div>
+        <Footer />
       </div>
 
       {isScreensaverActive && questions.length > 0 && (

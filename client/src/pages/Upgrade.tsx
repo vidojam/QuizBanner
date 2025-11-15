@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
 import { useLocation } from "wouter";
+import Footer from "@/components/Footer";
 
 export default function Upgrade() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col">
+      <div className="flex-1 p-4">
       <div className="max-w-4xl mx-auto py-8 space-y-8">
         {/* Header with Logo */}
         <div className="flex items-center justify-between">
@@ -183,6 +185,8 @@ export default function Upgrade() {
           </p>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }

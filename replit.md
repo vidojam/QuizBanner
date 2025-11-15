@@ -35,13 +35,15 @@ This is a learning reinforcement application that helps users memorize informati
 - ⏳ Study history analytics
 - ⏳ Preview mode for banner animations
 
-### Recent Changes (November 10, 2025)
+### Recent Changes (November 15, 2025)
 
 **Latest UI Improvements:**
-1. **Tab Renaming** - "Settings" renamed to "Banner Settings" for clarity
-2. **Tier-Based Feature Access** - Import/Export tab only visible to premium users
-3. **Simplified Labels** - Removed ".json" from import/export button labels
-4. **Credit Card Payments** - Stripe integration supports all major credit cards automatically
+1. **Logo Enhancement** - QB text in logo increased by 50% for better visibility and brand presence
+2. **Dynamic Footer** - Added copyright footer "© [year] Jose A Torres. All rights reserved." to all pages using JavaScript Date object
+3. **Tab Renaming** - "Settings" renamed to "Banner Settings" for clarity
+4. **Tier-Based Feature Access** - Import/Export tab only visible to premium users
+5. **Simplified Labels** - Removed ".json" from import/export button labels
+6. **Credit Card Payments** - Stripe integration supports all major credit cards automatically
 
 **Major Features Added:**
 1. **User Authentication System** (architect-reviewed, production-ready)
