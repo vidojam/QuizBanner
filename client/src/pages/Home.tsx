@@ -471,7 +471,7 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value="questions" className="space-y-6 mt-6">
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-center font-bold mb-4">
                 Enter, view and edit questions and answers below
               </p>
               
@@ -503,15 +503,8 @@ export default function Home() {
                       ? 'Fullscreen mode with black background - blocks your view completely'
                       : 'Overlay mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.'}
                   </p>
-                  {displayMode === 'overlay' && (
-                    <div className="mt-3 p-3 bg-muted rounded-md">
-                      <p className="text-sm text-muted-foreground">
-                        💡 For best results, resize your browser window to take up half your screen, then position your work (documents, email, etc.) on the other half. The banners will scroll within this window while you work elsewhere.
-                      </p>
-                    </div>
-                  )}
                   <div className="mt-3 p-3 bg-muted rounded-md">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm font-bold">
                       💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 10 or up to 50 Q & A's.
                     </p>
                   </div>
