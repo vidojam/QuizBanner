@@ -121,8 +121,8 @@ export default function Landing() {
           </Card>
         </div>
 
-        <div className="text-center text-sm text-muted-foreground">
-          Sign in to get started with your free account
+        <div className="text-center text-sm text-muted-foreground font-bold">
+          Sign in to get started with your free account or premium account
         </div>
       </div>
       </div>
