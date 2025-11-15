@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
-import logoImage from "@assets/image_1762971225686.png";
+import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
 
 export default function Landing() {
   return (

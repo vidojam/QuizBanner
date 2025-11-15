@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
-import logoImage from "@assets/image_1762971225686.png";
+import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
 
 const MODE_STORAGE_KEY = "display-mode";
 

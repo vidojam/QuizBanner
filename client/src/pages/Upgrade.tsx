@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check, CreditCard, Lock, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoImage from "@assets/image_1762971225686.png";
+import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
 import { useLocation } from "wouter";
 
 export default function Upgrade() {
