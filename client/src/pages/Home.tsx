@@ -501,7 +501,7 @@ export default function Home() {
                   <p className="text-sm text-muted-foreground">
                     {displayMode === 'screensaver' 
                       ? 'Fullscreen mode with black background - blocks your view completely'
-                      : 'Overlay mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.'}
+                      : 'Always on top mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.'}
                   </p>
                   <div className="mt-3 p-3 bg-muted rounded-md">
                     <p className="text-lg font-bold text-center">
