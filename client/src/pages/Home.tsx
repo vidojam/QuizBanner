@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
-import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
+import logoImage from "@assets/generated_images/QuizBanner_logo_primary_blue_2dd318cd.png";
 import Footer from "@/components/Footer";
 
 const MODE_STORAGE_KEY = "display-mode";
@@ -392,7 +392,6 @@ export default function Home() {
                     src={logoImage} 
                     alt="QuizBanner Logo" 
                     className="h-full w-full object-contain"
-                    style={{ filter: 'brightness(1.8) saturate(0.3)' }}
                   />
                 </div>
                 <div className="flex items-center gap-3">

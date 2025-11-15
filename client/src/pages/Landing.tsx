@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
-import logoImage from "@assets/generated_images/QuizBanner_logo_with_larger_QB_8931337e.png";
+import logoImage from "@assets/generated_images/QuizBanner_logo_primary_blue_2dd318cd.png";
 import Footer from "@/components/Footer";
 
 export default function Landing() {
@@ -16,7 +16,6 @@ export default function Landing() {
                 src={logoImage} 
                 alt="QuizBanner Logo" 
                 className="h-full w-full object-contain"
-                style={{ filter: 'brightness(1.8) saturate(0.3)' }}
               />
             </div>
           </div>
