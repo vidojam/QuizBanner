@@ -471,7 +471,7 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value="questions" className="space-y-6 mt-6">
-              <p className="text-sm text-center font-bold mb-4">
+              <p className="text-lg text-center font-bold mb-4">
                 Enter, view and edit questions and answers below
               </p>
               
@@ -504,7 +504,7 @@ export default function Home() {
                       : 'Overlay mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.'}
                   </p>
                   <div className="mt-3 p-3 bg-muted rounded-md">
-                    <p className="text-sm font-bold">
+                    <p className="text-lg font-bold">
                       💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 10 or up to 50 Q & A's.
                     </p>
                   </div>
