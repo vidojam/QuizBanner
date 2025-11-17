@@ -1,14 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
+<<<<<<< HEAD
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
+=======
+import logoImage from "@assets/generated_images/QuizBanner_logo_primary_blue_2dd318cd.png";
+import Footer from "@/components/Footer";
+>>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
 
 export default function Landing() {
   const { t, language } = useTranslation();
   
   return (
+<<<<<<< HEAD
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
       <div className="max-w-4xl w-full space-y-8" key={`landing-${language}`}>
         {/* Language Selector */}
@@ -23,6 +29,24 @@ export default function Landing() {
           <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-gray-700">
             {t('landingTitle')}
           </h2>
+=======
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
+      <div className="max-w-4xl w-full space-y-8">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center mb-6">
+            <div className="h-24 w-24 rounded-full overflow-hidden flex items-center justify-center">
+              <img 
+                src={logoImage} 
+                alt="QuizBanner Logo" 
+                className="h-full w-full object-contain"
+              />
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            Learn Smarter with Banner Q&A
+          </h1>
+>>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t('landingSubtitle')}
           </p>
@@ -126,10 +150,6 @@ export default function Landing() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
-                  <span className="font-semibold">JSON import/export</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-primary" />
                   <span className="font-semibold">Paste text import</span>
                 </li>
                 <li className="flex items-center gap-2">
@@ -141,8 +161,8 @@ export default function Landing() {
           </Card>
         </div>
 
-        <div className="text-center text-sm text-muted-foreground">
-          Sign in to get started with your free account
+        <div className="text-center text-sm text-muted-foreground font-bold">
+          Sign in to get started with your free account or premium account
         </div>
 
         {/* Footer with Copyright */}
@@ -162,6 +182,8 @@ export default function Landing() {
           </div>
         </footer>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 }
