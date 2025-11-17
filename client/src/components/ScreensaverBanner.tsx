@@ -128,7 +128,7 @@ export default function ScreensaverBanner({
 
   return (
     <div 
-      className={`flex items-center relative overflow-hidden ${
+      className={`flex items-center ${isVertical ? 'justify-center' : ''} relative overflow-hidden ${
         isVertical ? 'h-full' : 'w-full'
       }`}
       style={{ 
@@ -157,7 +157,7 @@ export default function ScreensaverBanner({
         } as React.CSSProperties}
       >
         <span 
-          className="font-bold px-8"
+          className={`font-bold px-8 ${isVertical ? 'text-center' : ''}`}
           style={{ 
             textShadow: '0 2px 8px rgba(0,0,0,0.5)',
             fontSize: `${fontSize}px`,
@@ -185,7 +185,7 @@ export default function ScreensaverBanner({
           } as React.CSSProperties}
         >
           <span 
-            className="font-bold px-8"
+            className={`font-bold px-8 ${isVertical ? 'text-center' : ''}`}
             style={{ 
               textShadow: '0 2px 8px rgba(0,0,0,0.5)',
               fontSize: `${fontSize}px`,

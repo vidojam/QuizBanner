@@ -1,17 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import { Logo } from "@/components/Logo";
+import { useTranslation } from "@/hooks/useTranslation";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Landing() {
+  const { t, language } = useTranslation();
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
-      <div className="max-w-4xl w-full space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Learn Smarter with Banner Q&A
-          </h1>
+      <div className="max-w-4xl w-full space-y-8" key={`landing-${language}`}>
+        {/* Language Selector */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector />
+        </div>
+        {/* Logo and Hero Section */}
+        <div className="text-center space-y-6">
+          <div className="flex justify-center mb-6">
+            <Logo size="lg" className="shadow-2xl" />
+          </div>
+          <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-gray-700">
+            {t('landingTitle')}
+          </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Reinforce your knowledge with beautiful, customizable scrolling banners that keep your Q&A pairs top of mind.
+            {t('landingSubtitle')}
           </p>
           <div className="pt-4 flex flex-wrap gap-4 justify-center">
             <Button 
@@ -21,7 +34,7 @@ export default function Landing() {
               data-testid="button-login-free"
               className="text-lg px-8 py-6"
             >
-              Get Started Free
+              {t('getStartedFree')}
             </Button>
             <Button 
               size="lg" 
@@ -30,6 +43,22 @@ export default function Landing() {
               className="text-lg px-8 py-6"
             >
               Upgrade to Premium
+            </Button>
+            {/* Development Login Button - Always show in development */}
+            <Button 
+              size="lg" 
+              variant="secondary"
+              onClick={() => {
+                console.log('Dev login button clicked');
+                // Set dev login cookie and redirect
+                document.cookie = 'dev-login=true; path=/; max-age=86400'; // 24 hours
+                console.log('Dev cookie set, redirecting...');
+                window.location.href = '/?dev=true';
+              }}
+              data-testid="button-dev-login"
+              className="text-lg px-8 py-6 bg-yellow-500 hover:bg-yellow-600 text-black"
+            >
+              🛠️ Dev Login
             </Button>
           </div>
         </div>
@@ -115,6 +144,23 @@ export default function Landing() {
         <div className="text-center text-sm text-muted-foreground">
           Sign in to get started with your free account
         </div>
+
+        {/* Footer with Copyright */}
+        <footer className="mt-16 pt-8 border-t border-gray-200">
+          <div className="text-center">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
+              <div className="text-sm text-gray-500">
+                © {new Date().getFullYear()} QuizBanner. All rights reserved.
+              </div>
+              <div className="text-xs text-gray-400">
+                Developed by vidojam
+              </div>
+            </div>
+            <p className="text-sm text-black font-bold">
+              Learn smarter with customizable scrolling banners • Enhanced spaced repetition • Visual learning reinforcement
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );

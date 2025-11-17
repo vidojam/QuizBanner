@@ -16,8 +16,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Logo } from "@/components/Logo";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "@/hooks/useTranslation";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const MODE_STORAGE_KEY = "display-mode";
 
@@ -25,6 +28,7 @@ export type DisplayMode = 'screensaver' | 'overlay';
 
 export default function Home() {
   const { user } = useAuth();
+  const { t, language } = useTranslation();
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(() => {
     const stored = localStorage.getItem(MODE_STORAGE_KEY);
@@ -381,39 +385,53 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background" key={`home-${language}`}>
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
           <header className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar>
-                  <AvatarImage src={user?.profileImageUrl || undefined} alt={user?.email || "User"} />
-                  <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="text-sm font-medium">{user?.email}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
-                  </div>
-                </div>
+              <LanguageSelector />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.reload();
+                  }}
+                  data-testid="button-logout"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('logOut')}
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.location.href = "/api/logout"}
-                data-testid="button-logout"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Log Out
-              </Button>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Logo size="xl" />
+                <span className="text-lg font-semibold capitalize">{user?.tier || 'Free'} Plan</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {user?.tier === 'free' && (
+                  <Button 
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => {
+                      localStorage.setItem('selectedPlan', 'premium');
+                      window.location.reload();
+                    }}
+                  >
+                    {t('upgradeButton')}
+                  </Button>
+                )}
+              </div>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold">
-                  Learning Reinforcement
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Create questions to reinforce your learning with timed screensavers
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  {t('learningReinforcement')}
+                </h2>
+                <p className="text-muted-foreground mt-2 text-center font-bold">
+                  {t('subtitle')}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -427,12 +445,12 @@ export default function Home() {
                   {isScreensaverActive ? (
                     <>
                       <Square className="w-5 h-5 mr-2" />
-                      Stop
+                      {t('stopScreensaver')}
                     </>
                   ) : (
                     <>
                       <Play className="w-5 h-5 mr-2" />
-                      Start
+                      {t('startScreensaver')}
                     </>
                   )}
                 </Button>
@@ -442,20 +460,44 @@ export default function Home() {
 
           <Tabs defaultValue="questions" className="w-full">
             <TabsList className={`grid w-full ${user?.tier === 'premium' ? 'grid-cols-3' : 'grid-cols-2'}`}>
-              <TabsTrigger value="questions">Questions</TabsTrigger>
-              <TabsTrigger value="settings">
-                <SettingsIcon className="w-4 h-4 mr-2" />
-                Banner Settings
-              </TabsTrigger>
+              <TabsTrigger value="questions">{t('questionsTab')}</TabsTrigger>
+              <TabsTrigger value="settings">{t('bannerSettingsTab')}</TabsTrigger>
               {user?.tier === 'premium' && (
-                <TabsTrigger value="data">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Import/Export
-                </TabsTrigger>
+                <TabsTrigger value="data">{t('importExportTab')}</TabsTrigger>
               )}
             </TabsList>
 
             <TabsContent value="questions" className="space-y-6 mt-6">
+              <div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-blue-800 text-center">
+                    {t('premiumInfo')}
+                  </p>
+                </div>
+                <p className="text-muted-foreground mb-4 text-center font-bold">
+                  {t('enterQuestionsText')}
+                </p>
+              </div>
+
+              <QuestionForm
+                onAdd={handleAddQuestion}
+                questionsCount={questions.length}
+                maxQuestions={user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free}
+              />
+
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">
+                  Your Questions ({questions.length})
+                </h2>
+                <QuestionList
+                  questions={questions}
+                  onDelete={handleDeleteQuestion}
+                  onEdit={handleEditQuestion}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="settings" className="space-y-6 mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Display Mode</CardTitle>
@@ -495,25 +537,7 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              <QuestionForm
-                onAdd={handleAddQuestion}
-                questionsCount={questions.length}
-                maxQuestions={user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free}
-              />
 
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
-                  Your Questions ({questions.length})
-                </h2>
-                <QuestionList
-                  questions={questions}
-                  onDelete={handleDeleteQuestion}
-                  onEdit={handleEditQuestion}
-                />
-              </div>
-            </TabsContent>
-
-            <TabsContent value="settings" className="space-y-6 mt-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Banner Appearance</CardTitle>
@@ -582,7 +606,7 @@ export default function Home() {
             <TabsContent value="data" className="space-y-6 mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Export</CardTitle>
+                  <CardTitle>{t('exportTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -594,10 +618,10 @@ export default function Home() {
                       disabled={questions.length === 0}
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Export Questions
+                      {t('exportQuestions')}
                     </Button>
                     <p className="text-xs text-muted-foreground">
-                      Save all your questions and settings for backup or sharing
+                      {t('exportDescription')}
                     </p>
                   </div>
                 </CardContent>
@@ -605,7 +629,7 @@ export default function Home() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Import Questions</CardTitle>
+                  <CardTitle>{t('importQuestionsTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -616,7 +640,7 @@ export default function Home() {
                       data-testid="button-import-csv"
                     >
                       <FileText className="w-4 h-4 mr-2" />
-                      Import from CSV File
+                      {t('importFromCSV')}
                     </Button>
                     <input
                       id="csv-import-file"
@@ -627,7 +651,7 @@ export default function Home() {
                       data-testid="input-import-csv"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Import from Excel or Google Sheets. Format: <code className="bg-muted px-1 rounded">question,answer</code>
+                      Import from Excel or Google Sheets. A: question and b: answer format.
                     </p>
                   </div>
 
@@ -640,14 +664,14 @@ export default function Home() {
                           data-testid="button-import-paste"
                         >
                           <Type className="w-4 h-4 mr-2" />
-                          Paste Questions as Text
+                          {t('pasteQuestionsText')}
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-2xl">
                         <DialogHeader>
-                          <DialogTitle>Paste Questions</DialogTitle>
+                          <DialogTitle>{t('pasteQuestionsTitle')}</DialogTitle>
                           <DialogDescription>
-                            Paste your questions in this format:
+                            {t('pasteFormat')}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
@@ -681,14 +705,14 @@ export default function Home() {
                               variant="outline"
                               data-testid="button-cancel-paste"
                             >
-                              Cancel
+                              {t('cancel')}
                             </Button>
                           </div>
                         </div>
                       </DialogContent>
                     </Dialog>
                     <p className="text-xs text-muted-foreground">
-                      Copy and paste questions directly - no file needed!
+                      Copy and paste questions directly - no file needed, in A: question and B: answer format.
                     </p>
                   </div>
 
@@ -700,7 +724,7 @@ export default function Home() {
                       data-testid="button-import"
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Import from File
+                      {t('importFromFile')}
                     </Button>
                     <input
                       id="import-file"
@@ -711,7 +735,7 @@ export default function Home() {
                       data-testid="input-import-file"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Load questions from a previously exported file
+                      Load questions from a previously exported file A: question and B: answer format.
                     </p>
                   </div>
                 </CardContent>
@@ -719,11 +743,11 @@ export default function Home() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Cloud Sync</CardTitle>
+                  <CardTitle>{t('cloudSyncTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    Your questions are automatically saved to the cloud. Access them from any device by logging into your account.
+                    {t('cloudSyncDescription')}
                   </p>
                 </CardContent>
               </Card>
@@ -773,6 +797,7 @@ export default function Home() {
             </TabsContent>
           </Tabs>
         </div>
+
       </div>
 
       {isScreensaverActive && questions.length > 0 && (

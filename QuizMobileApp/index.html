@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizMobileApp - Simple Version</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            min-width: 200px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .online {
+            background: #28a745;
+            color: white;
+        }
+        .offline {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 QuizMobileApp</h1>
+        <p>Mobile Quiz Application<span id="status" class="status offline">Offline</span></p>
+        
+        <button onclick="testBackend()">🔗 Test Backend Connection</button>
+        <button onclick="loadQuestions()">📝 Load Quiz Questions</button>
+        <button onclick="submitAnswer()">✅ Submit Test Answer</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let isConnected = false;
+
+        async function testBackend() {
+            showResult('⏳ Testing mobile backend connection...', 'info');
+            try {
+                const response = await fetch('http://localhost:5001/api/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Mobile Backend Connected! ${data.message}`, 'success');
+                    updateStatus(true);
+                } else {
+                    showResult(`❌ Backend Error: ${response.status}`, 'error');
+                    updateStatus(false);
+                }
+            } catch (error) {
+                showResult(`❌ Connection Failed: ${error.message}`, 'error');
+                updateStatus(false);
+            }
+        }
+
+        async function loadQuestions() {
+            if (!isConnected) {
+                showResult('❌ Please test backend connection first', 'error');
+                return;
+            }
+            showResult('⏳ Loading quiz questions...', 'info');
+            try {
+                const response = await fetch('http://localhost:5001/api/questions');
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`📝 Questions loaded: ${data.questions.length} questions available!`, 'success');
+                } else {
+                    showResult(`❌ Failed to load questions: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error loading questions: ${error.message}`, 'error');
+            }
+        }
+
+        async function submitAnswer() {
+            if (!isConnected) {
+                showResult('❌ Please test backend connection first', 'error');
+                return;
+            }
+            showResult('⏳ Submitting test answer...', 'info');
+            try {
+                const response = await fetch('http://localhost:5001/api/submit-answer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        questionId: 1,
+                        answer: 2, // Paris for "What is the capital of France?"
+                        userId: 'mobile-user'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ ${data.explanation}`, 'success');
+                } else {
+                    showResult(`❌ Failed to submit answer: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error submitting answer: ${error.message}`, 'error');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = `result ${type === 'success' ? 'success' : type === 'error' ? 'error' : ''}`;
+        }
+
+        function updateStatus(connected) {
+            const statusElement = document.getElementById('status');
+            isConnected = connected;
+            if (connected) {
+                statusElement.textContent = 'Online';
+                statusElement.className = 'status online';
+            } else {
+                statusElement.textContent = 'Offline';
+                statusElement.className = 'status offline';
+            }
+        }
+
+        // Auto-test connection on load
+        window.onload = function() {
+            showResult('📱 QuizMobileApp loaded! Click "Test Backend Connection" to begin.', 'info');
+        };
+    </script>
+</body>
+</html>

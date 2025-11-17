@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizBanner - Connection Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+        }
+        .loading {
+            background: rgba(59, 130, 246, 0.2);
+            border: 2px solid #3b82f6;
+        }
+        button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .test-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 QuizBanner</h1>
+            <h2>Mobile App Backend Connection Test</h2>
+            <p>Testing the connection between your mobile app and backend server</p>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>🏥 Health Check</h3>
+                <button onclick="testHealth()">Test Health Endpoint</button>
+                <div id="health-status"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>🧪 Basic Test</h3>
+                <button onclick="testBasic()">Test Basic Endpoint</button>
+                <div id="basic-status"></div>
+            </div>
+
+            <div class="test-card">
+                <h3>📱 Mobile Config</h3>
+                <button onclick="showMobileConfig()">Show Mobile URLs</button>
+                <div id="config-status"></div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <h3>📋 Test Results</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const statusDiv = document.getElementById('health-status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="status loading">🔄 Testing health endpoint...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/health');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ SUCCESS!<br>
+                            Status: ${data.status}<br>
+                            Environment: ${data.environment}<br>
+                            Time: ${new Date(data.timestamp).toLocaleTimeString()}
+                        </div>
+                    `;
+                    resultsDiv.innerHTML += '<p>✅ Health Check: PASSED</p>';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ FAILED<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+                resultsDiv.innerHTML += '<p>❌ Health Check: FAILED</p>';
+            }
+        }
+
+        async function testBasic() {
+            const statusDiv = document.getElementById('basic-status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.innerHTML = '<div class="status loading">🔄 Testing basic endpoint...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/test');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            ✅ SUCCESS!<br>
+                            Message: ${data.message}
+                        </div>
+                    `;
+                    resultsDiv.innerHTML += '<p>✅ Basic Test: PASSED</p>';
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status error">
+                        ❌ FAILED<br>
+                        Error: ${error.message}
+                    </div>
+                `;
+                resultsDiv.innerHTML += '<p>❌ Basic Test: FAILED</p>';
+            }
+        }
+
+        function showMobileConfig() {
+            const statusDiv = document.getElementById('config-status');
+            
+            statusDiv.innerHTML = `
+                <div class="status success" style="text-align: left; font-size: 14px;">
+                    📱 <strong>Mobile App URLs:</strong><br><br>
+                    🤖 <strong>Android Emulator:</strong><br>
+                    <code>http://10.0.2.2:5000</code><br><br>
+                    🍎 <strong>iOS Simulator:</strong><br>
+                    <code>http://localhost:5000</code><br><br>
+                    🌐 <strong>Web/Physical Device:</strong><br>
+                    <code>http://localhost:5000</code><br><br>
+                    ℹ️ <em>These URLs are configured in your mobile app's config file</em>
+                </div>
+            `;
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            setTimeout(testHealth, 1000);
+            setTimeout(testBasic, 2000);
+        };
+    </script>
+</body>
+</html>

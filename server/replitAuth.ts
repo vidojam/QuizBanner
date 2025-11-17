@@ -10,6 +10,10 @@ import { storage } from "./storage";
 
 const getOidcConfig = memoize(
   async () => {
+    // Disable Replit auth in development
+    if (process.env.NODE_ENV === 'development') {
+      return null;
+    }
     return await client.discovery(
       new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
       process.env.REPL_ID!
@@ -63,6 +67,12 @@ async function upsertUser(
 }
 
 export async function setupAuth(app: Express) {
+  // Skip Replit auth setup in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔓 Skipping Replit auth - development mode');
+    return;
+  }
+  
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
@@ -134,6 +144,20 @@ export async function setupAuth(app: Express) {
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
+
+  // Development bypass - always allow in development
+  if (process.env.NODE_ENV === 'development') {
+    // Create mock authenticated user for development
+    (req as any).user = {
+      claims: {
+        sub: 'dev-user-123',
+        name: 'Developer User',
+        email: 'dev@example.com'
+      },
+      expires_at: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
+    };
+    return next();
+  }
 
   if (!req.isAuthenticated() || !user.expires_at) {
     return res.status(401).json({ message: "Unauthorized" });

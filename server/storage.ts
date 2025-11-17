@@ -7,7 +7,7 @@ import type {
   StudySession, InsertStudySession,
   User, UpsertUser
 } from "@shared/schema";
-import { questions, preferences, templates, studySessions, users } from "@shared/schema";
+import { questions, preferences, templates, studySessions, users } from "./db";
 
 export interface IStorage {
   // User operations (required for Replit Auth)

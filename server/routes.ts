@@ -6,8 +6,19 @@ import { insertQuestionSchema, insertPreferencesSchema, insertTemplateSchema, in
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint (no auth required)
+  app.get('/api/health', (req, res) => {
+    res.json({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    });
+  });
+
   // Setup authentication
   await setupAuth(app);
+
+
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
