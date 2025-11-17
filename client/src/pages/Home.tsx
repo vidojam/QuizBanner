@@ -18,14 +18,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Logo } from "@/components/Logo";
 import { Textarea } from "@/components/ui/textarea";
-<<<<<<< HEAD
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
-=======
-import logoImage from "@assets/generated_images/QuizBanner_logo_primary_blue_2dd318cd.png";
 import Footer from "@/components/Footer";
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
 
 const MODE_STORAGE_KEY = "display-mode";
 
@@ -390,8 +386,7 @@ export default function Home() {
 
   return (
     <>
-<<<<<<< HEAD
-      <div className="min-h-screen bg-background" key={`home-${language}`}>
+      <div className="min-h-screen bg-background flex flex-col" key={`home-${language}`}>
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
           <header className="space-y-4">
             <div className="flex items-center justify-between">
@@ -414,69 +409,32 @@ export default function Home() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Logo size="xl" />
-                <span className="text-lg font-semibold capitalize">{user?.tier || 'Free'} Plan</span>
+                <div>
+                  <div className="text-xs text-muted-foreground">
+                    {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
+                  </div>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {user?.tier === 'free' && (
                   <Button 
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => {
-                      localStorage.setItem('selectedPlan', 'premium');
-                      window.location.reload();
-                    }}
+                    variant="default"
+                    onClick={() => window.location.href = "/upgrade"}
+                    data-testid="button-upgrade"
                   >
                     {t('upgradeButton')}
                   </Button>
                 )}
-=======
-      <div className="min-h-screen bg-background flex flex-col">
-        <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
-          <header className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-20 w-20 rounded-full overflow-hidden flex items-center justify-center">
-                  <img 
-                    src={logoImage} 
-                    alt="QuizBanner Logo" 
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="flex items-center gap-3">
-                  <div>
-                    <div className="text-xs text-muted-foreground">
-                      {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
-                    </div>
-                  </div>
-                  {user?.tier === "free" && (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => window.location.href = "/upgrade"}
-                      data-testid="button-upgrade"
-                    >
-                      Upgrade to Premium
-                    </Button>
-                  )}
-                </div>
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-<<<<<<< HEAD
                 <h2 className="text-3xl md:text-4xl font-bold">
                   {t('learningReinforcement')}
                 </h2>
                 <p className="text-muted-foreground mt-2 text-center font-bold">
                   {t('subtitle')}
-=======
-                <h1 className="text-3xl md:text-4xl font-bold">
-                  Learning Reinforcement
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Create questions to reinforce your learning with timed screensaver scrolling banners
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
                 </p>
               </div>
               <div className="flex gap-2">
@@ -513,7 +471,6 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value="questions" className="space-y-6 mt-6">
-<<<<<<< HEAD
               <div>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <p className="text-sm text-blue-800 text-center">
@@ -544,12 +501,10 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6 mt-6">
-=======
               <p className="text-lg text-center font-bold mb-4">
                 Enter, view and edit questions and answers below
               </p>
               
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
               <Card>
                 <CardHeader>
                   <CardTitle>Display Mode</CardTitle>
@@ -846,11 +801,8 @@ export default function Home() {
             </TabsContent>
           </Tabs>
         </div>
-<<<<<<< HEAD
 
-=======
         <Footer />
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
       </div>
 
       {isScreensaverActive && questions.length > 0 && (

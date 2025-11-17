@@ -7,11 +7,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Home from "@/pages/Home";
 import Landing from "@/pages/Landing";
-<<<<<<< HEAD
 import PlanSelection from "@/pages/PlanSelection";
-=======
 import Upgrade from "@/pages/Upgrade";
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
 import NotFound from "@/pages/not-found";
 
 function Router() {

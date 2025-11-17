@@ -128,11 +128,7 @@ export default function ScreensaverBanner({
 
   return (
     <div 
-<<<<<<< HEAD
-      className={`flex items-center ${isVertical ? 'justify-center' : ''} relative overflow-hidden ${
-=======
       className={`flex items-center justify-center relative overflow-hidden ${
->>>>>>> c4164a98cc612cb6c90aa031cb5fdb745ac2e5c2
         isVertical ? 'h-full' : 'w-full'
       }`}
       style={{ 
