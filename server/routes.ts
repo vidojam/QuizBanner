@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+
 import { insertQuestionSchema, insertPreferencesSchema, insertTemplateSchema, insertStudySessionSchema, TIER_LIMITS } from "@shared/schema";
 import { z } from "zod";
 
@@ -15,16 +15,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Setup authentication
-  await setupAuth(app);
+  // Stripe webhook (must be before body parsing middleware)
+  app.post('/api/stripe/webhook', async (req, res) => {
+    const { handleStripeWebhook } = await import('./stripeWebhooks');
+    await handleStripeWebhook(req, res);
+  });
 
-
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Auth routes  
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const userId = req.user.id;
+      let user = await storage.getUser(userId);
+      
+      // Check subscription status and update tier if needed
+      if (user) {
+        const SubscriptionManager = await import('./subscriptionManager');
+        const subscriptionInfo = await SubscriptionManager.default.checkSubscriptionStatus(user.id);
+        
+        // If subscription expired, downgrade user to free tier
+        if (user.tier === 'premium' && !subscriptionInfo.isActive && subscriptionInfo.status === 'expired') {
+          await SubscriptionManager.default.expireSubscription(user.id);
+          user = await storage.getUser(userId); // Fetch updated user
+        }
+        
+        // Add subscription info to user response
+        (user as any).subscriptionInfo = subscriptionInfo;
+      }
+      
       res.json(user);
     } catch (error: any) {
       console.error("Error fetching user:", error);
@@ -32,10 +49,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Questions CRUD (all protected)
-  app.get("/api/questions", isAuthenticated, async (req: any, res) => {
+  // Subscription management routes
+  app.get('/api/subscription/status', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
+      const SubscriptionManager = await import('./subscriptionManager');
+      const subscriptionInfo = await SubscriptionManager.default.checkSubscriptionStatus(userId);
+      res.json(subscriptionInfo);
+    } catch (error: any) {
+      console.error("Error fetching subscription status:", error);
+      res.status(500).json({ message: "Failed to fetch subscription status" });
+    }
+  });
+
+  app.post('/api/subscription/create-payment-intent', async (req: any, res) => {
+    try {
+      const { stripe } = await import('./stripeWebhooks');
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Create payment intent for $1.99 (199 cents)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 199, // $1.99 in cents
+        currency: 'usd',
+        metadata: {
+          userId: user.id,
+          tier: 'premium',
+          duration: '12months'
+        }
+      });
+
+      // Store payment intent ID for webhook verification
+      await storage.updateUser(user.id, {
+        stripePaymentIntentId: paymentIntent.id
+      });
+
+      res.json({
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id
+      });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ message: "Failed to create payment intent" });
+    }
+  });
+
+  app.post('/api/subscription/cancel', async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const SubscriptionManager = await import('./subscriptionManager');
+      await SubscriptionManager.default.cancelSubscription(userId);
+      res.json({ message: "Subscription cancelled successfully" });
+    } catch (error: any) {
+      console.error("Error cancelling subscription:", error);
+      res.status(500).json({ message: "Failed to cancel subscription" });
+    }
+  });
+
+  // Questions CRUD (all protected)
+  app.get("/api/questions", async (req: any, res) => {
+    try {
+      const userId = req.user.id;
       const questions = await storage.getQuestions(userId);
       res.json(questions);
     } catch (error: any) {
@@ -43,9 +121,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/questions/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/questions/:id", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const id = req.params.id;
       const question = await storage.getQuestion(id, userId);
       if (!question) {
@@ -57,9 +135,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/questions", isAuthenticated, async (req: any, res) => {
+  app.post("/api/questions", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -90,9 +168,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/questions/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/questions/:id", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const id = req.params.id;
       const question = await storage.updateQuestion(id, req.body, userId);
       if (!question) {
@@ -104,9 +182,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/questions", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/questions", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const count = await storage.deleteAllQuestions(userId);
       res.json({ count });
     } catch (error: any) {
@@ -114,9 +192,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/questions/:id", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/questions/:id", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const id = req.params.id;
       const success = await storage.deleteQuestion(id, userId);
       if (!success) {
@@ -128,9 +206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/questions/reorder", isAuthenticated, async (req: any, res) => {
+  app.post("/api/questions/reorder", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { questionIds } = req.body;
       if (!Array.isArray(questionIds)) {
         return res.status(400).json({ error: "questionIds must be an array" });
@@ -143,9 +221,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Preferences (protected)
-  app.get("/api/preferences", isAuthenticated, async (req: any, res) => {
+  app.get("/api/preferences", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const prefs = await storage.getPreferences(userId);
       res.json(prefs);
     } catch (error: any) {
@@ -153,9 +231,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/preferences", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/preferences", async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const prefs = await storage.updatePreferences(req.body, userId);
       res.json(prefs);
     } catch (error: any) {

@@ -67,7 +67,7 @@ export default function AuthWrapper({ children }: AuthWrapperProps) {
           </TouchableOpacity>
 
           <Text style={styles.disclaimer}>
-            Secure authentication powered by Replit
+            Secure authentication for QuizBanner
           </Text>
         </View>
       </LinearGradient>

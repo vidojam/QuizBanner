@@ -106,7 +106,25 @@ export const translations = {
     pasteFormat: "Paste your questions in this format:",
     importFromFile: "Import from File",
     cloudSyncTitle: "Cloud Sync",
-    cloudSyncDescription: "Your questions are automatically saved to the cloud. Access them from any device by logging into your account."
+    cloudSyncDescription: "Your questions are automatically saved to the cloud. Access them from any device by logging into your account.",
+    
+    // Subscription status
+    freeTier: "Free Tier",
+    freeTierDescription: "You're currently on the free plan with up to 10 questions.",
+    premiumActive: "Premium Subscription",
+    active: "Active",
+    renewsOn: "Renews on",
+    daysRemaining: "days remaining",
+    renewalNeeded: "Renewal Needed",
+    subscriptionExpiresSoon: "Your premium subscription expires on",
+    renewNow: "Renew Now",
+    subscriptionExpired: "Subscription Expired",
+    subscriptionExpiredOn: "Your subscription expired on",
+    downgradedToFree: "You've been downgraded to the free tier.",
+    renewSubscription: "Renew Subscription",
+    subscriptionCancelled: "Subscription Cancelled",
+    accessUntil: "You'll have premium access until",
+    reactivateSubscription: "Reactivate Subscription"
   },
   
   es: {
@@ -216,7 +234,25 @@ export const translations = {
     pasteFormat: "Pega tus preguntas en este formato:",
     importFromFile: "Importar desde Archivo",
     cloudSyncTitle: "Sincronización en la Nube",
-    cloudSyncDescription: "Tus preguntas se guardan automáticamente en la nube. Accédelas desde cualquier dispositivo iniciando sesión en tu cuenta."
+    cloudSyncDescription: "Tus preguntas se guardan automáticamente en la nube. Accédelas desde cualquier dispositivo iniciando sesión en tu cuenta.",
+    
+    // Subscription status
+    freeTier: "Plan Gratuito",
+    freeTierDescription: "Actualmente tienes el plan gratuito con hasta 10 preguntas.",
+    premiumActive: "Suscripción Premium",
+    active: "Activa",
+    renewsOn: "Se renueva el",
+    daysRemaining: "días restantes",
+    renewalNeeded: "Renovación Necesaria",
+    subscriptionExpiresSoon: "Tu suscripción premium expira el",
+    renewNow: "Renovar Ahora",
+    subscriptionExpired: "Suscripción Expirada",
+    subscriptionExpiredOn: "Tu suscripción expiró el",
+    downgradedToFree: "Has sido degradado al plan gratuito.",
+    renewSubscription: "Renovar Suscripción",
+    subscriptionCancelled: "Suscripción Cancelada",
+    accessUntil: "Tendrás acceso premium hasta el",
+    reactivateSubscription: "Reactivar Suscripción"
   }
 };
 

@@ -2,8 +2,22 @@ import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { startBackgroundTasks } from "./backgroundTasks";
 
 const app = express();
+
+// Simple development authentication
+app.use((req, res, next) => {
+  // In development, create a mock user
+  req.user = {
+    id: 'dev-user-1',
+    email: 'dev@example.com',
+    firstName: 'Dev',
+    lastName: 'User',
+    profileImageUrl: null
+  };
+  next();
+});
 
 declare module 'http' {
   interface IncomingMessage {
@@ -76,5 +90,8 @@ app.use((req, res, next) => {
   
   server.listen(port, host, () => {
     log(`serving on ${host}:${port}`);
+    
+    // Start background tasks for subscription management
+    startBackgroundTasks();
   });
 })();

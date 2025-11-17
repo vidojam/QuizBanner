@@ -12,6 +12,10 @@ export const users = sqliteTable("users", {
   tier: text("tier").notNull().default("free"),
   stripeCustomerId: text("stripe_customer_id"),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  subscriptionExpiresAt: text("subscription_expires_at"), // ISO date string when premium expires
+  subscriptionStatus: text("subscription_status").default("none"), // none, active, expired, cancelled
+  lastPaymentDate: text("last_payment_date"), // ISO date string of last successful payment
   upgradedAt: text("upgraded_at"),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
   updatedAt: text("updated_at").$defaultFn(() => new Date().toISOString()),
@@ -64,19 +68,12 @@ export const studySessions = sqliteTable("study_sessions", {
   totalDuration: integer("total_duration").notNull().default(0),
 });
 
-export const sessions = sqliteTable("sessions", {
-  sid: text("sid").primaryKey(),
-  sess: text("sess").notNull(), // JSON string
-  expire: text("expire").notNull(),
-});
-
 const schema = {
   users,
   questions,
   preferences,
   templates,
-  studySessions,
-  sessions
+  studySessions
 };
 
 // Use SQLite for local development
@@ -94,6 +91,10 @@ sqlite.exec(`
     tier TEXT NOT NULL DEFAULT 'free',
     stripe_customer_id TEXT,
     stripe_payment_intent_id TEXT,
+    stripe_subscription_id TEXT,
+    subscription_expires_at TEXT,
+    subscription_status TEXT DEFAULT 'none',
+    last_payment_date TEXT,
     upgraded_at TEXT,
     created_at TEXT,
     updated_at TEXT
@@ -146,11 +147,7 @@ sqlite.exec(`
     total_duration INTEGER NOT NULL DEFAULT 0
   );
 
-  CREATE TABLE IF NOT EXISTS sessions (
-    sid TEXT PRIMARY KEY,
-    sess TEXT NOT NULL,
-    expire TEXT NOT NULL
-  );
+
 `);
 
 // Insert development user if it doesn't exist

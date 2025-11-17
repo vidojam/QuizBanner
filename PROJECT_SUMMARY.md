@@ -23,16 +23,16 @@ This is a learning reinforcement application that helps users memorize informati
 ### What Was Implemented
 
 #### 1. **User Authentication System** ✅
-- **Technology:** Replit Auth (OpenID Connect)
+- **Technology:** 
 - **Features:**
-  - Secure login/logout with Replit account
+  - Secure login/logout with 
   - Session management stored in PostgreSQL
   - Environment-aware cookie security (dev vs production)
   - Landing page for unauthenticated users
   - User avatar, email, and tier status display in header
 
 **Files Modified:**
-- `server/replitAuth.ts` - Authentication setup with OpenID Client
+- `server/
 - `client/src/hooks/useAuth.ts` - React authentication hook
 - `client/src/App.tsx` - App-level auth routing
 - `client/src/pages/Landing.tsx` - Landing page for logged-out users
@@ -93,7 +93,7 @@ This is a learning reinforcement application that helps users memorize informati
 ### Authentication Flow
 1. User visits app → redirected to Landing page if not logged in
 2. Click "Get Started Free" or "Upgrade to Premium" → `/api/login`
-3. Replit Auth handles OAuth flow
+3. 
 4. User returned to app with session cookie
 5. Backend creates/updates user record in database
 6. User-specific questions and preferences loaded
@@ -148,7 +148,7 @@ This is a learning reinforcement application that helps users memorize informati
 
 ### Backend Changes
 **Files Created/Modified:**
-- `server/replitAuth.ts` - OpenID Connect authentication setup
+- `server/
 - `server/routes.ts` - Added authentication middleware to all endpoints
 - `server/storage.ts` - Updated all methods to accept userId parameter
 - `shared/schema.ts` - Added users/sessions tables, userId foreign keys
@@ -156,7 +156,7 @@ This is a learning reinforcement application that helps users memorize informati
 **Key Functions:**
 ```typescript
 // Authentication
-setupAuth(app) - Configures Replit Auth
+setupAuth(app) - Configures 
 isAuthenticated - Middleware to protect routes
 
 // Tier Enforcement
@@ -288,7 +288,7 @@ VITE_STRIPE_PUBLIC_KEY      # Frontend Stripe publishable key
 ## Documentation Updates
 
 **Files Updated:**
-- `replit.md` - Comprehensive project documentation
+- `
   - Current status section updated
   - Recent changes documented
   - Architecture details preserved
@@ -299,7 +299,7 @@ VITE_STRIPE_PUBLIC_KEY      # Frontend Stripe publishable key
 ## Key Takeaways
 
 ### What Works
-1. ✅ Users can sign in with Replit Auth
+1. ✅ Users can sign in with 
 2. ✅ Free users limited to 10 questions (enforced server-side)
 3. ✅ Premium users get 50 questions (when tier upgraded)
 4. ✅ All user data is private and isolated
@@ -339,9 +339,9 @@ npm run db:studio      # Open database GUI (Drizzle Studio)
 
 ### Environment Setup
 ```bash
-# Set secrets via Replit Secrets UI
+# Set secrets via 
 # Or use command line:
-replit secrets set STRIPE_SECRET_KEY your_secret_key
+
 ```
 
 ---
@@ -363,13 +363,13 @@ replit secrets set STRIPE_SECRET_KEY your_secret_key
 │   │   └── Landing.tsx            # Landing page (public)
 │   └── App.tsx                    # Root component
 ├── server/
-│   ├── replitAuth.ts              # Replit Auth setup
+│   ├── 
 │   ├── routes.ts                  # API endpoints
 │   ├── storage.ts                 # Database layer
 │   └── index.ts                   # Express server
 ├── shared/
 │   └── schema.ts                  # Database schema + Zod types
-├── replit.md                      # Project documentation
+├── 
 └── PROJECT_SUMMARY.md             # This file
 ```
 
@@ -377,9 +377,9 @@ replit secrets set STRIPE_SECRET_KEY your_secret_key
 
 ## Contact & Support
 
-**Deployment:** Ready for Replit publish when Stripe integration is complete
-**Database:** PostgreSQL with Neon (auto-provisioned by Replit)
-**Hosting:** Replit deployment (0.0.0.0:5000)
+**Deployment:** Ready for 
+**Database:** PostgreSQL with Neon (auto-provisioned by 
+**Hosting:** 
 
 ---
 

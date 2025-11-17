@@ -5,6 +5,7 @@ import { Check, Star } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { AnimatedBanners } from "@/components/AnimatedBanners";
 
 interface PlanSelectionProps {
   onPlanSelected: (plan: 'free' | 'premium') => void;
@@ -17,7 +18,9 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
   console.log('PlanSelection rendering with language:', language);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4">
+    <>
+      <AnimatedBanners />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4 relative z-10">
       <div className="max-w-4xl w-full space-y-8" key={`plan-content-${language}`}>
         {/* Language Selector */}
         <div className="flex justify-end mb-4">
@@ -30,36 +33,17 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
             <Logo size="lg" className="shadow-2xl" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            {t('choosePlan')}
+            Choose Your Banner Plan
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t('planSelectionSubtitle')}
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button 
-            size="lg" 
-            variant="outline"
-            onClick={() => onPlanSelected('free')}
-            className="text-lg px-12 py-6"
-          >
-            {t('continueFreePlan')}
-          </Button>
-          <Button 
-            size="lg" 
-            onClick={() => onPlanSelected('premium')}
-            className="text-lg px-12 py-6"
-          >
-            {t('continuePremiumPlan')}
-          </Button>
-        </div>
-
-        {/* Plan Cards */}
+        {/* Plan Cards with Integrated Buttons */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Free Plan */}
-          <Card className="hover:shadow-lg">
+          <Card className="hover:shadow-lg flex flex-col">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
@@ -70,8 +54,8 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
               <div className="text-3xl font-bold">{t('freePlanPrice')}</div>
               <p className="text-muted-foreground">{t('perfectForStarting')}</p>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3">
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <ul className="space-y-3 flex-1">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
                   <span>{t('upTo10Questions')}</span>
@@ -89,11 +73,21 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                   <span>{t('basicCustomization')}</span>
                 </li>
               </ul>
+              <div className="pt-4">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => onPlanSelected('free')}
+                  className="w-full text-lg py-6"
+                >
+                  Continue With Free Plan
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
           {/* Premium Plan */}
-          <Card className="hover:shadow-lg">
+          <Card className="hover:shadow-lg flex flex-col">
             <CardHeader className="text-center">
               <CardTitle className="flex items-center justify-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
@@ -104,8 +98,8 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
               <div className="text-3xl font-bold">{t('premiumPlanPrice')}</div>
               <p className="text-muted-foreground">{t('unlockFullPotential')}</p>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <ul className="space-y-3">
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <ul className="space-y-3 flex-1">
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
                   <span className="font-semibold">{t('upTo50Questions')}</span>
@@ -127,6 +121,15 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                   <span>{t('allFreeFeatures')}</span>
                 </li>
               </ul>
+              <div className="pt-4">
+                <Button 
+                  size="lg" 
+                  onClick={() => onPlanSelected('premium')}
+                  className="w-full text-lg py-6"
+                >
+                  Continue With Premium Plan
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -149,5 +152,6 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
         </footer>
       </div>
     </div>
+    </>
   );
 }

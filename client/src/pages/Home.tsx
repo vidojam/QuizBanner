@@ -23,6 +23,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import Footer from "@/components/Footer";
 
+
 const MODE_STORAGE_KEY = "display-mode";
 
 export type DisplayMode = 'screensaver' | 'overlay';
@@ -386,7 +387,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-background flex flex-col" key={`home-${language}`}>
+      <div className="min-h-screen bg-background flex flex-col relative" key={`home-${language}`}>
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
           <header className="space-y-4">
             <div className="flex items-center justify-between">

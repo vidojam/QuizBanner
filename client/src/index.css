@@ -344,4 +344,41 @@
   .banner-scroll-vertical {
     animation: scroll-vertical var(--animation-duration, 15s) linear forwards;
   }
+
+  /* Animated Banner Animations */
+  @keyframes slideRightToLeft {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(-100vw); }
+  }
+
+  @keyframes slideLeftToRight {
+    from { transform: translateX(-100vw); }
+    to { transform: translateX(100vw); }
+  }
+
+  @keyframes slideBottomToTop {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-100vh); }
+  }
+
+  @keyframes slideTopToBottom {
+    from { transform: translateY(-100vh); }
+    to { transform: translateY(100vh); }
+  }
+
+  .slide-right-to-left {
+    animation-name: slideRightToLeft;
+  }
+
+  .slide-left-to-right {
+    animation-name: slideLeftToRight;
+  }
+
+  .slide-bottom-to-top {
+    animation-name: slideBottomToTop;
+  }
+
+  .slide-top-to-bottom {
+    animation-name: slideTopToBottom;
+  }
 }

@@ -3,17 +3,6 @@ import { pgTable, text, integer, real, timestamp, json, varchar, jsonb, index } 
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { sql } from "drizzle-orm";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: jsonb("sess").notNull(),
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
 // User table with tier tracking
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -24,6 +13,10 @@ export const users = pgTable("users", {
   tier: varchar("tier").notNull().default("free"), // "free" or "premium"
   stripeCustomerId: varchar("stripe_customer_id"),
   stripePaymentIntentId: varchar("stripe_payment_intent_id"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  subscriptionExpiresAt: timestamp("subscription_expires_at"), // When premium expires
+  subscriptionStatus: varchar("subscription_status").default("none"), // none, active, expired, cancelled
+  lastPaymentDate: timestamp("last_payment_date"), // Last successful payment
   upgradedAt: timestamp("upgraded_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
