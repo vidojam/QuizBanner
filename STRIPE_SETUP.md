@@ -45,7 +45,7 @@ STRIPE_WEBHOOK_URL=https://yourdomain.com/api/stripe/webhook
 ### Payment Flow
 1. User clicks "Upgrade to Premium" 
 2. Frontend calls `/api/subscription/create-payment-intent`
-3. Server creates Stripe PaymentIntent for $1.99
+3. Server creates Stripe PaymentIntent for $2.99
 4. User completes payment with Stripe Elements
 5. Stripe sends webhook to `/api/stripe/webhook`
 6. Server verifies payment and activates 12-month subscription

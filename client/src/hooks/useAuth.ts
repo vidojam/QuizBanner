@@ -2,8 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
 
 export function useAuth() {
-  // Development mode bypass
-  const isDev = window.location.hostname === 'localhost' || window.location.search.includes('dev=true');
+  // Development mode bypass - works for localhost and local network IPs
+  const isDev = window.location.hostname === 'localhost' || 
+                window.location.hostname.startsWith('192.168.') || 
+                window.location.hostname.startsWith('10.') ||
+                window.location.hostname.startsWith('172.') ||
+                window.location.search.includes('dev=true');
   
   if (isDev) {
     // Check if user has selected a plan

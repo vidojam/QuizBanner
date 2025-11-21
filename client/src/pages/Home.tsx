@@ -409,7 +409,7 @@ export default function Home() {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Logo size="xl" />
+                <Logo size="lg" className="shadow-2xl" />
                 <div>
                   <div className="text-xs text-muted-foreground">
                     {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
@@ -478,8 +478,8 @@ export default function Home() {
                     {t('premiumInfo')}
                   </p>
                 </div>
-                <p className="text-muted-foreground mb-4 text-center font-bold">
-                  {t('enterQuestionsText')}
+                <p className="text-lg text-center font-bold mb-4">
+                  Enter, view and edit questions and answers below
                 </p>
               </div>
 
@@ -502,10 +502,6 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6 mt-6">
-              <p className="text-lg text-center font-bold mb-4">
-                Enter, view and edit questions and answers below
-              </p>
-              
               <Card>
                 <CardHeader>
                   <CardTitle>Display Mode</CardTitle>

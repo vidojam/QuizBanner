@@ -72,9 +72,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Create payment intent for $1.99 (199 cents)
+      // Create payment intent for $2.99 (299 cents)
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: 199, // $1.99 in cents
+        amount: 299, // $2.99 in cents
         currency: 'usd',
         metadata: {
           userId: user.id,

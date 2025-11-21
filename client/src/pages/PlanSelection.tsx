@@ -33,7 +33,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
             <Logo size="lg" className="shadow-2xl" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            Choose Your Banner Plan
+            Choose Your Learning Banner Plan
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t('planSelectionSubtitle')}
@@ -78,7 +78,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                   size="lg" 
                   variant="outline"
                   onClick={() => onPlanSelected('free')}
-                  className="w-full text-lg py-6"
+                  className="w-full text-lg py-6 bg-blue-50 hover:bg-blue-100 border-blue-200"
                 >
                   Continue With Free Plan
                 </Button>

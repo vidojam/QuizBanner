@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check, CreditCard, Lock, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoImage from "@assets/generated_images/QuizBanner_logo_primary_blue_2dd318cd.png";
+import { Logo } from "@/components/Logo";
 import { useLocation } from "wouter";
 import Footer from "@/components/Footer";
 
@@ -24,13 +24,7 @@ export default function Upgrade() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
-          <div className="h-16 w-16 rounded-full overflow-hidden flex items-center justify-center">
-            <img 
-              src={logoImage} 
-              alt="QuizBanner Logo" 
-              className="h-full w-full object-contain"
-            />
-          </div>
+          <Logo size="lg" className="shadow-2xl" />
         </div>
 
         {/* Hero Section */}
@@ -92,7 +86,7 @@ export default function Upgrade() {
 
               <div className="pt-4 border-t">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">$1.99</span>
+                  <span className="text-4xl font-bold">$2.99</span>
                   <span className="text-muted-foreground">one-time</span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">

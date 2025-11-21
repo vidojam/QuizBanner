@@ -7,7 +7,7 @@ export const translations = {
     upgradeButton: "Upgrade to Premium",
     
     // Main sections
-    learningReinforcement: "Learning Reinforcement",
+    learningReinforcement: "Learn with Banners",
     subtitle: "Create questions to reinforce your learning with timed screensaver scrolling banners",
     
     // Tabs
@@ -70,7 +70,7 @@ export const translations = {
     freePlanTitle: "Free Plan",
     premiumPlanTitle: "Premium Plan",
     freePlanPrice: "$ 0",
-    premiumPlanPrice: "$1.99/year",
+    premiumPlanPrice: "$2.99/year",
     questionsLimit: "questions",
     startFree: "Start Free",
     startPremium: "Start Premium",
@@ -135,7 +135,7 @@ export const translations = {
     upgradeButton: "Actualizar a Premium",
     
     // Main sections
-    learningReinforcement: "Refuerzo del Aprendizaje",
+    learningReinforcement: "Aprende con Banners",
     subtitle: "Crea preguntas para reforzar tu aprendizaje con banners de desplazamiento temporizados",
     
     // Tabs
@@ -198,7 +198,7 @@ export const translations = {
     freePlanTitle: "Plan Gratuito",
     premiumPlanTitle: "Plan Premium",
     freePlanPrice: "$ 0",
-    premiumPlanPrice: "$1.99/año",
+    premiumPlanPrice: "$2.99/año",
     questionsLimit: "preguntas",
     startFree: "Comenzar Gratis",
     startPremium: "Comenzar Premium",
