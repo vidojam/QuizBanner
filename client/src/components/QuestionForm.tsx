@@ -34,7 +34,7 @@ export default function QuestionForm({
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">
-          Add New Question ({questionsCount}/{maxQuestions})
+          Add New Question with Answer for Banners ({questionsCount}/{maxQuestions})
         </CardTitle>
       </CardHeader>
       <CardContent>

@@ -16,6 +16,7 @@ export default function Upgrade() {
       <div className="max-w-4xl mx-auto py-8 space-y-8">
         {/* Header with Logo */}
         <div className="flex items-center justify-between">
+          <Logo size="lg" className="shadow-2xl" />
           <Button
             variant="ghost"
             onClick={() => setLocation("/")}
@@ -24,7 +25,6 @@ export default function Upgrade() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Button>
-          <Logo size="lg" className="shadow-2xl" />
         </div>
 
         {/* Hero Section */}

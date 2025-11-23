@@ -411,7 +411,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <Logo size="lg" className="shadow-2xl" />
                 <div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xl font-bold text-foreground">
                     {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
                   </div>
                 </div>
@@ -532,7 +532,7 @@ export default function Home() {
                   </p>
                   <div className="mt-3 p-3 bg-muted rounded-md">
                     <p className="text-lg font-bold text-center">
-                      💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 10 or up to 50 questions and answers in Q: & A: format
+                      💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 50 questions and answers in Q: & A: format
                     </p>
                   </div>
                 </CardContent>

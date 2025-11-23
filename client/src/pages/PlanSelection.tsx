@@ -33,7 +33,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
             <Logo size="lg" className="shadow-2xl" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            Choose Your Learning Banner Plan
+            {t('planSelectionTitle')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {t('planSelectionSubtitle')}

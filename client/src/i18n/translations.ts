@@ -66,6 +66,7 @@ export const translations = {
     
     // Plan Selection
     choosePlan: "Choose Your Plan",
+    planSelectionTitle: "Choose Your Learning Banner Plan",
     planSelectionSubtitle: "Select the plan that best fits your learning needs",
     freePlanTitle: "Free Plan",
     premiumPlanTitle: "Premium Plan",
@@ -194,6 +195,7 @@ export const translations = {
     
     // Plan Selection
     choosePlan: "Elige Tu Plan",
+    planSelectionTitle: "Elige Tu Plan de Banners de Aprendizaje",
     planSelectionSubtitle: "Selecciona el plan que mejor se adapte a tus necesidades de aprendizaje",
     freePlanTitle: "Plan Gratuito",
     premiumPlanTitle: "Plan Premium",
