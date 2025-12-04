@@ -13,7 +13,7 @@ Learn smarter with customizable scrolling question banners featuring enhanced sp
 - Study session tracking
 - No account required - use as guest
 
-### Premium Tier ($1.99/year)
+### Premium Tier ($2.99/year)
 - Unlimited question-answer pairs
 - CSV file import
 - Paste text import
