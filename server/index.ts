@@ -1,23 +1,12 @@
 import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { registerAuthRoutes } from "./authRoutes";
 import { setupVite, serveStatic, log } from "./vite";
 import { startBackgroundTasks } from "./backgroundTasks";
+import { verifyEmailConfig } from "./emailService";
 
 const app = express();
-
-// Simple development authentication
-app.use((req, res, next) => {
-  // In development, create a mock user
-  req.user = {
-    id: 'dev-user-123',
-    email: 'dev@example.com',
-    firstName: 'Developer',
-    lastName: 'User',
-    profileImageUrl: null
-  };
-  next();
-});
 
 declare module 'http' {
   interface IncomingMessage {
@@ -62,7 +51,14 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Register auth routes first (these don't require authentication)
+  registerAuthRoutes(app);
+  
+  // Register other routes (these require authentication)
   const server = await registerRoutes(app);
+
+  // Verify email configuration on startup
+  verifyEmailConfig();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

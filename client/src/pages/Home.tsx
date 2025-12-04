@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, useLogout } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import Footer from "@/components/Footer";
+import { useLocation } from "wouter";
 
 
 const MODE_STORAGE_KEY = "display-mode";
@@ -29,7 +30,9 @@ const MODE_STORAGE_KEY = "display-mode";
 export type DisplayMode = 'screensaver' | 'overlay';
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, guestId, isGuest, tier } = useAuth();
+  const logout = useLogout();
+  const [, navigate] = useLocation();
   const { t, language } = useTranslation();
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(() => {
@@ -39,6 +42,9 @@ export default function Home() {
   const [pasteDialogOpen, setPasteDialogOpen] = useState(false);
   const [pasteText, setPasteText] = useState("");
   const { toast } = useToast();
+
+  // Use guestId as userId for guests
+  const effectiveUserId = user?.id || guestId || 'guest';
 
   // Fetch questions from database
   const { data: questions = [], isLoading: questionsLoading } = useQuery<QuestionAnswer[]>({
@@ -396,9 +402,9 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => {
-                    localStorage.clear();
-                    window.location.reload();
+                  onClick={async () => {
+                    await logout.mutateAsync();
+                    navigate('/login');
                   }}
                   data-testid="button-logout"
                 >

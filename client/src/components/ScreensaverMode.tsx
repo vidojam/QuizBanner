@@ -115,15 +115,13 @@ export default function ScreensaverMode({
     // Move to next question
     const nextQuestionIndex = (currentIndex + 1) % shuffledQuestions.length;
     
+    // Randomize position after every question
+    const randomPositionIndex = Math.floor(Math.random() * POSITION_CYCLE.length);
+    setPositionIndex(randomPositionIndex);
+    
     if (nextQuestionIndex === 0) {
-      // Completed all questions at current position, move to next position
-      const nextPositionIndex = (positionIndex + 1) % POSITION_CYCLE.length;
-      setPositionIndex(nextPositionIndex);
-      
-      if (nextPositionIndex === 0) {
-        // Completed full cycle (all questions at all positions)
-        setCompletedCount(prev => prev + 1);
-      }
+      // Completed all questions
+      setCompletedCount(prev => prev + 1);
     }
     
     // Update to next question
@@ -133,7 +131,7 @@ export default function ScreensaverMode({
     const newBgColor = getRandomAccessibleColor();
     setBackgroundColor(newBgColor);
     setTextColor(getAccessibleTextColor(newBgColor));
-  }, [currentIndex, positionIndex, shuffledQuestions.length, playNotificationSound]);
+  }, [currentIndex, shuffledQuestions.length, playNotificationSound]);
 
   const handleSkip = () => {
     handleComplete();

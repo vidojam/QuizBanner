@@ -5,11 +5,15 @@ import { sqliteTable, text, integer, real, blob } from 'drizzle-orm/sqlite-core'
 // SQLite-compatible schema for local development
 export const users = sqliteTable("users", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  email: text("email").unique(),
+  email: text("email").unique().notNull(),
+  passwordHash: text("password_hash").notNull(),
   firstName: text("first_name"),
   lastName: text("last_name"),
   profileImageUrl: text("profile_image_url"),
   tier: text("tier").notNull().default("free"),
+  emailVerified: integer("email_verified").notNull().default(0), // 0 = false, 1 = true
+  resetToken: text("reset_token"),
+  resetTokenExpires: text("reset_token_expires"), // ISO date string
   stripeCustomerId: text("stripe_customer_id"),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -62,10 +66,37 @@ export const templates = sqliteTable("templates", {
 
 export const studySessions = sqliteTable("study_sessions", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id"),
+  guestId: text("guest_id"), // For guest sessions
   startTime: text("start_time").notNull(), // ISO string for SQLite
   endTime: text("end_time"),
   questionsReviewed: integer("questions_reviewed").notNull().default(0),
   totalDuration: integer("total_duration").notNull().default(0),
+});
+
+// Guest premium purchases - tracks premium status for guests
+export const guestPremium = sqliteTable("guest_premium", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  guestId: text("guest_id").notNull().unique(),
+  email: text("email"),
+  tier: text("tier").notNull().default("premium"),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  linkedUserId: text("linked_user_id"), // Set when guest converts to account
+  subscriptionExpiresAt: text("subscription_expires_at"),
+  subscriptionStatus: text("subscription_status").default("active"),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+  updatedAt: text("updated_at").$defaultFn(() => new Date().toISOString()),
+});
+
+// Contact form submissions
+export const contactMessages = sqliteTable("contact_messages", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("new"), // new, read, resolved
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
 const schema = {
@@ -73,7 +104,9 @@ const schema = {
   questions,
   preferences,
   templates,
-  studySessions
+  studySessions,
+  guestPremium,
+  contactMessages
 };
 
 // Use SQLite for local development
@@ -85,6 +118,7 @@ sqlite.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT UNIQUE,
+    password_hash TEXT,
     first_name TEXT,
     last_name TEXT,
     profile_image_url TEXT,
@@ -96,6 +130,9 @@ sqlite.exec(`
     subscription_status TEXT DEFAULT 'none',
     last_payment_date TEXT,
     upgraded_at TEXT,
+    email_verified INTEGER NOT NULL DEFAULT 0,
+    reset_token TEXT,
+    reset_token_expires TEXT,
     created_at TEXT,
     updated_at TEXT
   );
@@ -141,12 +178,36 @@ sqlite.exec(`
 
   CREATE TABLE IF NOT EXISTS study_sessions (
     id TEXT PRIMARY KEY,
+    user_id TEXT,
+    guest_id TEXT,
     start_time TEXT NOT NULL,
     end_time TEXT,
     questions_reviewed INTEGER NOT NULL DEFAULT 0,
     total_duration INTEGER NOT NULL DEFAULT 0
   );
 
+  CREATE TABLE IF NOT EXISTS guest_premium (
+    id TEXT PRIMARY KEY,
+    guest_id TEXT NOT NULL UNIQUE,
+    email TEXT,
+    tier TEXT NOT NULL DEFAULT 'premium',
+    stripe_payment_intent_id TEXT,
+    stripe_customer_id TEXT,
+    linked_user_id TEXT,
+    subscription_expires_at TEXT,
+    subscription_status TEXT DEFAULT 'active',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS contact_messages (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'new',
+    created_at TEXT NOT NULL
+  );
 
 `);
 

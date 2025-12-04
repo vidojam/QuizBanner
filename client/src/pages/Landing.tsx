@@ -5,6 +5,7 @@ import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import Footer from "@/components/Footer";
+import { Link } from "wouter";
 
 export default function Landing() {
   const { t, language } = useTranslation();
@@ -30,39 +31,26 @@ export default function Landing() {
               {t('landingSubtitle')}
             </p>
             <div className="pt-4 flex flex-wrap gap-4 justify-center">
-              <Button 
-                size="lg" 
-                variant="outline"
-                onClick={() => window.location.href = "/api/login"}
-                data-testid="button-login-free"
-                className="text-lg px-8 py-6"
-              >
-                {t('getStartedFree')}
-              </Button>
-              <Button 
-                size="lg" 
-                onClick={() => window.location.href = "/api/login"}
-                data-testid="button-login-premium"
-                className="text-lg px-8 py-6"
-              >
-                Upgrade to Premium
-              </Button>
-              {/* Development Login Button - Always show in development */}
-              <Button 
-                size="lg" 
-                variant="secondary"
-                onClick={() => {
-                  console.log('Dev login button clicked');
-                  // Set dev login cookie and redirect
-                  document.cookie = 'dev-login=true; path=/; max-age=86400'; // 24 hours
-                  console.log('Dev cookie set, redirecting...');
-                  window.location.href = '/?dev=true';
-                }}
-                data-testid="button-dev-login"
-                className="text-lg px-8 py-6 bg-yellow-500 hover:bg-yellow-600 text-black"
-              >
-                🛠️ Dev Login
-              </Button>
+              <Link href="/app">
+                <Button 
+                  size="lg" 
+                  variant="default"
+                  data-testid="button-try-free"
+                  className="text-lg px-8 py-6 w-64"
+                >
+                  Try Banners for Free
+                </Button>
+              </Link>
+              <Link href="/upgrade">
+                <Button 
+                  size="lg" 
+                  variant="default"
+                  data-testid="button-login"
+                  className="text-lg px-8 py-6 w-64"
+                >
+                  Premium
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -150,6 +138,23 @@ export default function Landing() {
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
                 <div className="text-sm text-gray-500">
                   © {new Date().getFullYear()} QuizBanner. All rights reserved.
+                </div>
+                <div className="flex gap-4">
+                  <Link href="/terms">
+                    <a className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
+                      Terms of Service
+                    </a>
+                  </Link>
+                  <Link href="/privacy">
+                    <a className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
+                      Privacy Policy
+                    </a>
+                  </Link>
+                  <Link href="/contact">
+                    <a className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
+                      Contact Us
+                    </a>
+                  </Link>
                 </div>
                 <div className="text-xs text-gray-400">
                   Developed by vidojam

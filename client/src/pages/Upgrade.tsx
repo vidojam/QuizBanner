@@ -19,7 +19,7 @@ export default function Upgrade() {
           <Logo size="lg" className="shadow-2xl" />
           <Button
             variant="ghost"
-            onClick={() => setLocation("/")}
+            onClick={() => setLocation("/app")}
             data-testid="button-back"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

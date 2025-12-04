@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { db, users } from './db';
 import { eq } from 'drizzle-orm';
 import SubscriptionManager from './subscriptionManager';
+import { storage } from './storage';
 
 // Initialize Stripe (you'll need to add your Stripe secret key to environment variables)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -64,7 +65,29 @@ export async function handleStripeWebhook(req: Request, res: Response) {
 async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   console.log('Payment succeeded:', paymentIntent.id);
   
-  // Find user by payment intent ID
+  const metadata = paymentIntent.metadata;
+  const isGuest = metadata?.isGuest === 'true';
+  const guestId = metadata?.guestId;
+  const email = metadata?.email;
+
+  if (isGuest && guestId) {
+    // Handle guest payment
+    console.log(`Guest payment succeeded for guestId: ${guestId}`);
+    
+    try {
+      await storage.createGuestPremium({
+        guestId,
+        email,
+        stripePaymentIntentId: paymentIntent.id,
+      });
+      console.log(`Created guest premium for ${guestId}`);
+    } catch (error) {
+      console.error('Error creating guest premium:', error);
+    }
+    return;
+  }
+  
+  // Handle authenticated user payment
   const userResults = await db.select()
     .from(users)
     .where(eq(users.stripePaymentIntentId, paymentIntent.id))

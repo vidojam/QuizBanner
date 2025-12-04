@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,17 +7,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import Home from "@/pages/Home";
 import Landing from "@/pages/Landing";
-import PlanSelection from "@/pages/PlanSelection";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import Upgrade from "@/pages/Upgrade";
+import TermsOfService from "@/pages/TermsOfService";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading, needsPlanSelection } = useAuth();
-
-  const handlePlanSelection = (plan: 'free' | 'premium') => {
-    localStorage.setItem('selectedPlan', plan);
-    window.location.reload(); // Refresh to update auth state
-  };
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -27,22 +28,24 @@ function Router() {
     );
   }
 
-  // Show plan selection if needed
-  if (needsPlanSelection) {
-    return <PlanSelection onPlanSelected={handlePlanSelection} />;
-  }
-
   return (
     <Switch>
-      {!isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          {/* Always use desktop version - force Home component */}
-          <Route path="/" component={Home} />
-          <Route path="/upgrade" component={Upgrade} />
-        </>
-      )}
+      {/* Public routes */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/contact" component={Contact} />
+      
+      {/* Landing page - entry point for everyone */}
+      <Route path="/" component={Landing} />
+      
+      {/* App routes */}
+      <Route path="/app" component={Home} />
+      <Route path="/upgrade" component={Upgrade} />
+      
       <Route component={NotFound} />
     </Switch>
   );

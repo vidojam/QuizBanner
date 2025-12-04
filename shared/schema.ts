@@ -6,11 +6,15 @@ import { sql } from "drizzle-orm";
 // User table with tier tracking
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  email: varchar("email").unique(),
+  email: varchar("email").unique().notNull(),
+  passwordHash: varchar("password_hash").notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   tier: varchar("tier").notNull().default("free"), // "free" or "premium"
+  emailVerified: integer("email_verified").notNull().default(0), // 0 = false, 1 = true
+  resetToken: varchar("reset_token"),
+  resetTokenExpires: timestamp("reset_token_expires"),
   stripeCustomerId: varchar("stripe_customer_id"),
   stripePaymentIntentId: varchar("stripe_payment_intent_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),

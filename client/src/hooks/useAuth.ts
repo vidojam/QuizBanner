@@ -1,57 +1,75 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@shared/schema";
 
-export function useAuth() {
-  // Development mode bypass - works for localhost and local network IPs
-  const isDev = window.location.hostname === 'localhost' || 
-                window.location.hostname.startsWith('192.168.') || 
-                window.location.hostname.startsWith('10.') ||
-                window.location.hostname.startsWith('172.') ||
-                window.location.search.includes('dev=true');
-  
-  if (isDev) {
-    // Check if user has selected a plan
-    const selectedPlan = localStorage.getItem('selectedPlan') as 'free' | 'premium' | null;
-    
-    if (!selectedPlan) {
-      return {
-        user: null,
-        isLoading: false,
-        isAuthenticated: false,
-        needsPlanSelection: true,
-        error: null
-      };
-    }
-    
-    return {
-      user: {
-        id: 'dev-user-123',
-        name: 'Developer User',
-        email: 'dev@example.com',
-        tier: selectedPlan,
-        avatar: '',
-        firstName: 'Developer',
-        lastName: 'User',
-        profileImageUrl: ''
-      },
-      isLoading: false,
-      isAuthenticated: true,
-      needsPlanSelection: false,
-      error: null
-    };
-  }
+interface AuthContextType {
+  user: User | null;
+  guestId: string | null;
+  isGuest: boolean;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  tier: 'free' | 'premium';
+  error: Error | null;
+}
 
-  const { data: user, isLoading, error } = useQuery<User>({
+async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  const token = localStorage.getItem('authToken');
+  
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  return response;
+}
+
+// Generate or get persistent guest ID
+function getOrCreateGuestId(): string {
+  let guestId = localStorage.getItem('guestId');
+  if (!guestId) {
+    guestId = `guest-${crypto.randomUUID()}`;
+    localStorage.setItem('guestId', guestId);
+  }
+  return guestId;
+}
+
+// Check if guest has premium
+async function checkGuestPremium(guestId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`/api/guest/premium/${guestId}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.isPremium === true;
+    }
+  } catch (error) {
+    console.error('Error checking guest premium:', error);
+  }
+  return false;
+}
+
+export function useAuth(): AuthContextType {
+  const token = localStorage.getItem('authToken');
+  const guestId = getOrCreateGuestId();
+
+  const { data: user, isLoading, error } = useQuery<User | null>({
     queryKey: ["/api/auth/user"],
     retry: false,
-    // Treat 401 as expected unauthenticated state, not an error
     queryFn: async () => {
-      const response = await fetch("/api/auth/user", {
-        credentials: "include",
-      });
+      const token = localStorage.getItem('authToken');
       
-      // If 401, return null to indicate not authenticated
+      // No token means not authenticated
+      if (!token) {
+        return null;
+      }
+      
+      const response = await fetchWithAuth("/api/auth/user");
+      
+      // If 401, clear token and return null
       if (response.status === 401) {
+        localStorage.removeItem('authToken');
         return null;
       }
       
@@ -63,10 +81,132 @@ export function useAuth() {
     },
   });
 
+  // Check guest premium status
+  const { data: guestPremium } = useQuery({
+    queryKey: ['guestPremium', guestId],
+    queryFn: () => checkGuestPremium(guestId),
+    enabled: !user && !!guestId, // Only check if not logged in
+  });
+
+  const isGuest = !user;
+  const tier = user?.tier || (guestPremium ? 'premium' : 'free');
+
   return {
     user: user || null,
+    guestId: isGuest ? guestId : null,
+    isGuest,
     isLoading,
     isAuthenticated: !!user,
-    needsPlanSelection: false,
+    tier: tier as 'free' | 'premium',
+    error: error as Error | null,
   };
+}
+
+export function useLogin() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (credentials: { email: string; password: string }) => {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Login failed');
+      }
+      
+      const data = await response.json();
+      localStorage.setItem('authToken', data.token);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+  });
+}
+
+export function useRegister() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: { 
+      email: string; 
+      password: string; 
+      firstName: string; 
+      lastName: string;
+    }) => {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Registration failed');
+      }
+      
+      const result = await response.json();
+      localStorage.setItem('authToken', result.token);
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+  });
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async () => {
+      localStorage.removeItem('authToken');
+      queryClient.setQueryData(['/api/auth/user'], null);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+    },
+  });
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send reset email');
+      }
+      
+      return response.json();
+    },
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async (data: { token: string; newPassword: string }) => {
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to reset password');
+      }
+      
+      return response.json();
+    },
+  });
 }

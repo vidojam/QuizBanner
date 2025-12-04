@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { authenticate, optionalAuth } from "./authMiddleware";
 
 import { insertQuestionSchema, insertPreferencesSchema, insertTemplateSchema, insertStudySessionSchema, TIER_LIMITS } from "@shared/schema";
 import { z } from "zod";
@@ -21,8 +22,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await handleStripeWebhook(req, res);
   });
 
-  // Auth routes  
-  app.get('/api/auth/user', async (req: any, res) => {
+  // Auth routes - get current user (requires authentication)
+  app.get('/api/auth/user', authenticate, async (req: any, res) => {
     try {
       const userId = req.user.id;
       let user = await storage.getUser(userId);
@@ -49,8 +50,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Guest premium check (public)
+  app.get('/api/guest/premium/:guestId', async (req, res) => {
+    try {
+      const { guestId } = req.params;
+      const guestPremium = await storage.getGuestPremium(guestId);
+      
+      if (!guestPremium) {
+        return res.json({ isPremium: false });
+      }
+      
+      // Check if subscription is still active
+      const isActive = guestPremium.subscriptionStatus === 'active' &&
+        (!guestPremium.subscriptionExpiresAt || new Date(guestPremium.subscriptionExpiresAt) > new Date());
+      
+      res.json({
+        isPremium: isActive,
+        expiresAt: guestPremium.subscriptionExpiresAt,
+        status: guestPremium.subscriptionStatus,
+      });
+    } catch (error: any) {
+      console.error("Error checking guest premium:", error);
+      res.status(500).json({ error: "Failed to check guest premium status" });
+    }
+  });
+
+  // Link guest purchase to user account (requires authentication)
+  app.post('/api/guest/link', authenticate, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { guestId } = req.body;
+      
+      if (!guestId) {
+        return res.status(400).json({ error: "guestId required" });
+      }
+      
+      await storage.linkGuestToUser(guestId, userId);
+      res.json({ success: true, message: "Guest premium linked to account" });
+    } catch (error: any) {
+      console.error("Error linking guest to user:", error);
+      res.status(500).json({ error: "Failed to link guest premium" });
+    }
+  });
+
   // Subscription management routes
-  app.get('/api/subscription/status', async (req: any, res) => {
+  app.get('/api/subscription/status', authenticate, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const SubscriptionManager = await import('./subscriptionManager');
@@ -62,31 +106,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/subscription/create-payment-intent', async (req: any, res) => {
+  app.post('/api/subscription/create-payment-intent', optionalAuth, async (req: any, res) => {
     try {
       const { stripe } = await import('./stripeWebhooks');
-      const userId = req.user.id;
-      const user = await storage.getUser(userId);
+      const { email, guestId } = req.body;
       
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+      // Support both authenticated users and guests
+      const userId = req.user?.id;
+      const isGuest = !userId;
+      
+      // For guests, require email and guestId
+      if (isGuest && (!email || !guestId)) {
+        return res.status(400).json({ message: "Email and guestId required for guest checkout" });
+      }
+      
+      // For authenticated users, get their info
+      let user;
+      if (userId) {
+        user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
       }
 
       // Create payment intent for $2.99 (299 cents)
       const paymentIntent = await stripe.paymentIntents.create({
         amount: 299, // $2.99 in cents
         currency: 'usd',
+        receipt_email: email || user?.email || undefined,
         metadata: {
-          userId: user.id,
+          userId: userId || 'guest',
+          guestId: isGuest ? guestId : undefined,
+          email: email || user?.email || '',
           tier: 'premium',
-          duration: '12months'
+          duration: '12months',
+          isGuest: isGuest.toString()
         }
       });
 
-      // Store payment intent ID for webhook verification
-      await storage.updateUser(user.id, {
-        stripePaymentIntentId: paymentIntent.id
-      });
+      // Store payment intent ID for authenticated users
+      if (userId && user) {
+        await storage.updateUser(user.id, {
+          stripePaymentIntentId: paymentIntent.id
+        });
+      }
 
       res.json({
         clientSecret: paymentIntent.client_secret,
@@ -98,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/subscription/cancel', async (req: any, res) => {
+  app.post('/api/subscription/cancel', authenticate, async (req: any, res) => {
     try {
       const userId = req.user.id;
       const SubscriptionManager = await import('./subscriptionManager');
@@ -110,10 +173,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Questions CRUD (all protected)
-  app.get("/api/questions", async (req: any, res) => {
+  // Questions CRUD (support guests and authenticated users)
+  app.get("/api/questions", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.query.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const questions = await storage.getQuestions(userId);
       res.json(questions);
     } catch (error: any) {
@@ -121,9 +187,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/questions/:id", async (req: any, res) => {
+  app.get("/api/questions/:id", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.query.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const id = req.params.id;
       const question = await storage.getQuestion(id, userId);
       if (!question) {
@@ -135,25 +204,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/questions", async (req: any, res) => {
+  app.post("/api/questions", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
-      const user = await storage.getUser(userId);
-      
-      if (!user) {
-        return res.status(401).json({ error: "User not found" });
+      const userId = req.user?.id || req.body.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
       }
+      
+      // Get user for tier limits (guests default to free tier)
+      const user = req.user?.id ? await storage.getUser(req.user.id) : null;
+      const guestPremium = !user && userId ? await storage.getGuestPremium(userId) : null;
+      
+      // Determine tier from user or guest premium
+      const tier = user?.tier || (guestPremium?.tier) || 'free';
 
       // Enforce tier limits
       const currentCount = await storage.getQuestionCount(userId);
-      const limit = TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS];
+      const limit = TIER_LIMITS[tier as keyof typeof TIER_LIMITS];
       
       if (currentCount >= limit) {
         return res.status(403).json({ 
-          error: `Question limit reached. ${user.tier === 'free' ? 'Upgrade to premium for up to 50 questions.' : 'Maximum of 50 questions reached.'}`,
+          error: `Question limit reached. ${tier === 'free' ? 'Upgrade to premium for up to 50 questions.' : 'Maximum of 50 questions reached.'}`,
           currentCount,
           limit,
-          tier: user.tier
+          tier
         });
       }
 
@@ -168,9 +242,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/questions/:id", async (req: any, res) => {
+  app.patch("/api/questions/:id", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.body.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const id = req.params.id;
       const question = await storage.updateQuestion(id, req.body, userId);
       if (!question) {
@@ -182,9 +259,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/questions", async (req: any, res) => {
+  app.delete("/api/questions", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.query.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const count = await storage.deleteAllQuestions(userId);
       res.json({ count });
     } catch (error: any) {
@@ -192,9 +272,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/questions/:id", async (req: any, res) => {
+  app.delete("/api/questions/:id", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.query.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const id = req.params.id;
       const success = await storage.deleteQuestion(id, userId);
       if (!success) {
@@ -206,9 +289,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/questions/reorder", async (req: any, res) => {
+  app.post("/api/questions/reorder", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.body.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const { questionIds } = req.body;
       if (!Array.isArray(questionIds)) {
         return res.status(400).json({ error: "questionIds must be an array" });
@@ -220,10 +306,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Preferences (protected)
-  app.get("/api/preferences", async (req: any, res) => {
+  // Preferences (support guests and authenticated users)
+  app.get("/api/preferences", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.query.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const prefs = await storage.getPreferences(userId);
       res.json(prefs);
     } catch (error: any) {
@@ -231,9 +320,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/preferences", async (req: any, res) => {
+  app.patch("/api/preferences", optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user?.id || req.body.guestId || req.headers['x-guest-id'];
+      if (!userId) {
+        return res.status(400).json({ error: "User ID or Guest ID required" });
+      }
       const prefs = await storage.updatePreferences(req.body, userId);
       res.json(prefs);
     } catch (error: any) {
@@ -324,6 +416,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(sessions);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Contact form submission (no auth required)
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const { name, email, message } = req.body;
+      
+      if (!name || !email || !message) {
+        return res.status(400).json({ message: "Name, email, and message are required" });
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email address" });
+      }
+      
+      const result = await storage.createContactMessage({ name, email, message });
+      res.json({ success: true, id: result.id });
+    } catch (error: any) {
+      console.error("Error submitting contact form:", error);
+      res.status(500).json({ message: "Failed to submit contact form" });
     }
   });
 

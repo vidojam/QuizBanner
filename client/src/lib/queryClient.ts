@@ -7,15 +7,42 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Get guest ID from localStorage
+function getGuestId(): string | null {
+  return localStorage.getItem('guestId');
+}
+
+// Get auth token from localStorage
+function getAuthToken(): string | null {
+  return localStorage.getItem('authToken');
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const token = getAuthToken();
+  const guestId = getGuestId();
+  
+  const headers: Record<string, string> = {};
+  if (data) {
+    headers["Content-Type"] = "application/json";
+  }
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  if (guestId && !token) {
+    headers["X-Guest-Id"] = guestId;
+  }
+
+  // Add guestId to body for POST/PATCH requests if not authenticated
+  const bodyData = data && !token && guestId ? { ...data as any, guestId } : data;
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
+    headers,
+    body: bodyData ? JSON.stringify(bodyData) : undefined,
     credentials: "include",
   });
 
@@ -29,7 +56,27 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
+    const token = getAuthToken();
+    const guestId = getGuestId();
+    
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    if (guestId && !token) {
+      headers["X-Guest-Id"] = guestId;
+    }
+
+    // Add guestId as query param for GET requests if not authenticated
+    let url = queryKey.join("/") as string;
+    if (guestId && !token && !url.includes('?')) {
+      url += `?guestId=${guestId}`;
+    } else if (guestId && !token && !url.includes('guestId=')) {
+      url += `&guestId=${guestId}`;
+    }
+
+    const res = await fetch(url, {
+      headers,
       credentials: "include",
     });
 

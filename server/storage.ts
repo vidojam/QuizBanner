@@ -7,14 +7,41 @@ import type {
   StudySession, InsertStudySession,
   User, UpsertUser
 } from "@shared/schema";
-import { questions, preferences, templates, studySessions, users } from "./db";
+import { questions, preferences, templates, studySessions, users, guestPremium, contactMessages } from "./db";
+
+export interface GuestPremium {
+  id: string;
+  guestId: string;
+  email: string | null;
+  tier: string;
+  stripePaymentIntentId: string | null;
+  stripeCustomerId: string | null;
+  linkedUserId: string | null;
+  subscriptionExpiresAt: string | null;
+  subscriptionStatus: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
+  createUser(userData: Omit<UpsertUser, 'id'>): Promise<User>;
+  updateUser(id: string, userData: Partial<User>): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  setResetToken(userId: string, token: string, expires: Date): Promise<void>;
+  clearResetToken(userId: string): Promise<void>;
+  updatePassword(userId: string, passwordHash: string): Promise<void>;
   
-  // Questions (user-specific)
+  // Guest premium operations
+  getGuestPremium(guestId: string): Promise<GuestPremium | undefined>;
+  getGuestPremiumByEmail(email: string): Promise<GuestPremium | undefined>;
+  createGuestPremium(data: { guestId: string; email?: string; stripePaymentIntentId?: string }): Promise<GuestPremium>;
+  linkGuestToUser(guestId: string, userId: string): Promise<void>;
+  
+  // Questions (user-specific or guest-specific)
   getQuestions(userId: string): Promise<Question[]>;
   getQuestion(id: string, userId: string): Promise<Question | undefined>;
   createQuestion(question: InsertQuestion, userId: string): Promise<Question>;
@@ -38,6 +65,9 @@ export interface IStorage {
   createStudySession(session: InsertStudySession): Promise<StudySession>;
   updateStudySession(id: string, session: Partial<InsertStudySession>): Promise<StudySession | undefined>;
   getRecentSessions(limit?: number): Promise<StudySession[]>;
+  
+  // Contact messages
+  createContactMessage(data: { name: string; email: string; message: string }): Promise<{ id: string; createdAt: string }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -47,15 +77,141 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.resetToken, token));
+    
+    // Check if token is expired
+    if (user && user.resetTokenExpires) {
+      const expires = new Date(user.resetTokenExpires);
+      if (expires < new Date()) {
+        return undefined; // Token expired
+      }
+    }
+    
+    return user || undefined;
+  }
+
+  async createUser(userData: Omit<UpsertUser, 'id'>): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as any)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: string, userData: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...userData,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async setResetToken(userId: string, token: string, expires: Date): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        resetToken: token,
+        resetTokenExpires: expires.toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async clearResetToken(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        resetToken: null,
+        resetTokenExpires: null,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        passwordHash,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  // Guest premium operations
+  async getGuestPremium(guestId: string): Promise<GuestPremium | undefined> {
+    const [guest] = await db.select().from(guestPremium).where(eq(guestPremium.guestId, guestId));
+    return guest || undefined;
+  }
+
+  async getGuestPremiumByEmail(email: string): Promise<GuestPremium | undefined> {
+    const [guest] = await db.select().from(guestPremium).where(eq(guestPremium.email, email));
+    return guest || undefined;
+  }
+
+  async createGuestPremium(data: { 
+    guestId: string; 
+    email?: string; 
+    stripePaymentIntentId?: string;
+  }): Promise<GuestPremium> {
+    const now = new Date().toISOString();
+    const expiresAt = new Date();
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 12 months
+
+    const [created] = await db.insert(guestPremium).values({
+      guestId: data.guestId,
+      email: data.email || null,
+      tier: 'premium',
+      stripePaymentIntentId: data.stripePaymentIntentId || null,
+      subscriptionExpiresAt: expiresAt.toISOString(),
+      subscriptionStatus: 'active',
+      createdAt: now,
+      updatedAt: now,
+    }).returning();
+    return created as GuestPremium;
+  }
+
+  async linkGuestToUser(guestId: string, userId: string): Promise<void> {
+    const now = new Date().toISOString();
+    await db.update(guestPremium)
+      .set({ linkedUserId: userId, updatedAt: now })
+      .where(eq(guestPremium.guestId, guestId));
+    
+    // Also transfer the guest's premium status to the user
+    const guest = await this.getGuestPremium(guestId);
+    if (guest && guest.subscriptionExpiresAt) {
+      await this.updateUser(userId, {
+        tier: 'premium',
+        subscriptionExpiresAt: guest.subscriptionExpiresAt,
+        subscriptionStatus: 'active',
+        stripePaymentIntentId: guest.stripePaymentIntentId || undefined,
+      });
+    }
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
-      .values(userData)
+      .values(userData as any)
       .onConflictDoUpdate({
         target: users.id,
         set: {
           ...userData,
-          updatedAt: new Date(),
+          updatedAt: new Date().toISOString(),
         },
       })
       .returning();
@@ -202,6 +358,15 @@ export class DatabaseStorage implements IStorage {
 
   async getRecentSessions(limit: number = 10): Promise<StudySession[]> {
     return await db.select().from(studySessions).orderBy(desc(studySessions.startTime)).limit(limit);
+  }
+
+  // Contact messages
+  async createContactMessage(data: { name: string; email: string; message: string }): Promise<{ id: string; createdAt: string }> {
+    const [created] = await db.insert(contactMessages).values({
+      ...data,
+      createdAt: new Date().toISOString(),
+    }).returning({ id: contactMessages.id, createdAt: contactMessages.createdAt });
+    return created;
   }
 }
 
