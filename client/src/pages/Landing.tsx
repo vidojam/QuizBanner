@@ -103,7 +103,7 @@ export default function Landing() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-1">
-                  <div className="text-3xl font-bold">$1.99</div>
+                  <div className="text-3xl font-bold">$2.99</div>
                   <div className="text-sm text-muted-foreground">one-time payment for 12 months</div>
                 </div>
                 <ul className="space-y-2">

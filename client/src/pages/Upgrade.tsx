@@ -147,7 +147,7 @@ export default function Upgrade() {
                 data-testid="button-pay"
               >
                 <Lock className="w-4 h-4 mr-2" />
-                Pay $1.99 (Preview Mode)
+                Pay $2.99 (Preview Mode)
               </Button>
 
               <div className="text-xs text-center text-muted-foreground space-y-1">
