@@ -115,8 +115,12 @@ export default function ScreensaverMode({
     // Move to next question
     const nextQuestionIndex = (currentIndex + 1) % shuffledQuestions.length;
     
-    // Randomize position after every question
-    const randomPositionIndex = Math.floor(Math.random() * POSITION_CYCLE.length);
+    // Randomize position after every question, but ensure it's different from current
+    let randomPositionIndex;
+    do {
+      randomPositionIndex = Math.floor(Math.random() * POSITION_CYCLE.length);
+    } while (randomPositionIndex === positionIndex && POSITION_CYCLE.length > 1);
+    
     setPositionIndex(randomPositionIndex);
     
     if (nextQuestionIndex === 0) {
@@ -131,7 +135,7 @@ export default function ScreensaverMode({
     const newBgColor = getRandomAccessibleColor();
     setBackgroundColor(newBgColor);
     setTextColor(getAccessibleTextColor(newBgColor));
-  }, [currentIndex, shuffledQuestions.length, playNotificationSound]);
+  }, [currentIndex, positionIndex, shuffledQuestions.length, playNotificationSound]);
 
   const handleSkip = () => {
     handleComplete();
