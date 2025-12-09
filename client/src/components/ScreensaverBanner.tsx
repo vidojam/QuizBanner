@@ -33,6 +33,8 @@ export default function ScreensaverBanner({
   const [isReady, setIsReady] = useState(false);
   const questionRef = useRef<HTMLDivElement>(null);
   const answerRef = useRef<HTMLDivElement>(null);
+  const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const answerTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // When question animation ends, show answer
   const handleQuestionAnimationEnd = () => {
@@ -47,6 +49,36 @@ export default function ScreensaverBanner({
       onComplete();
     }
   };
+
+  // Fallback timer for question in case animationEnd doesn't fire
+  useEffect(() => {
+    if (!isPaused && isReady && !showAnswer) {
+      questionTimerRef.current = setTimeout(() => {
+        setShowAnswer(true);
+      }, (questionDuration + 0.5) * 1000); // Add 0.5s buffer
+    }
+    
+    return () => {
+      if (questionTimerRef.current) {
+        clearTimeout(questionTimerRef.current);
+      }
+    };
+  }, [isPaused, isReady, showAnswer, questionDuration]);
+
+  // Fallback timer for answer in case animationEnd doesn't fire
+  useEffect(() => {
+    if (!isPaused && showAnswer && answerDuration > 0) {
+      answerTimerRef.current = setTimeout(() => {
+        onComplete();
+      }, (answerDuration + 0.5) * 1000); // Add 0.5s buffer
+    }
+    
+    return () => {
+      if (answerTimerRef.current) {
+        clearTimeout(answerTimerRef.current);
+      }
+    };
+  }, [isPaused, showAnswer, answerDuration, onComplete]);
 
   // Calculate durations based on text width to ensure constant scroll speed
   useEffect(() => {
