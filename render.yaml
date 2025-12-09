@@ -5,7 +5,7 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install --legacy-peer-deps && npm run build
+    buildCommand: NPM_CONFIG_PRODUCTION=false npm install --legacy-peer-deps && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
