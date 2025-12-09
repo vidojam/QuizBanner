@@ -35,26 +35,46 @@ export default function ScreensaverBanner({
   const answerRef = useRef<HTMLDivElement>(null);
   const questionTimerRef = useRef<NodeJS.Timeout | null>(null);
   const answerTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasShownAnswerRef = useRef(false);
+  const hasCompletedRef = useRef(false);
 
   // When question animation ends, show answer
   const handleQuestionAnimationEnd = () => {
-    if (!isPaused) {
+    if (!isPaused && !hasShownAnswerRef.current) {
+      hasShownAnswerRef.current = true;
+      if (questionTimerRef.current) {
+        clearTimeout(questionTimerRef.current);
+      }
       setShowAnswer(true);
     }
   };
 
   // When answer animation ends, complete and move to next position
   const handleAnswerAnimationEnd = () => {
-    if (!isPaused) {
+    if (!isPaused && !hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      if (answerTimerRef.current) {
+        clearTimeout(answerTimerRef.current);
+      }
       onComplete();
     }
   };
 
+  // Reset refs when component remounts with new question
+  useEffect(() => {
+    hasShownAnswerRef.current = false;
+    hasCompletedRef.current = false;
+    setShowAnswer(false);
+  }, [question, answer]);
+
   // Fallback timer for question in case animationEnd doesn't fire
   useEffect(() => {
-    if (!isPaused && isReady && !showAnswer) {
+    if (!isPaused && isReady && !showAnswer && !hasShownAnswerRef.current) {
       questionTimerRef.current = setTimeout(() => {
-        setShowAnswer(true);
+        if (!hasShownAnswerRef.current) {
+          hasShownAnswerRef.current = true;
+          setShowAnswer(true);
+        }
       }, (questionDuration + 0.5) * 1000); // Add 0.5s buffer
     }
     
@@ -67,9 +87,12 @@ export default function ScreensaverBanner({
 
   // Fallback timer for answer in case animationEnd doesn't fire
   useEffect(() => {
-    if (!isPaused && showAnswer && answerDuration > 0) {
+    if (!isPaused && showAnswer && answerDuration > 0 && !hasCompletedRef.current) {
       answerTimerRef.current = setTimeout(() => {
-        onComplete();
+        if (!hasCompletedRef.current) {
+          hasCompletedRef.current = true;
+          onComplete();
+        }
       }, (answerDuration + 0.5) * 1000); // Add 0.5s buffer
     }
     
