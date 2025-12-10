@@ -7,7 +7,7 @@ import { storage } from './storage';
 
 // Initialize Stripe (you'll need to add your Stripe secret key to environment variables)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-11-17.clover',
 });
 
 export async function handleStripeWebhook(req: Request, res: Response) {
@@ -128,7 +128,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   
   if (subscription.status === 'active') {
     // Calculate expiry date based on current period end
-    const expiresAt = new Date(subscription.current_period_end * 1000);
+    const expiresAt = new Date((subscription as any).current_period_end * 1000);
     
     await db.update(users)
       .set({
@@ -167,11 +167,11 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   console.log('Invoice payment succeeded:', invoice.id);
   
-  if (invoice.subscription) {
+  if ((invoice as any).subscription) {
     // This is a subscription renewal
     const userResults = await db.select()
       .from(users)
-      .where(eq(users.stripeSubscriptionId, invoice.subscription as string))
+      .where(eq(users.stripeSubscriptionId, (invoice as any).subscription as string))
       .limit(1);
 
     if (userResults.length > 0) {
@@ -199,10 +199,10 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   console.error('Invoice payment failed:', invoice.id);
   
-  if (invoice.subscription) {
+  if ((invoice as any).subscription) {
     const userResults = await db.select()
       .from(users)
-      .where(eq(users.stripeSubscriptionId, invoice.subscription as string))
+      .where(eq(users.stripeSubscriptionId, (invoice as any).subscription as string))
       .limit(1);
 
     if (userResults.length > 0) {
