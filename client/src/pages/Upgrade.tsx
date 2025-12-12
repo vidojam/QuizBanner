@@ -1,14 +1,61 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, CreditCard, Lock, ArrowLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Check, Lock, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useLocation } from "wouter";
 import Footer from "@/components/Footer";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import CheckoutForm from "@/components/CheckoutForm";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
 
 export default function Upgrade() {
-  const [, setLocation] = useLocation();
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    // Create payment intent when component mounts
+    const createPaymentIntent = async () => {
+      try {
+        const response = await fetch("/api/subscription/create-payment-intent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to create payment intent");
+        }
+
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+      } catch (err: any) {
+        setError(err.message || "Failed to initialize payment. Please try again.");
+        toast({
+          variant: "destructive",
+          title: "Payment initialization failed",
+          description: err.message || "Please refresh the page and try again.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    createPaymentIntent();
+  }, [toast]);
+
+  const handlePaymentSuccess = () => {
+    setTimeout(() => {
+      setLocation("/app");
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col">
@@ -106,57 +153,36 @@ export default function Upgrade() {
               <CardDescription>Your payment information is encrypted and secure</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Stripe Payment Element Placeholder */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="card-element">Card Information</Label>
-                  <div 
-                    id="card-element" 
-                    className="border rounded-md p-4 bg-muted/30"
-                  >
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <CreditCard className="w-5 h-5" />
-                      <span>Card number will appear here</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 mt-3 text-sm text-muted-foreground">
-                      <div>MM / YY</div>
-                      <div>CVC</div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Powered by Stripe - Accepts all major credit cards
-                  </p>
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                  <p className="text-sm text-muted-foreground">Initializing secure payment...</p>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="billing-email">Email for Receipt</Label>
-                  <Input
-                    id="billing-email"
-                    type="email"
-                    placeholder="your@email.com"
-                    disabled
-                    data-testid="input-billing-email"
-                  />
-                </div>
-              </div>
-
-              <Button 
-                className="w-full" 
-                size="lg"
-                disabled
-                data-testid="button-pay"
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                Pay $2.99 (Preview Mode)
-              </Button>
-
-              <div className="text-xs text-center text-muted-foreground space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <Lock className="w-3 h-3" />
-                  <span>Secure payment by Stripe</span>
-                </div>
-                <div>No recurring charges - one-time payment</div>
-              </div>
+              ) : error ? (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : clientSecret ? (
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    clientSecret,
+                    appearance: {
+                      theme: 'stripe',
+                    },
+                  }}
+                >
+                  <CheckoutForm onSuccess={handlePaymentSuccess} />
+                </Elements>
+              ) : (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Payment system not configured. Please contact support.
+                  </AlertDescription>
+                </Alert>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -173,9 +199,6 @@ export default function Upgrade() {
               <span>Money-back Guarantee</span>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
-            Note: This is a preview mockup. Actual payment processing will be enabled once Stripe API keys are configured.
-          </p>
         </div>
       </div>
       </div>
