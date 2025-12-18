@@ -108,17 +108,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/subscription/create-payment-intent', optionalAuth, async (req: any, res) => {
     try {
+      // Check if Stripe is configured
+      if (!process.env.STRIPE_SECRET_KEY) {
+        console.error("STRIPE_SECRET_KEY not configured");
+        return res.status(500).json({ message: "Payment system not configured. Please contact support." });
+      }
+
       const { stripe } = await import('./stripeWebhooks');
-      const { email, guestId } = req.body;
+      const { email, guestId } = req.body || {};
       
       // Support both authenticated users and guests
       const userId = req.user?.id;
       const isGuest = !userId;
-      
-      // For guests, require email and guestId
-      if (isGuest && (!email || !guestId)) {
-        return res.status(400).json({ message: "Email and guestId required for guest checkout" });
-      }
       
       // For authenticated users, get their info
       let user;
@@ -129,15 +130,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // If no authenticated user and no guest info, we can still create payment intent
+      // The email will be collected in the Stripe checkout form
+      const receiptEmail = email || user?.email || undefined;
+
       // Create payment intent for $2.99 (299 cents)
       const paymentIntent = await stripe.paymentIntents.create({
         amount: 299, // $2.99 in cents
         currency: 'usd',
-        receipt_email: email || user?.email || undefined,
+        receipt_email: receiptEmail,
         metadata: {
           userId: userId || 'guest',
-          guestId: isGuest ? guestId : undefined,
-          email: email || user?.email || '',
+          guestId: guestId || '',
+          email: receiptEmail || '',
           tier: 'premium',
           duration: '12months',
           isGuest: isGuest.toString()
@@ -157,7 +162,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Error creating payment intent:", error);
-      res.status(500).json({ message: "Failed to create payment intent" });
+      const errorMessage = error.message || "Failed to create payment intent";
+      res.status(500).json({ message: `Payment setup failed: ${errorMessage}` });
+    }
+  });
+
+  app.post('/api/subscription/confirm-payment', authenticate, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if user has a payment intent
+      if (!user.stripePaymentIntentId) {
+        return res.status(400).json({ message: "No payment intent found" });
+      }
+
+      // Verify payment with Stripe
+      const { stripe } = await import('./stripeWebhooks');
+      const paymentIntent = await stripe.paymentIntents.retrieve(user.stripePaymentIntentId);
+
+      if (paymentIntent.status === 'succeeded') {
+        // Activate premium subscription
+        const SubscriptionManager = await import('./subscriptionManager');
+        await SubscriptionManager.default.activateSubscription(
+          user.id,
+          paymentIntent.id,
+          paymentIntent.customer as string
+        );
+
+        console.log(`Manually activated premium for user ${user.id} after payment confirmation`);
+        res.json({ message: "Subscription activated", tier: "premium" });
+      } else {
+        res.status(400).json({ message: "Payment not completed", status: paymentIntent.status });
+      }
+    } catch (error: any) {
+      console.error("Error confirming payment:", error);
+      res.status(500).json({ message: "Failed to confirm payment" });
     }
   });
 

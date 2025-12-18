@@ -404,7 +404,7 @@ export default function Home() {
                   size="sm"
                   onClick={async () => {
                     await logout.mutateAsync();
-                    navigate('/login');
+                    navigate('/');
                   }}
                   data-testid="button-logout"
                 >

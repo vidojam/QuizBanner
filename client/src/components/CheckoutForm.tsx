@@ -3,6 +3,7 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { Button } from "@/components/ui/button";
 import { Lock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 interface CheckoutFormProps {
   onSuccess: () => void;
@@ -39,11 +40,44 @@ export default function CheckoutForm({ onSuccess }: CheckoutFormProps) {
           description: error.message || "An error occurred during payment processing.",
         });
       } else {
-        toast({
-          title: "Payment successful!",
-          description: "Your premium subscription has been activated.",
-        });
-        onSuccess();
+        // Call backend to confirm payment and upgrade user
+        try {
+          const confirmResponse = await fetch('/api/subscription/confirm-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+          });
+
+          if (!confirmResponse.ok) {
+            const errorData = await confirmResponse.json();
+            console.error('Failed to confirm payment on backend:', errorData);
+            toast({
+              variant: "destructive",
+              title: "Payment processed but upgrade failed",
+              description: "Please contact support. Your payment was successful.",
+            });
+          } else {
+            // Force refresh user data
+            await queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+            
+            toast({
+              title: "Payment successful!",
+              description: "Your premium subscription has been activated.",
+            });
+            
+            // Wait a moment for cache to update
+            setTimeout(() => {
+              onSuccess();
+            }, 500);
+          }
+        } catch (confirmError) {
+          console.error('Error confirming payment:', confirmError);
+          toast({
+            variant: "destructive",
+            title: "Payment processed but upgrade failed",
+            description: "Please refresh the page or contact support.",
+          });
+        }
       }
     } catch (err: any) {
       toast({

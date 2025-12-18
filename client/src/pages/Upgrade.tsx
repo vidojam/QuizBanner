@@ -18,21 +18,27 @@ export default function Upgrade() {
   const [clientSecret, setClientSecret] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     // Create payment intent when component mounts
     const createPaymentIntent = async () => {
       try {
+        // For now, send empty body - authenticated users don't need email/guestId
+        // Guest users will be prompted for email in checkout form
         const response = await fetch("/api/subscription/create-payment-intent", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include",
+          body: JSON.stringify({}),
         });
 
         if (!response.ok) {
-          throw new Error("Failed to create payment intent");
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to create payment intent");
         }
 
         const data = await response.json();
@@ -53,9 +59,10 @@ export default function Upgrade() {
   }, [toast]);
 
   const handlePaymentSuccess = () => {
+    // Force a full page reload to ensure all user data is fresh
     setTimeout(() => {
-      setLocation("/app");
-    }, 2000);
+      window.location.href = "/app";
+    }, 1000);
   };
 
   return (
