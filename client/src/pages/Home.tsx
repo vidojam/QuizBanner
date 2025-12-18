@@ -489,6 +489,73 @@ export default function Home() {
                 </p>
               </div>
 
+              {/* Paste Import Card - Available for all users */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Import</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Dialog open={pasteDialogOpen} onOpenChange={setPasteDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        data-testid="button-import-paste-questions"
+                      >
+                        <Type className="w-4 h-4 mr-2" />
+                        Paste Multiple Questions (Q: & A: format)
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Paste Questions and Answers</DialogTitle>
+                        <DialogDescription>
+                          Paste your questions and answers using the format shown below. You can import up to {user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free} questions.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="bg-muted p-3 rounded-md text-sm font-mono">
+                          Q: What is 2+2?<br />
+                          A: 4<br />
+                          <br />
+                          Q: What is the capital of France?<br />
+                          A: Paris
+                        </div>
+                        <Textarea
+                          placeholder="Q: Your question here?&#10;A: Your answer here&#10;&#10;Q: Another question?&#10;A: Another answer"
+                          value={pasteText}
+                          onChange={(e) => setPasteText(e.target.value)}
+                          className="min-h-[200px] font-mono"
+                          data-testid="textarea-paste-questions"
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={handlePasteImport}
+                            disabled={!pasteText.trim()}
+                            data-testid="button-confirm-paste"
+                          >
+                            Import Questions
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setPasteDialogOpen(false);
+                              setPasteText("");
+                            }}
+                            variant="outline"
+                            data-testid="button-cancel-paste"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Copy and paste questions directly - no file needed. Use Q: for questions and A: for answers.
+                  </p>
+                </CardContent>
+              </Card>
+
               <QuestionForm
                 onAdd={handleAddQuestion}
                 questionsCount={questions.length}

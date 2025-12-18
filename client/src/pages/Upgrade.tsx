@@ -11,7 +11,8 @@ import CheckoutForm from "@/components/CheckoutForm";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export default function Upgrade() {
   const [clientSecret, setClientSecret] = useState<string>("");
@@ -153,7 +154,22 @@ export default function Upgrade() {
               <CardDescription>Your payment information is encrypted and secure</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {isLoading ? (
+              {!stripePublishableKey ? (
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <div className="space-y-2">
+                      <p className="font-semibold">Stripe payment not configured</p>
+                      <p className="text-sm">
+                        Please add your Stripe publishable key to the environment variables.
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Set VITE_STRIPE_PUBLISHABLE_KEY in your .env file
+                      </p>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              ) : isLoading ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
                   <p className="text-sm text-muted-foreground">Initializing secure payment...</p>
@@ -163,7 +179,7 @@ export default function Upgrade() {
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
-              ) : clientSecret ? (
+              ) : clientSecret && stripePromise ? (
                 <Elements
                   stripe={stripePromise}
                   options={{
