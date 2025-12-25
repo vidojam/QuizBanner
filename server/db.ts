@@ -14,6 +14,8 @@ export const users = sqliteTable("users", {
   emailVerified: integer("email_verified").notNull().default(0), // 0 = false, 1 = true
   resetToken: text("reset_token"),
   resetTokenExpires: text("reset_token_expires"), // ISO date string
+  magicLinkToken: text("magic_link_token"),
+  magicLinkExpires: text("magic_link_expires"), // ISO date string
   stripeCustomerId: text("stripe_customer_id"),
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -83,6 +85,8 @@ export const guestPremium = sqliteTable("guest_premium", {
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   stripeCustomerId: text("stripe_customer_id"),
   linkedUserId: text("linked_user_id"), // Set when guest converts to account
+  magicLinkToken: text("magic_link_token"),
+  magicLinkExpires: text("magic_link_expires"), // ISO date string
   subscriptionExpiresAt: text("subscription_expires_at"),
   subscriptionStatus: text("subscription_status").default("active"),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
@@ -133,6 +137,8 @@ sqlite.exec(`
     email_verified INTEGER NOT NULL DEFAULT 0,
     reset_token TEXT,
     reset_token_expires TEXT,
+    magic_link_token TEXT,
+    magic_link_expires TEXT,
     created_at TEXT,
     updated_at TEXT
   );
@@ -194,6 +200,8 @@ sqlite.exec(`
     stripe_payment_intent_id TEXT,
     stripe_customer_id TEXT,
     linked_user_id TEXT,
+    magic_link_token TEXT,
+    magic_link_expires TEXT,
     subscription_expires_at TEXT,
     subscription_status TEXT DEFAULT 'active',
     created_at TEXT NOT NULL,

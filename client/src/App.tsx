@@ -11,6 +11,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
+import MagicLinkLogin from "@/pages/MagicLinkLogin";
+import VerifyMagicLink from "@/pages/VerifyMagicLink";
 import Upgrade from "@/pages/Upgrade";
 import TermsOfService from "@/pages/TermsOfService";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
@@ -35,6 +37,8 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/magic-login" component={MagicLinkLogin} />
+      <Route path="/verify-magic-link" component={VerifyMagicLink} />
       <Route path="/terms" component={TermsOfService} />
       <Route path="/privacy" component={PrivacyPolicy} />
       <Route path="/contact" component={Contact} />

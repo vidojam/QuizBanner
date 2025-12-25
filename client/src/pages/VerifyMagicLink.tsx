@@ -1,0 +1,118 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/Logo";
+import { Link } from "wouter";
+
+export default function VerifyMagicLink() {
+  const [, navigate] = useLocation();
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      // Get token from URL query params
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+
+      if (!token) {
+        setStatus("error");
+        setMessage("No magic link token provided");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/auth/verify-magic-link", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setStatus("success");
+          setMessage("Login successful! Redirecting...");
+
+          // Handle different types of logins
+          if (data.token && data.user) {
+            // Authenticated user - store JWT token
+            localStorage.setItem("authToken", data.token);
+            setTimeout(() => navigate("/app"), 2000);
+          } else if (data.guestPremium) {
+            // Guest premium - store guestId
+            localStorage.setItem("guestId", data.guestPremium.guestId);
+            setTimeout(() => navigate("/app"), 2000);
+          }
+        } else {
+          setStatus("error");
+          setMessage(data.message || "Invalid or expired magic link");
+        }
+      } catch (err) {
+        setStatus("error");
+        setMessage("Network error. Please try again.");
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
+      <div className="w-full max-w-md space-y-6">
+        <div className="flex justify-center mb-6">
+          <Logo size="md" />
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            {status === "loading" && (
+              <div className="text-center space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+                <p className="text-lg font-medium">Verifying your magic link...</p>
+                <p className="text-sm text-muted-foreground">Please wait a moment</p>
+              </div>
+            )}
+
+            {status === "success" && (
+              <div className="text-center space-y-4">
+                <CheckCircle2 className="h-12 w-12 mx-auto text-green-600" />
+                <Alert className="bg-green-50 border-green-200">
+                  <AlertDescription className="text-green-800">
+                    <strong>Success!</strong>
+                    <p className="mt-1">{message}</p>
+                  </AlertDescription>
+                </Alert>
+              </div>
+            )}
+
+            {status === "error" && (
+              <div className="text-center space-y-4">
+                <XCircle className="h-12 w-12 mx-auto text-red-600" />
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    <strong>Verification Failed</strong>
+                    <p className="mt-1">{message}</p>
+                  </AlertDescription>
+                </Alert>
+                <div className="flex flex-col gap-2 mt-4">
+                  <Button asChild variant="default">
+                    <Link href="/magic-login">Request New Magic Link</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link href="/">Back to Home</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

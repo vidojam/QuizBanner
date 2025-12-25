@@ -28,17 +28,23 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByResetToken(token: string): Promise<User | undefined>;
+  getUserByMagicLinkToken(token: string): Promise<User | undefined>;
   createUser(userData: Omit<UpsertUser, 'id'>): Promise<User>;
   updateUser(id: string, userData: Partial<User>): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   setResetToken(userId: string, token: string, expires: Date): Promise<void>;
   clearResetToken(userId: string): Promise<void>;
+  setMagicLinkToken(userId: string, token: string, expires: Date): Promise<void>;
+  clearMagicLinkToken(userId: string): Promise<void>;
   updatePassword(userId: string, passwordHash: string): Promise<void>;
   
   // Guest premium operations
   getGuestPremium(guestId: string): Promise<GuestPremium | undefined>;
   getGuestPremiumByEmail(email: string): Promise<GuestPremium | undefined>;
+  getGuestPremiumByMagicLinkToken(token: string): Promise<GuestPremium | undefined>;
   createGuestPremium(data: { guestId: string; email?: string; stripePaymentIntentId?: string }): Promise<GuestPremium>;
+  setGuestMagicLinkToken(guestId: string, token: string, expires: Date): Promise<void>;
+  clearGuestMagicLinkToken(guestId: string): Promise<void>;
   linkGuestToUser(guestId: string, userId: string): Promise<void>;
   
   // Questions (user-specific or guest-specific)
@@ -142,6 +148,42 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId));
   }
 
+  async setMagicLinkToken(userId: string, token: string, expires: Date): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        magicLinkToken: token,
+        magicLinkExpires: expires.toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async clearMagicLinkToken(userId: string): Promise<void> {
+    await db
+      .update(users)
+      .set({
+        magicLinkToken: null,
+        magicLinkExpires: null,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+  }
+
+  async getUserByMagicLinkToken(token: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.magicLinkToken, token));
+    
+    // Check if token is expired
+    if (user && user.magicLinkExpires) {
+      const expires = new Date(user.magicLinkExpires);
+      if (expires < new Date()) {
+        return undefined; // Token expired
+      }
+    }
+    
+    return user || undefined;
+  }
+
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
     await db
       .update(users)
@@ -161,6 +203,42 @@ export class DatabaseStorage implements IStorage {
   async getGuestPremiumByEmail(email: string): Promise<GuestPremium | undefined> {
     const [guest] = await db.select().from(guestPremium).where(eq(guestPremium.email, email));
     return guest || undefined;
+  }
+
+  async getGuestPremiumByMagicLinkToken(token: string): Promise<GuestPremium | undefined> {
+    const [guest] = await db.select().from(guestPremium).where(eq(guestPremium.magicLinkToken, token));
+    
+    // Check if token is expired
+    if (guest && guest.magicLinkExpires) {
+      const expires = new Date(guest.magicLinkExpires);
+      if (expires < new Date()) {
+        return undefined; // Token expired
+      }
+    }
+    
+    return guest || undefined;
+  }
+
+  async setGuestMagicLinkToken(guestId: string, token: string, expires: Date): Promise<void> {
+    await db
+      .update(guestPremium)
+      .set({
+        magicLinkToken: token,
+        magicLinkExpires: expires.toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(guestPremium.guestId, guestId));
+  }
+
+  async clearGuestMagicLinkToken(guestId: string): Promise<void> {
+    await db
+      .update(guestPremium)
+      .set({
+        magicLinkToken: null,
+        magicLinkExpires: null,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(guestPremium.guestId, guestId));
   }
 
   async createGuestPremium(data: { 

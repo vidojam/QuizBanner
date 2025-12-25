@@ -15,6 +15,8 @@ export const users = pgTable("users", {
   emailVerified: integer("email_verified").notNull().default(0), // 0 = false, 1 = true
   resetToken: varchar("reset_token"),
   resetTokenExpires: timestamp("reset_token_expires"),
+  magicLinkToken: varchar("magic_link_token"),
+  magicLinkExpires: timestamp("magic_link_expires"),
   stripeCustomerId: varchar("stripe_customer_id"),
   stripePaymentIntentId: varchar("stripe_payment_intent_id"),
   stripeSubscriptionId: varchar("stripe_subscription_id"),

@@ -36,7 +36,7 @@ export default function Landing() {
                   size="lg" 
                   variant="default"
                   data-testid="button-try-free"
-                  className="text-lg px-8 py-6 w-64"
+                  className="text-2xl px-8 py-6 w-64"
                 >
                   Try Banners for Free
                 </Button>
@@ -46,11 +46,19 @@ export default function Landing() {
                   size="lg" 
                   variant="default"
                   data-testid="button-login"
-                  className="text-lg px-8 py-6 w-64"
+                  className="text-2xl px-8 py-6 w-64"
                 >
                   Premium
                 </Button>
               </Link>
+            </div>
+            <div className="text-center mt-4">
+              <p className="text-2xl font-bold">
+                Already paid for premium?{" "}
+                <Link href="/magic-login" className="text-primary hover:underline">
+                  Access your account →
+                </Link>
+              </p>
             </div>
           </div>
 

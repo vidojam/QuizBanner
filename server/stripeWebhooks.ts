@@ -4,6 +4,8 @@ import { db, users } from './db';
 import { eq } from 'drizzle-orm';
 import SubscriptionManager from './subscriptionManager';
 import { storage } from './storage';
+import { generateMagicLinkToken } from './auth';
+import { sendMagicLinkEmail } from './emailService';
 
 // Initialize Stripe (you'll need to add your Stripe secret key to environment variables)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -81,6 +83,22 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
         stripePaymentIntentId: paymentIntent.id,
       });
       console.log(`Created guest premium for ${guestId}`);
+      
+      // Send magic link email if email provided
+      if (email) {
+        try {
+          const magicLinkToken = generateMagicLinkToken();
+          const expires = new Date();
+          expires.setHours(expires.getHours() + 1);
+          
+          await storage.setGuestMagicLinkToken(guestId, magicLinkToken, expires);
+          await sendMagicLinkEmail(email, magicLinkToken, true);
+          console.log(`Magic link sent to ${email} for guest ${guestId}`);
+        } catch (emailError) {
+          console.error('Error sending magic link:', emailError);
+          // Don't fail the payment if email fails
+        }
+      }
     } catch (error) {
       console.error('Error creating guest premium:', error);
     }
@@ -108,6 +126,22 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   );
 
   console.log(`Activated premium subscription for user ${user.id}`);
+  
+  // Send magic link email
+  if (user.email) {
+    try {
+      const magicLinkToken = generateMagicLinkToken();
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 1);
+      
+      await storage.setMagicLinkToken(user.id, magicLinkToken, expires);
+      await sendMagicLinkEmail(user.email, magicLinkToken, true);
+      console.log(`Magic link sent to ${user.email}`);
+    } catch (emailError) {
+      console.error('Error sending magic link:', emailError);
+      // Don't fail the payment if email fails
+    }
+  }
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {

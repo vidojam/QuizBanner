@@ -17,6 +17,9 @@ const transporter = nodemailer.createTransport({
     user: EMAIL_USER,
     pass: EMAIL_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false // Accept self-signed certificates
+  }
 });
 
 /**
@@ -187,6 +190,109 @@ export async function sendWelcomeEmail(email: string, firstName: string): Promis
   } catch (error) {
     console.error('Error sending welcome email:', error);
     // Don't throw error for welcome email - it's not critical
+  }
+}
+
+/**
+ * Send magic link email for passwordless login
+ */
+export async function sendMagicLinkEmail(email: string, magicLinkToken: string, isPremium: boolean = true): Promise<void> {
+  const magicUrl = `${APP_URL}/verify-magic-link?token=${magicLinkToken}`;
+  
+  const mailOptions = {
+    from: EMAIL_FROM,
+    to: email,
+    subject: isPremium ? 'Access Your QuizBanner Premium Account 🎉' : 'Login to QuizBanner',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .button { display: inline-block; background: #10b981; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+            .success { background: #d1fae5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0; }
+            .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>${isPremium ? '🎉 Welcome to Premium!' : '🔐 Your Login Link'}</h1>
+            </div>
+            <div class="content">
+              <p>Hello,</p>
+              ${isPremium ? `
+              <div class="success">
+                <strong>✓ Payment Successful!</strong>
+                <p style="margin: 5px 0 0 0;">Your premium subscription is now active. Click below to access your premium features on any device.</p>
+              </div>
+              ` : `
+              <p>Click the button below to securely login to your QuizBanner account:</p>
+              `}
+              <p style="text-align: center;">
+                <a href="${magicUrl}" class="button">Access QuizBanner${isPremium ? ' Premium' : ''}</a>
+              </p>
+              <p>Or copy and paste this link into your browser:</p>
+              <p style="word-break: break-all; background: white; padding: 10px; border-radius: 4px; font-size: 14px;">${magicUrl}</p>
+              ${isPremium ? `
+              <h3 style="margin-top: 30px;">Your Premium Features:</h3>
+              <ul>
+                <li>✓ Up to 50 question-answer pairs</li>
+                <li>✓ CSV file import</li>
+                <li>✓ Paste text import</li>
+                <li>✓ Advanced customization</li>
+                <li>✓ Access on any device with this email</li>
+              </ul>
+              ` : ''}
+              <div class="warning">
+                <strong>⚠️ Security Notice:</strong>
+                <p style="margin: 5px 0 0 0;">This link will expire in 1 hour. If you didn't request this login, please ignore this email.</p>
+              </div>
+            </div>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} QuizBanner. All rights reserved.</p>
+              <p>This is an automated email, please do not reply.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `
+      ${isPremium ? 'Welcome to QuizBanner Premium!' : 'Login to QuizBanner'}
+      
+      Hello,
+      
+      ${isPremium ? 'Your payment was successful! Your premium subscription is now active.' : 'Click the link below to securely login to your QuizBanner account:'}
+      
+      ${magicUrl}
+      
+      This link will expire in 1 hour.
+      
+      ${isPremium ? `
+Your Premium Features:
+- Up to 50 question-answer pairs
+- CSV file import
+- Paste text import
+- Advanced customization
+- Access on any device with this email
+      ` : ''}
+      
+      If you didn't request this login, please ignore this email.
+      
+      © ${new Date().getFullYear()} QuizBanner. All rights reserved.
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Magic link email sent to:', email);
+  } catch (error) {
+    console.error('Error sending magic link email:', error);
+    throw new Error('Failed to send magic link email');
   }
 }
 

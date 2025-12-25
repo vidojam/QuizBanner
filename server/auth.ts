@@ -53,6 +53,13 @@ export function generateResetToken(): string {
 }
 
 /**
+ * Generate a secure random token for magic link authentication
+ */
+export function generateMagicLinkToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+/**
  * Validate email format
  */
 export function isValidEmail(email: string): boolean {
