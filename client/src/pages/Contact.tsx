@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
@@ -12,6 +12,7 @@ export default function Contact() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,10 +47,11 @@ export default function Contact() {
         description: "Thank you for contacting us! We'll get back to you soon.",
       });
 
-      // Clear form
+      // Clear form and show success state
       setName("");
       setEmail("");
       setMessage("");
+      setIsSuccess(true);
     } catch (error) {
       toast({
         title: "Error",
@@ -76,7 +78,30 @@ export default function Contact() {
           Have a question or issue? Send us a message and we'll get back to you as soon as possible.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {isSuccess ? (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+            <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-green-900 mb-2">Message Sent Successfully!</h2>
+            <p className="text-green-700 mb-6">
+              Thank you for contacting us. We've received your message and will get back to you as soon as possible.
+            </p>
+            <div className="space-y-3">
+              <Button
+                onClick={() => setIsSuccess(false)}
+                variant="outline"
+                className="w-full"
+              >
+                Send Another Message
+              </Button>
+              <Link href="/">
+                <Button className="w-full">
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -123,6 +148,7 @@ export default function Contact() {
             {isSubmitting ? "Sending..." : "Send Message"}
           </Button>
         </form>
+        )}
       </div>
     </div>
   );

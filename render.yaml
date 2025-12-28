@@ -35,7 +35,7 @@ services:
       - key: EMAIL_FROM
         value: QuizBanner <noreply@quizbanner.com>
       - key: APP_URL
-        value: https://quizbanner.com
+        value: https://quizbanner.onrender.com
 
 # PostgreSQL Database (optional - can use SQLite)
 # databases:

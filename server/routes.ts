@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { authenticate, optionalAuth } from "./authMiddleware";
+import { sendContactFormEmail } from "./emailService";
 
 import { insertQuestionSchema, insertPreferencesSchema, insertTemplateSchema, insertStudySessionSchema, TIER_LIMITS } from "@shared/schema";
 import { z } from "zod";
@@ -478,7 +479,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid email address" });
       }
       
+      // Save to database
       const result = await storage.createContactMessage({ name, email, message });
+      
+      // Send email notification
+      try {
+        await sendContactFormEmail(name, email, message);
+        console.log('Contact form email sent successfully');
+      } catch (emailError) {
+        console.error('Failed to send contact form email:', emailError);
+        // Don't fail the request if email fails, message is still saved
+      }
+      
       res.json({ success: true, id: result.id });
     } catch (error: any) {
       console.error("Error submitting contact form:", error);

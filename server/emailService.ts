@@ -297,6 +297,61 @@ Your Premium Features:
 }
 
 /**
+ * Send contact form notification email
+ */
+export async function sendContactFormEmail(name: string, email: string, message: string): Promise<void> {
+  const mailOptions = {
+    from: EMAIL_FROM,
+    to: EMAIL_USER, // Send to your own email address
+    replyTo: email, // Allow replying directly to the user
+    subject: `New Contact Form Submission from ${name}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">
+          New Contact Form Submission
+        </h2>
+        
+        <div style="background-color: #f5f5f5; padding: 20px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 10px 0;"><strong>From:</strong> ${name}</p>
+          <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+          <p style="margin: 10px 0;"><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+        
+        <div style="background-color: #fff; padding: 20px; border-left: 4px solid #4CAF50; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #333;">Message:</h3>
+          <p style="white-space: pre-wrap; line-height: 1.6;">${message}</p>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #777; font-size: 12px;">
+          <p>This message was sent via the QuizBanner contact form.</p>
+        </div>
+      </div>
+    `,
+    text: `
+New Contact Form Submission
+
+From: ${name}
+Email: ${email}
+Date: ${new Date().toLocaleString()}
+
+Message:
+${message}
+
+---
+This message was sent via the QuizBanner contact form.
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Contact form notification sent to:', EMAIL_USER);
+  } catch (error) {
+    console.error('Error sending contact form notification:', error);
+    throw new Error('Failed to send contact form notification');
+  }
+}
+
+/**
  * Verify email configuration
  */
 export async function verifyEmailConfig(): Promise<boolean> {

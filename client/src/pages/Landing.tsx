@@ -4,11 +4,11 @@ import { Check } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import Footer from "@/components/Footer";
-import { Link } from "wouter";
+import { useLocation, Link } from "wouter";
 
 export default function Landing() {
   const { t, language } = useTranslation();
+  const [, setLocation] = useLocation();
   
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/20">
@@ -53,12 +53,15 @@ export default function Landing() {
               </Link>
             </div>
             <div className="text-center mt-4">
-              <p className="text-2xl font-bold">
+              <div className="text-2xl font-bold">
                 Already paid for premium?{" "}
-                <Link href="/magic-login" className="text-primary hover:underline">
+                <span 
+                  onClick={() => setLocation("/magic-login")} 
+                  className="text-primary hover:underline cursor-pointer"
+                >
                   Access your account →
-                </Link>
-              </p>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -148,21 +151,24 @@ export default function Landing() {
                   © {new Date().getFullYear()} QuizBanner. All rights reserved.
                 </div>
                 <div className="flex gap-4">
-                  <Link href="/terms">
-                    <a className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
-                      Terms of Service
-                    </a>
-                  </Link>
-                  <Link href="/privacy">
-                    <a className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
-                      Privacy Policy
-                    </a>
-                  </Link>
-                  <Link href="/contact">
-                    <a className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
-                      Contact Us
-                    </a>
-                  </Link>
+                  <span 
+                    onClick={() => setLocation("/terms")} 
+                    className="text-sm text-gray-500 hover:text-gray-700 hover:underline cursor-pointer"
+                  >
+                    Terms of Service
+                  </span>
+                  <span 
+                    onClick={() => setLocation("/privacy")} 
+                    className="text-sm text-gray-500 hover:text-gray-700 hover:underline cursor-pointer"
+                  >
+                    Privacy Policy
+                  </span>
+                  <span 
+                    onClick={() => setLocation("/contact")} 
+                    className="text-sm text-gray-500 hover:text-gray-700 hover:underline cursor-pointer"
+                  >
+                    Contact Us
+                  </span>
                 </div>
                 <div className="text-xs text-gray-400">
                   Developed by vidojam
@@ -175,7 +181,6 @@ export default function Landing() {
           </footer>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
