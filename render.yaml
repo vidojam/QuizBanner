@@ -37,8 +37,8 @@ services:
       - key: APP_URL
         value: https://quizbanner.onrender.com
 
-# PostgreSQL Database (optional - can use SQLite)
-# databases:
-#   - name: quizbanner-db
-#     databaseName: quizbanner
-#     plan: free
+# PostgreSQL Database
+databases:
+  - name: quizbanner-db
+    databaseName: quizbanner
+    plan: free
