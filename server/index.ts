@@ -51,6 +51,65 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Test route for mobile debugging (before other routes)
+  app.get('/test-mobile', (_req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>QuizBanner Mobile Test</title>
+          <style>
+              body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+              .status { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+              .success { border-left: 4px solid #10b981; }
+              .error { border-left: 4px solid #ef4444; }
+              button { background: #3b82f6; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 16px; margin: 10px 0; width: 100%; }
+          </style>
+      </head>
+      <body>
+          <h1>QuizBanner Mobile Test</h1>
+          <div id="results"></div>
+          <button onclick="testAPI()">Test API Endpoint</button>
+          <button onclick="goToApp()">Go to App (/app)</button>
+          <button onclick="goToLanding()">Go to Landing (/)</button>
+          <script>
+              function addResult(message, type = 'success') {
+                  const div = document.createElement('div');
+                  div.className = \`status \${type}\`;
+                  div.innerHTML = \`<strong>\${new Date().toLocaleTimeString()}</strong><br>\${message}\`;
+                  document.getElementById('results').appendChild(div);
+              }
+              async function testAPI() {
+                  addResult('Testing API endpoint...', 'success');
+                  try {
+                      const response = await fetch('/api/guest/premium/test-id');
+                      const data = await response.json();
+                      addResult(\`✓ API responded: \${JSON.stringify(data)}\`, 'success');
+                  } catch (error) {
+                      addResult(\`✗ API failed: \${error.message}\`, 'error');
+                  }
+              }
+              function goToApp() {
+                  addResult('Navigating to /app...', 'success');
+                  window.location.href = '/app';
+              }
+              function goToLanding() {
+                  addResult('Navigating to /...', 'success');
+                  window.location.href = '/';
+              }
+              window.addEventListener('load', () => {
+                  addResult('✓ Test page loaded successfully!', 'success');
+                  addResult(\`User Agent: \${navigator.userAgent}\`, 'success');
+              });
+          </script>
+      </body>
+      </html>
+    `);
+  });
+
   // Register auth routes first (these don't require authentication)
   registerAuthRoutes(app);
   

@@ -37,18 +37,21 @@ export default function VerifyMagicLink() {
 
         if (response.ok) {
           setStatus("success");
-          setMessage("Login successful! Redirecting...");
 
           // Handle different types of logins
           if (data.token && data.user) {
             // Authenticated user - store JWT token
             localStorage.setItem("authToken", data.token);
-            setTimeout(() => navigate("/app"), 2000);
+            console.log("Auth token stored, user:", data.user);
           } else if (data.guestPremium) {
             // Guest premium - store guestId
             localStorage.setItem("guestId", data.guestPremium.guestId);
-            setTimeout(() => navigate("/app"), 2000);
+            console.log("Guest premium stored, guestId:", data.guestPremium.guestId);
           }
+          
+          // Clean up URL by removing token
+          window.history.replaceState({}, document.title, "/verify-magic-link");
+          console.log("Verification successful, ready to navigate to /app");
         } else {
           setStatus("error");
           setMessage(data.message || "Invalid or expired magic link");
@@ -85,9 +88,31 @@ export default function VerifyMagicLink() {
                 <Alert className="bg-green-50 border-green-200">
                   <AlertDescription className="text-green-800">
                     <strong>Success!</strong>
-                    <p className="mt-1">{message}</p>
+                    <p className="mt-1">Login successful! Click below to continue.</p>
                   </AlertDescription>
                 </Alert>
+                <div style={{ padding: '20px 0' }}>
+                  <a 
+                    href="/app"
+                    style={{
+                      display: 'block',
+                      padding: '16px 32px',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      textDecoration: 'none',
+                      borderRadius: '8px',
+                      fontSize: '18px',
+                      fontWeight: '600',
+                      textAlign: 'center'
+                    }}
+                    onClick={() => console.log('Access Premium button clicked')}
+                  >
+                    Access Premium →
+                  </a>
+                </div>
+                <p style={{ fontSize: '14px', color: '#666' }}>
+                  Or manually go to: {window.location.origin}/app
+                </p>
               </div>
             )}
 

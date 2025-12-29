@@ -25,6 +25,8 @@ export default function Upgrade() {
     // Create payment intent when component mounts
     const createPaymentIntent = async () => {
       try {
+        console.log('Creating payment intent...');
+        
         // For now, send empty body - authenticated users don't need email/guestId
         // Guest users will be prompted for email in checkout form
         const response = await fetch("/api/subscription/create-payment-intent", {
@@ -36,19 +38,25 @@ export default function Upgrade() {
           body: JSON.stringify({}),
         });
 
+        console.log('Payment intent response status:', response.status);
+
         if (!response.ok) {
           const errorData = await response.json();
+          console.error('Payment intent error:', errorData);
           throw new Error(errorData.message || "Failed to create payment intent");
         }
 
         const data = await response.json();
+        console.log('Payment intent created successfully');
         setClientSecret(data.clientSecret);
       } catch (err: any) {
-        setError(err.message || "Failed to initialize payment. Please try again.");
+        console.error('Payment intent failed:', err);
+        const errorMessage = err.message || "Failed to initialize payment. Please try again.";
+        setError(errorMessage);
         toast({
           variant: "destructive",
           title: "Payment initialization failed",
-          description: err.message || "Please refresh the page and try again.",
+          description: errorMessage,
         });
       } finally {
         setIsLoading(false);

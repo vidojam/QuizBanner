@@ -427,7 +427,7 @@ export default function Home() {
                   <Button 
                     size="sm"
                     variant="default"
-                    onClick={() => window.location.href = "/upgrade"}
+                    onClick={() => navigate("/upgrade")}
                     data-testid="button-upgrade"
                   >
                     {t('upgradeButton')}

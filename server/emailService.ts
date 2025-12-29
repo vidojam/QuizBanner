@@ -226,10 +226,7 @@ export async function sendMagicLinkEmail(email: string, magicLinkToken: string, 
             <div class="content">
               <p>Hello,</p>
               ${isPremium ? `
-              <div class="success">
-                <strong>✓ Payment Successful!</strong>
-                <p style="margin: 5px 0 0 0;">Your premium subscription is now active. Click below to access your premium features on any device.</p>
-              </div>
+              <p>Click the button below to access your premium QuizBanner account on any device:</p>
               ` : `
               <p>Click the button below to securely login to your QuizBanner account:</p>
               `}
@@ -266,7 +263,7 @@ export async function sendMagicLinkEmail(email: string, magicLinkToken: string, 
       
       Hello,
       
-      ${isPremium ? 'Your payment was successful! Your premium subscription is now active.' : 'Click the link below to securely login to your QuizBanner account:'}
+      Click the link below to access your QuizBanner${isPremium ? ' Premium' : ''} account:
       
       ${magicUrl}
       
