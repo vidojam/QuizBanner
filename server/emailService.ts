@@ -1,26 +1,55 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 // Email configuration
 const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
 const EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '587');
 const EMAIL_USER = process.env.EMAIL_USER || '';
 const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || '';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'QuizBanner <noreply@quizbanner.com>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'QuizBanner <onboarding@resend.dev>';
 const APP_URL = process.env.APP_URL || 'http://localhost:5000';
+const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 
-// Create transporter
-const transporter = nodemailer.createTransport({
+// Determine which email service to use
+const useResend = !!RESEND_API_KEY;
+const resend = useResend ? new Resend(RESEND_API_KEY) : null;
+
+// Create nodemailer transporter for local development
+const transporter = !useResend ? nodemailer.createTransport({
   host: EMAIL_HOST,
   port: EMAIL_PORT,
-  secure: EMAIL_PORT === 465, // true for 465, false for other ports
+  secure: EMAIL_PORT === 465,
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false // Accept self-signed certificates
   }
-});
+}) : null;
+
+/**
+ * Helper function to send email using either Resend or nodemailer
+ */
+async function sendEmail(options: { to: string; subject: string; html: string; text: string }): Promise<void> {
+  if (useResend && resend) {
+    // Use Resend for production (Render)
+    await resend.emails.send({
+      from: EMAIL_FROM,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    });
+  } else if (transporter) {
+    // Use nodemailer for local development
+    await transporter.sendMail({
+      from: EMAIL_FROM,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+    });
+  } else {
+    throw new Error('No email service configured');
+  }
+}
 
 /**
  * Send password reset email
@@ -90,7 +119,12 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await sendEmail({
+      to: email,
+      subject: 'Reset Your QuizBanner Password',
+      html: mailOptions.html,
+      text: mailOptions.text,
+    });
     console.log('Password reset email sent to:', email);
   } catch (error) {
     console.error('Error sending password reset email:', error);
@@ -185,7 +219,12 @@ export async function sendWelcomeEmail(email: string, firstName: string): Promis
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await sendEmail({
+      to: email,
+      subject: 'Welcome to QuizBanner!',
+      html: mailOptions.html,
+      text: mailOptions.text,
+    });
     console.log('Welcome email sent to:', email);
   } catch (error) {
     console.error('Error sending welcome email:', error);
@@ -285,7 +324,12 @@ Your Premium Features:
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await sendEmail({
+      to: email,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+      text: mailOptions.text,
+    });
     console.log('Magic link email sent to:', email);
   } catch (error) {
     console.error('Error sending magic link email:', error);
@@ -340,7 +384,12 @@ This message was sent via the QuizBanner contact form.
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await sendEmail({
+      to: EMAIL_USER,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+      text: mailOptions.text,
+    });
     console.log('Contact form notification sent to:', EMAIL_USER);
   } catch (error) {
     console.error('Error sending contact form notification:', error);
