@@ -401,10 +401,20 @@ This message was sent via the QuizBanner contact form.
  * Verify email configuration
  */
 export async function verifyEmailConfig(): Promise<boolean> {
+  if (useResend && RESEND_API_KEY) {
+    console.log('✅ Email service configured (Resend)');
+    return true;
+  }
+  
   // Skip verification if email credentials are not configured
   if (!EMAIL_USER || !EMAIL_PASSWORD || EMAIL_USER === 'your-email@gmail.com') {
     console.log('⚠️  Email service not configured. Password reset will not work.');
     console.log('   To enable: Set EMAIL_USER and EMAIL_PASSWORD in .env file');
+    return false;
+  }
+  
+  if (!transporter) {
+    console.log('⚠️  Email service not configured.');
     return false;
   }
   
