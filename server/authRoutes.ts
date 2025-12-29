@@ -279,11 +279,21 @@ export function registerAuthRoutes(app: Express) {
       if (user) {
         // Set token for authenticated user
         await storage.setMagicLinkToken(user.id, magicLinkToken, expires);
-        await sendMagicLinkEmail(email, magicLinkToken, user.tier === 'premium');
+        try {
+          await sendMagicLinkEmail(email, magicLinkToken, user.tier === 'premium');
+        } catch (emailError) {
+          console.error('Failed to send magic link email:', emailError);
+          // Continue anyway to prevent email enumeration
+        }
       } else if (guestPremium) {
         // Set token for guest premium user
         await storage.setGuestMagicLinkToken(guestPremium.guestId, magicLinkToken, expires);
-        await sendMagicLinkEmail(email, magicLinkToken, true);
+        try {
+          await sendMagicLinkEmail(email, magicLinkToken, true);
+        } catch (emailError) {
+          console.error('Failed to send magic link email:', emailError);
+          // Continue anyway to prevent email enumeration
+        }
       }
 
       res.json({ 
