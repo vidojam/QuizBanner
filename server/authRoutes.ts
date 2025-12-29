@@ -259,12 +259,16 @@ export function registerAuthRoutes(app: Express) {
   app.post('/api/auth/send-magic-link', async (req: Request, res: Response) => {
     try {
       const { email } = sendMagicLinkSchema.parse(req.body);
+      console.log('Magic link requested for email:', email);
 
       // Check if email exists in users table or guestPremium table
       const user = await storage.getUserByEmail(email);
       const guestPremium = await storage.getGuestPremiumByEmail(email);
 
+      console.log('User found:', !!user, 'GuestPremium found:', !!guestPremium);
+
       if (!user && !guestPremium) {
+        console.log('No user or guest premium found for email:', email);
         // Always return success to prevent email enumeration
         return res.json({ 
           message: 'If a premium account exists with that email, a magic link has been sent.' 
@@ -277,19 +281,23 @@ export function registerAuthRoutes(app: Express) {
       expires.setHours(expires.getHours() + 1);
 
       if (user) {
+        console.log('Sending magic link for user:', user.id, user.email);
         // Set token for authenticated user
         await storage.setMagicLinkToken(user.id, magicLinkToken, expires);
         try {
           await sendMagicLinkEmail(email, magicLinkToken, user.tier === 'premium');
+          console.log('Magic link email sent successfully for user');
         } catch (emailError) {
           console.error('Failed to send magic link email:', emailError);
           // Continue anyway to prevent email enumeration
         }
       } else if (guestPremium) {
+        console.log('Sending magic link for guest premium:', guestPremium.guestId, guestPremium.email);
         // Set token for guest premium user
         await storage.setGuestMagicLinkToken(guestPremium.guestId, magicLinkToken, expires);
         try {
           await sendMagicLinkEmail(email, magicLinkToken, true);
+          console.log('Magic link email sent successfully for guest premium');
         } catch (emailError) {
           console.error('Failed to send magic link email:', emailError);
           // Continue anyway to prevent email enumeration
