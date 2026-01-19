@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Logo } from "@/components/Logo";
 import { Textarea } from "@/components/ui/textarea";
+import { AnimatedBanners } from "@/components/AnimatedBanners";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslation } from "@/hooks/useTranslation";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -382,18 +383,22 @@ export default function Home() {
 
   if (questionsLoading || preferencesLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg font-medium">Loading...</div>
-          <div className="text-sm text-muted-foreground mt-2">Setting up your learning environment</div>
+      <>
+        <AnimatedBanners />
+        <div className="min-h-screen bg-background flex items-center justify-center relative z-10">
+          <div className="text-center">
+            <div className="text-lg font-medium">Loading...</div>
+            <div className="text-sm text-muted-foreground mt-2">Setting up your learning environment</div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <>
-      <div className="min-h-screen bg-background flex flex-col relative" key={`home-${language}`}>
+      <AnimatedBanners />
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 relative z-10">
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
           <header className="space-y-4">
             <div className="flex items-center justify-between">

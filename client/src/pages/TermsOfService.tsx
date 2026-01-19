@@ -1,10 +1,13 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { AnimatedBanners } from "@/components/AnimatedBanners";
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-background p-8">
+    <>
+      <AnimatedBanners />
+      <div className="min-h-screen bg-background p-8 relative z-10">
       <div className="max-w-4xl mx-auto">
         <Link href="/">
           <Button variant="ghost" className="mb-6">
@@ -154,5 +157,6 @@ export default function TermsOfService() {
         </div>
       </div>
     </div>
+    </>
   );
 }

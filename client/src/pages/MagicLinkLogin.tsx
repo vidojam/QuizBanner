@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, CheckCircle2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { Link } from "wouter";
+import { AnimatedBanners } from "@/components/AnimatedBanners";
 
 export default function MagicLinkLogin() {
   const [email, setEmail] = useState("");
@@ -43,7 +44,9 @@ export default function MagicLinkLogin() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
+    <>
+      <AnimatedBanners />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20 relative z-10">
       <div className="w-full max-w-md space-y-6">
         <div className="flex justify-center mb-6">
           <Logo size="md" />
@@ -153,5 +156,6 @@ export default function MagicLinkLogin() {
         </div>
       </div>
     </div>
+    </>
   );
 }

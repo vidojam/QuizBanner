@@ -10,6 +10,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "@/components/CheckoutForm";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AnimatedBanners } from "@/components/AnimatedBanners";
 
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
@@ -74,7 +75,9 @@ export default function Upgrade() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col">
+    <>
+      <AnimatedBanners />
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex flex-col relative z-10">
       <div className="flex-1 p-4">
       <div className="max-w-4xl mx-auto py-8 space-y-8">
         {/* Header with Logo */}
@@ -235,5 +238,6 @@ export default function Upgrade() {
       </div>
       <Footer />
     </div>
+    </>
   );
 }

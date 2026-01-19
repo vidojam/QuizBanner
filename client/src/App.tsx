@@ -14,6 +14,7 @@ import ResetPassword from "@/pages/ResetPassword";
 import MagicLinkLogin from "@/pages/MagicLinkLogin";
 import VerifyMagicLink from "@/pages/VerifyMagicLink";
 import Upgrade from "@/pages/Upgrade";
+import PlanSelection from "@/pages/PlanSelection";
 import TermsOfService from "@/pages/TermsOfService";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import Contact from "@/pages/Contact";
@@ -45,6 +46,9 @@ function Router() {
       
       {/* Landing page - entry point for everyone */}
       <Route path="/" component={Landing} />
+      <Route path="/plans">
+        {() => <PlanSelection onPlanSelected={(plan) => window.location.href = plan === 'free' ? '/app' : '/upgrade'} />}
+      </Route>
       
       {/* App routes */}
       <Route path="/app" component={Home} />

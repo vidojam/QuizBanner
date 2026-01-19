@@ -78,7 +78,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                   size="lg" 
                   variant="outline"
                   onClick={() => onPlanSelected('free')}
-                  className="w-full text-lg py-6 bg-blue-50 hover:bg-blue-100 border-blue-200"
+                  className="w-full text-3xl py-12 bg-blue-50 hover:bg-blue-100 border-blue-200"
                 >
                   Continue With Free Plan
                 </Button>
@@ -125,7 +125,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                 <Button 
                   size="lg" 
                   onClick={() => onPlanSelected('premium')}
-                  className="w-full text-lg py-6"
+                  className="w-full text-3xl py-12"
                 >
                   Continue With Premium Plan
                 </Button>

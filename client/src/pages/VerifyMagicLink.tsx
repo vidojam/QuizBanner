@@ -6,6 +6,7 @@ import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { Link } from "wouter";
+import { AnimatedBanners } from "@/components/AnimatedBanners";
 
 export default function VerifyMagicLink() {
   const [, navigate] = useLocation();
@@ -66,7 +67,9 @@ export default function VerifyMagicLink() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
+    <>
+      <AnimatedBanners />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20 relative z-10">
       <div className="w-full max-w-md space-y-6">
         <div className="flex justify-center mb-6">
           <Logo size="md" />
@@ -139,5 +142,6 @@ export default function VerifyMagicLink() {
         </Card>
       </div>
     </div>
+    </>
   );
 }
