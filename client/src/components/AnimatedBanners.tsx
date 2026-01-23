@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AnimatedBanner {
   id: string;
@@ -36,12 +37,13 @@ function getRandomDelay() {
   return Math.random() * 2; // 0-2 seconds
 }
 
-function getFixedSize() {
-  return 60; // Fixed 60px thickness for all banners
+function getFixedSize(isMobile: boolean) {
+  return isMobile ? 30 : 60; // 30px for mobile, 60px for desktop
 }
 
 export function AnimatedBanners() {
   const [banners, setBanners] = useState<AnimatedBanner[]>([]);
+  const isMobile = useIsMobile();
   
   console.log('AnimatedBanners render - banners count:', banners.length);
 
@@ -65,7 +67,7 @@ export function AnimatedBanners() {
           color: getRandomColor(),
           duration: getRandomDuration(),
           delay: getRandomDelay() + (i * 0.5),
-          size: getFixedSize(),
+          size: getFixedSize(isMobile),
         });
       }
     });
@@ -91,7 +93,7 @@ export function AnimatedBanners() {
           color: getRandomColor(),
           duration: getRandomDuration(),
           delay: 0,
-          size: getFixedSize(),
+          size: getFixedSize(isMobile),
         };
 
         console.log('Adding new banner:', newBanner.side, newBanner.color);
@@ -100,7 +102,7 @@ export function AnimatedBanners() {
     }, 1000); // Add new banner every 1 second (faster for testing)
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isMobile]);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden">
