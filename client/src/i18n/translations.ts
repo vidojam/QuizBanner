@@ -4,6 +4,8 @@ export const translations = {
     logOut: "Log Out",
     premiumPlan: "Premium Plan",
     freePlan: "Free Plan",
+    premiumMember: "Premium Member",
+    freeTierLabel: "Free Tier",
     upgradeButton: "Upgrade to Premium",
     
     // Main sections
@@ -125,7 +127,35 @@ export const translations = {
     renewSubscription: "Renew Subscription",
     subscriptionCancelled: "Subscription Cancelled",
     accessUntil: "You'll have premium access until",
-    reactivateSubscription: "Reactivate Subscription"
+    reactivateSubscription: "Reactivate Subscription",
+    
+    // Dialog boxes
+    quickImport: "Quick Import",
+    pasteMultipleQuestions: "Paste Multiple Questions (Q: & A: format)",
+    pasteQuestionsAndAnswers: "Paste Questions and Answers",
+    pasteFormatDescription: "Paste your questions and answers using the format shown below. You can import up to",
+    importQuestions: "Import Questions",
+    quickImportDescription: "Copy and paste questions directly - no file needed. Use Q: for questions and A: for answers.",
+    yourQuestions: "Your Questions",
+    displayMode: "Display Mode",
+    screensaverOnly: "Screensaver Only",
+    alwaysOnTop: "Always On Top",
+    screensaverModeDescription: "Fullscreen mode with black background - blocks your view completely",
+    alwaysOnTopModeDescription: "Always on top mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.",
+    premiumModeInfo: "💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 50 questions and answers in Q: & A: format",
+    bannerAppearance: "Banner Appearance",
+    changesApplyImmediately: "Changes apply immediately while screensaver is running",
+    dangerZone: "Danger Zone",
+    clearAllQuestions: "Clear All Questions",
+    clearing: "Clearing...",
+    areYouAbsoluteSure: "Are you absolutely sure?",
+    deleteAllDescription: "This action cannot be undone. This will permanently delete all",
+    deleteAllQuestionsButton: "Delete All Questions",
+    questionsFromAccount: "questions from your account.",
+    permanentlyRemovesDescription: "Permanently removes all questions from your database. This cannot be undone.",
+    importFromExcelDescription: "Import from Excel or Google Sheets. A: question and b: answer format.",
+    copyPasteDescription: "Copy and paste questions directly - no file needed, in A: question and B: answer format.",
+    loadFromFileDescription: "Load questions from a previously exported file A: question and B: answer format."
   },
   
   es: {
@@ -133,6 +163,8 @@ export const translations = {
     logOut: "Cerrar Sesión",
     premiumPlan: "Plan Premium",
     freePlan: "Plan Gratuito",
+    premiumMember: "Miembro Premium",
+    freeTierLabel: "Plan Gratuito",
     upgradeButton: "Actualizar a Premium",
     
     // Main sections
@@ -254,7 +286,35 @@ export const translations = {
     renewSubscription: "Renovar Suscripción",
     subscriptionCancelled: "Suscripción Cancelada",
     accessUntil: "Tendrás acceso premium hasta el",
-    reactivateSubscription: "Reactivar Suscripción"
+    reactivateSubscription: "Reactivar Suscripción",
+    
+    // Dialog boxes
+    quickImport: "Importación Rápida",
+    pasteMultipleQuestions: "Pegar Múltiples Preguntas (formato P: y R:)",
+    pasteQuestionsAndAnswers: "Pegar Preguntas y Respuestas",
+    pasteFormatDescription: "Pega tus preguntas y respuestas usando el formato mostrado abajo. Puedes importar hasta",
+    importQuestions: "Importar Preguntas",
+    quickImportDescription: "Copia y pega preguntas directamente - no se necesita archivo. Usa P: para preguntas y R: para respuestas.",
+    yourQuestions: "Tus Preguntas",
+    displayMode: "Modo de Visualización",
+    screensaverOnly: "Solo Salvapantallas",
+    alwaysOnTop: "Siempre Visible",
+    screensaverModeDescription: "Modo de pantalla completa con fondo negro - bloquea tu vista completamente",
+    alwaysOnTopModeDescription: "Modo siempre visible - los banners aparecen transparentemente dentro de esta pestaña del navegador. Mantén esta pestaña abierta junto a otro trabajo para refuerzo continuo del aprendizaje.",
+    premiumModeInfo: "💡 El modo premium permite agregar preguntas y respuestas más rápido con archivo CSV u opción de pegar hasta 50 preguntas y respuestas en formato P: y R:",
+    bannerAppearance: "Apariencia del Banner",
+    changesApplyImmediately: "Los cambios se aplican inmediatamente mientras el salvapantallas está en ejecución",
+    dangerZone: "Zona de Peligro",
+    clearAllQuestions: "Borrar Todas las Preguntas",
+    clearing: "Borrando...",
+    areYouAbsoluteSure: "¿Estás absolutamente seguro?",
+    deleteAllDescription: "Esta acción no se puede deshacer. Esto eliminará permanentemente todas las",
+    deleteAllQuestionsButton: "Eliminar Todas las Preguntas",
+    questionsFromAccount: "preguntas de tu cuenta.",
+    permanentlyRemovesDescription: "Elimina permanentemente todas las preguntas de tu base de datos. Esto no se puede deshacer.",
+    importFromExcelDescription: "Importar desde Excel o Google Sheets. Formato A: pregunta y B: respuesta.",
+    copyPasteDescription: "Copia y pega preguntas directamente - no se necesita archivo, en formato A: pregunta y B: respuesta.",
+    loadFromFileDescription: "Cargar preguntas desde un archivo previamente exportado formato A: pregunta y B: respuesta."
   }
 };
 

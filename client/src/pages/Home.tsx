@@ -423,7 +423,7 @@ export default function Home() {
                 <Logo size="lg" className="shadow-2xl" />
                 <div>
                   <div className="text-xl font-bold text-foreground">
-                    {user?.tier === "premium" ? "Premium Member" : "Free Tier"}
+                    {user?.tier === "premium" ? t('premiumMember') : t('freeTierLabel')}
                   </div>
                 </div>
               </div>
@@ -497,7 +497,7 @@ export default function Home() {
               {/* Paste Import Card - Available for all users */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Quick Import</CardTitle>
+                  <CardTitle>{t('quickImport')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Dialog open={pasteDialogOpen} onOpenChange={setPasteDialogOpen}>
@@ -508,26 +508,38 @@ export default function Home() {
                         data-testid="button-import-paste-questions"
                       >
                         <Type className="w-4 h-4 mr-2" />
-                        Paste Multiple Questions (Q: & A: format)
+                        {t('pasteMultipleQuestions')}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Paste Questions and Answers</DialogTitle>
+                        <DialogTitle>{t('pasteQuestionsAndAnswers')}</DialogTitle>
                         <DialogDescription>
-                          Paste your questions and answers using the format shown below. You can import up to {user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free} questions.
+                          {t('pasteFormatDescription')} {user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free} {language === 'es' ? 'preguntas' : 'questions'}.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div className="bg-muted p-3 rounded-md text-sm font-mono">
-                          Q: What is 2+2?<br />
-                          A: 4<br />
-                          <br />
-                          Q: What is the capital of France?<br />
-                          A: Paris
+                          {language === 'es' ? (
+                            <>
+                              P: ¿Cuánto es 2+2?<br />
+                              R: 4<br />
+                              <br />
+                              P: ¿Cuál es la capital de Francia?<br />
+                              R: París
+                            </>
+                          ) : (
+                            <>
+                              Q: What is 2+2?<br />
+                              A: 4<br />
+                              <br />
+                              Q: What is the capital of France?<br />
+                              A: Paris
+                            </>
+                          )}
                         </div>
                         <Textarea
-                          placeholder="Q: Your question here?&#10;A: Your answer here&#10;&#10;Q: Another question?&#10;A: Another answer"
+                          placeholder={language === 'es' ? "P: ¿Tu pregunta aquí?&#10;R: Tu respuesta aquí&#10;&#10;P: ¿Otra pregunta?&#10;R: Otra respuesta" : "Q: Your question here?&#10;A: Your answer here&#10;&#10;Q: Another question?&#10;A: Another answer"}
                           value={pasteText}
                           onChange={(e) => setPasteText(e.target.value)}
                           className="min-h-[200px] font-mono"
@@ -539,7 +551,7 @@ export default function Home() {
                             disabled={!pasteText.trim()}
                             data-testid="button-confirm-paste"
                           >
-                            Import Questions
+                            {t('importQuestions')}
                           </Button>
                           <Button
                             onClick={() => {
@@ -549,14 +561,14 @@ export default function Home() {
                             variant="outline"
                             data-testid="button-cancel-paste"
                           >
-                            Cancel
+                            {t('cancel')}
                           </Button>
                         </div>
                       </div>
                     </DialogContent>
                   </Dialog>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Copy and paste questions directly - no file needed. Use Q: for questions and A: for answers.
+                    {t('quickImportDescription')}
                   </p>
                 </CardContent>
               </Card>
@@ -569,7 +581,7 @@ export default function Home() {
 
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">
-                  Your Questions ({questions.length})
+                  {t('yourQuestions')} ({questions.length})
                 </h2>
                 <QuestionList
                   questions={questions}
@@ -582,7 +594,7 @@ export default function Home() {
             <TabsContent value="settings" className="space-y-6 mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Display Mode</CardTitle>
+                  <CardTitle>{t('displayMode')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex gap-4">
@@ -592,7 +604,7 @@ export default function Home() {
                       data-testid="button-mode-screensaver"
                       className="flex-1"
                     >
-                      Screensaver Only
+                      {t('screensaverOnly')}
                     </Button>
                     <Button
                       variant={displayMode === 'overlay' ? 'default' : 'outline'}
@@ -600,17 +612,17 @@ export default function Home() {
                       data-testid="button-mode-overlay"
                       className="flex-1"
                     >
-                      Always On Top
+                      {t('alwaysOnTop')}
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {displayMode === 'screensaver' 
-                      ? 'Fullscreen mode with black background - blocks your view completely'
-                      : 'Always on top mode - banners appear transparently within this browser tab. Keep this tab open alongside other work for continuous learning reinforcement.'}
+                      ? t('screensaverModeDescription')
+                      : t('alwaysOnTopModeDescription')}
                   </p>
                   <div className="mt-3 p-3 bg-muted rounded-md">
                     <p className="text-lg font-bold text-center">
-                      💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 50 questions and answers in Q: & A: format
+                      {t('premiumModeInfo')}
                     </p>
                   </div>
                 </CardContent>
@@ -619,63 +631,63 @@ export default function Home() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Banner Appearance</CardTitle>
+                  <CardTitle>{t('bannerAppearance')}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Changes apply immediately while screensaver is running
+                    {t('changesApplyImmediately')}
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>Default Duration (seconds)</Label>
+                      <Label>{t('defaultDurationLabel')}</Label>
                       <span className="text-sm font-medium">{preferences?.defaultDuration || 5}s</span>
                     </div>
                     <Slider
                       value={[preferences?.defaultDuration || 5]}
                       onValueChange={([value]) => updatePreferencesMutation.mutate({ defaultDuration: value })}
                       min={1}
-                      max={10}
+                      max={15}
                       step={1}
                       data-testid="slider-duration"
                     />
                     <p className="text-xs text-muted-foreground">
-                      How long each question and answer scrolls across the screen
+                      {t('defaultDurationDescription')}
                     </p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>Banner Height (pixels)</Label>
-                      <span className="text-sm font-medium">{preferences?.bannerHeight || 48}px</span>
+                      <Label>{t('bannerHeightLabel')}</Label>
+                      <span className="text-sm font-medium">{preferences?.bannerHeight || 72}px</span>
                     </div>
                     <Slider
-                      value={[preferences?.bannerHeight || 48]}
+                      value={[preferences?.bannerHeight || 72]}
                       onValueChange={([value]) => updatePreferencesMutation.mutate({ bannerHeight: value })}
                       min={32}
-                      max={128}
+                      max={144}
                       step={8}
                       data-testid="slider-banner-height"
                     />
                     <p className="text-xs text-muted-foreground">
-                      The height of the scrolling banner
+                      {t('bannerHeightDescription')}
                     </p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label>Font Size (pixels)</Label>
-                      <span className="text-sm font-medium">{preferences?.fontSize || 48}px</span>
+                      <Label>{t('fontSizeLabel')}</Label>
+                      <span className="text-sm font-medium">{preferences?.fontSize || 60}px</span>
                     </div>
                     <Slider
-                      value={[preferences?.fontSize || 48]}
+                      value={[preferences?.fontSize || 60]}
                       onValueChange={([value]) => updatePreferencesMutation.mutate({ fontSize: value })}
                       min={24}
-                      max={96}
+                      max={144}
                       step={8}
                       data-testid="slider-font-size"
                     />
                     <p className="text-xs text-muted-foreground">
-                      The size of the text in the banner
+                      {t('fontSizeDescription')}
                     </p>
                   </div>
                 </CardContent>
@@ -730,7 +742,7 @@ export default function Home() {
                       data-testid="input-import-csv"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Import from Excel or Google Sheets. A: question and b: answer format.
+                      {t('importFromExcelDescription')}
                     </p>
                   </div>
 
@@ -755,14 +767,26 @@ export default function Home() {
                         </DialogHeader>
                         <div className="space-y-4">
                           <div className="bg-muted p-3 rounded-md text-sm font-mono">
-                            Q: What is 2+2?<br />
-                            A: 4<br />
-                            <br />
-                            Q: What is the capital of France?<br />
-                            A: Paris
+                            {language === 'es' ? (
+                              <>
+                                P: ¿Cuánto es 2+2?<br />
+                                R: 4<br />
+                                <br />
+                                P: ¿Cuál es la capital de Francia?<br />
+                                R: París
+                              </>
+                            ) : (
+                              <>
+                                Q: What is 2+2?<br />
+                                A: 4<br />
+                                <br />
+                                Q: What is the capital of France?<br />
+                                A: Paris
+                              </>
+                            )}
                           </div>
                           <Textarea
-                            placeholder="Q: Your question here?&#10;A: Your answer here&#10;&#10;Q: Another question?&#10;A: Another answer"
+                            placeholder={language === 'es' ? "P: ¿Tu pregunta aquí?&#10;R: Tu respuesta aquí&#10;&#10;P: ¿Otra pregunta?&#10;R: Otra respuesta" : "Q: Your question here?&#10;A: Your answer here&#10;&#10;Q: Another question?&#10;A: Another answer"}
                             value={pasteText}
                             onChange={(e) => setPasteText(e.target.value)}
                             className="min-h-[200px] font-mono"
@@ -774,7 +798,7 @@ export default function Home() {
                               disabled={!pasteText.trim()}
                               data-testid="button-confirm-paste"
                             >
-                              Import Questions
+                              {t('importQuestions')}
                             </Button>
                             <Button
                               onClick={() => {
@@ -791,7 +815,7 @@ export default function Home() {
                       </DialogContent>
                     </Dialog>
                     <p className="text-xs text-muted-foreground">
-                      Copy and paste questions directly - no file needed, in A: question and B: answer format.
+                      {t('copyPasteDescription')}
                     </p>
                   </div>
 
@@ -814,7 +838,7 @@ export default function Home() {
                       data-testid="input-import-file"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Load questions from a previously exported file A: question and B: answer format.
+                      {t('loadFromFileDescription')}
                     </p>
                   </div>
                 </CardContent>
@@ -833,7 +857,7 @@ export default function Home() {
 
               <Card className="border-destructive">
                 <CardHeader>
-                  <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                  <CardTitle className="text-destructive">{t('dangerZone')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -845,30 +869,30 @@ export default function Home() {
                           disabled={questions.length === 0 || clearAllQuestionsMutation.isPending}
                           data-testid="button-clear-all"
                         >
-                          {clearAllQuestionsMutation.isPending ? "Clearing..." : "Clear All Questions"}
+                          {clearAllQuestionsMutation.isPending ? t('clearing') : t('clearAllQuestions')}
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent data-testid="dialog-clear-all-confirm">
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogTitle>{t('areYouAbsoluteSure')}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete all {questions.length} questions from your account.
+                            {t('deleteAllDescription')} {questions.length} {t('questionsFromAccount')}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel data-testid="button-cancel-clear">Cancel</AlertDialogCancel>
+                          <AlertDialogCancel data-testid="button-cancel-clear">{t('cancel')}</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => clearAllQuestionsMutation.mutate()}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             data-testid="button-confirm-clear"
                           >
-                            Delete All Questions
+                            {t('deleteAllQuestionsButton')}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
                     <p className="text-xs text-muted-foreground mt-2">
-                      Permanently removes all questions from your database. This cannot be undone.
+                      {t('permanentlyRemovesDescription')}
                     </p>
                   </div>
                 </CardContent>
@@ -887,8 +911,8 @@ export default function Home() {
           mode={displayMode}
           onExit={() => setIsScreensaverActive(false)}
           defaultDuration={preferences?.defaultDuration || 5}
-          bannerHeight={preferences?.bannerHeight || 48}
-          fontSize={preferences?.fontSize || 48}
+          bannerHeight={preferences?.bannerHeight || 72}
+          fontSize={preferences?.fontSize || 60}
           enableSoundNotifications={Boolean(preferences?.enableSoundNotifications)}
         />
       )}
