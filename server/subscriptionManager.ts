@@ -59,7 +59,7 @@ export class SubscriptionManager {
     stripeCustomerId?: string
   ): Promise<void> {
     const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // Add 12 months
+    expiresAt.setMonth(expiresAt.getMonth() + 1); // Add 1 month
     
     const updateData: any = {
       tier: 'premium',

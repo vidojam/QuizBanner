@@ -181,7 +181,7 @@ export async function sendWelcomeEmail(email: string, firstName: string): Promis
                 <a href="${APP_URL}" class="button">Get Started</a>
               </p>
               
-              <p>Want more? Upgrade to Premium for $2.99/year to get:</p>
+              <p>Want more? Upgrade to Premium for 99¢/month to get:</p>
               <ul>
                 <li>Up to 50 question-answer pairs</li>
                 <li>CSV file import</li>
@@ -212,7 +212,7 @@ export async function sendWelcomeEmail(email: string, firstName: string): Promis
       
       Get started: ${APP_URL}
       
-      Want more? Upgrade to Premium for $2.99/year to get up to 50 questions, CSV import, and advanced features.
+      Want more? Upgrade to Premium for 99¢/month to get up to 50 questions, CSV import, and advanced features.
       
       © ${new Date().getFullYear()} QuizBanner. All rights reserved.
     `,

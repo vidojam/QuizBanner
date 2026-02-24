@@ -118,10 +118,10 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
   const user = userResults[0];
   
-  // Activate subscription for 12 months
+  // Activate subscription for 1 month
   await SubscriptionManager.activateSubscription(
     user.id,
-    paymentIntent.id, // Using payment intent as subscription ID for one-time payments
+    paymentIntent.id, // Using payment intent as subscription ID for payment-intent based billing
     paymentIntent.customer as string
   );
 
@@ -211,10 +211,10 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     if (userResults.length > 0) {
       const user = userResults[0];
       
-      // Extend subscription by 12 months from current expiry or now
+      // Extend subscription by 1 month from current expiry or now
       const currentExpiry = user.subscriptionExpiresAt ? new Date(user.subscriptionExpiresAt) : new Date();
       const newExpiry = new Date(Math.max(currentExpiry.getTime(), new Date().getTime()));
-      newExpiry.setFullYear(newExpiry.getFullYear() + 1);
+      newExpiry.setMonth(newExpiry.getMonth() + 1);
       
       await db.update(users)
         .set({
