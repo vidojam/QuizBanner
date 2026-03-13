@@ -219,7 +219,7 @@ export default function ScreensaverBanner({
             lineHeight: 1.2
           }}
         >
-          Q: {question}
+          {question}
         </span>
       </div>
 
@@ -248,7 +248,7 @@ export default function ScreensaverBanner({
             }}
             data-testid="text-answer-display"
           >
-            A: {answer}
+            {answer}
           </span>
         </div>
       )}

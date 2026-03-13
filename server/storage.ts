@@ -248,7 +248,7 @@ export class DatabaseStorage implements IStorage {
   }): Promise<GuestPremium> {
     const now = new Date().toISOString();
     const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 month
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 1 year
 
     const [created] = await db.insert(guestPremium).values({
       guestId: data.guestId,
@@ -375,10 +375,30 @@ export class DatabaseStorage implements IStorage {
     if (!prefs) {
       // Create default preferences if none exist
       const [created] = await db.insert(preferences)
-        .values({ userId })
+        .values({
+          userId,
+          defaultDuration: 5,
+          bannerHeight: 72,
+          fontSize: 60,
+        })
         .returning();
       return created;
     }
+
+    const isLegacyDefaultSize = prefs.bannerHeight === 48 && prefs.fontSize === 24;
+    if (isLegacyDefaultSize) {
+      const [upgraded] = await db
+        .update(preferences)
+        .set({
+          bannerHeight: 72,
+          fontSize: 60,
+        } as any)
+        .where(eq(preferences.id, prefs.id))
+        .returning();
+
+      return upgraded;
+    }
+
     return prefs;
   }
 

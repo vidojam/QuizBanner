@@ -125,7 +125,7 @@ export default function MagicLinkLogin() {
                   <p className="mt-2">
                     Don't have premium?{" "}
                     <Link href="/upgrade" className="text-primary hover:underline font-medium">
-                      Upgrade now for 99¢/month
+                      Upgrade now for $9.99/year
                     </Link>
                   </p>
                 </div>

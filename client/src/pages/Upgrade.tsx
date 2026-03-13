@@ -144,6 +144,15 @@ export default function Upgrade() {
                     <Check className="w-5 h-5 text-primary" />
                   </div>
                   <div>
+                    <div className="font-semibold">AI Generated Custom Q&A</div>
+                    <div className="text-sm text-muted-foreground">Generate custom questions and answers with 10, 25, or 50 selection</div>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Check className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
                     <div className="font-semibold">Cloud Sync</div>
                     <div className="text-sm text-muted-foreground">Access from any device</div>
                   </div>
@@ -152,11 +161,11 @@ export default function Upgrade() {
 
               <div className="pt-4 border-t">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">99¢</span>
-                  <span className="text-muted-foreground">per month</span>
+                  <span className="text-4xl font-bold">$9.99</span>
+                  <span className="text-muted-foreground">per year</span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
-                  Premium access billed monthly
+                  Premium access billed annually
                 </div>
               </div>
             </CardContent>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Pause, Play, SkipForward } from "lucide-react";
 import ScreensaverBanner, { type BannerPosition } from "./ScreensaverBanner";
@@ -141,6 +141,13 @@ export default function ScreensaverMode({
     handleComplete();
   };
 
+  const activePosition = POSITION_CYCLE[positionIndex];
+  const controlPadding = 16;
+  const controlsStyle: CSSProperties = {
+    top: activePosition === 'top' ? bannerHeight + controlPadding : controlPadding,
+    right: activePosition === 'right' ? bannerHeight + controlPadding : controlPadding,
+  };
+
   if (shuffledQuestions.length === 0) {
     return null;
   }
@@ -151,7 +158,7 @@ export default function ScreensaverMode({
       data-testid="screensaver-mode"
     >
       {/* Controls - visible in both modes */}
-      <div className="absolute top-4 right-4 z-10 flex gap-2 pointer-events-auto">
+      <div className="absolute z-10 flex gap-2 pointer-events-auto" style={controlsStyle}>
         <Button
           variant="ghost"
           size="icon"

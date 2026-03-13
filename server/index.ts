@@ -116,8 +116,15 @@ app.use((req, res, next) => {
   // Register other routes (these require authentication)
   const server = await registerRoutes(app);
 
-  // Verify email configuration on startup
-  verifyEmailConfig();
+  // Verify email configuration on startup in production.
+  // Development can opt in with EMAIL_VERIFY_ON_STARTUP=true.
+  const shouldVerifyEmailOnStartup =
+    process.env.NODE_ENV === 'production' || process.env.EMAIL_VERIFY_ON_STARTUP === 'true';
+  if (shouldVerifyEmailOnStartup) {
+    await verifyEmailConfig();
+  } else {
+    console.log('ℹ️  Skipping email configuration verification on startup (development mode).');
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

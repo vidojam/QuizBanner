@@ -46,7 +46,7 @@
 
 ### After Payment:
 ```
-1. User pays $0.99
+1. User pays $9.99/year
 2. Email received: "Welcome to Premium! 🎉"
 3. Click magic link in email
 4. Instantly logged in with premium access
@@ -87,7 +87,14 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
 EMAIL_FROM=QuizBanner <noreply@quizbanner.com>
 APP_URL=http://localhost:5000
+
+# Optional (development)
+# EMAIL_VERIFY_ON_STARTUP=true
 ```
+
+Local dev note:
+- Email verification on server startup is skipped by default in development.
+- Set `EMAIL_VERIFY_ON_STARTUP=true` to force SMTP verification locally.
 
 ## 📱 Benefits
 

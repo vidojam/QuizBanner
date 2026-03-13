@@ -13,7 +13,7 @@ Learn smarter with customizable scrolling question banners featuring enhanced sp
 - Study session tracking
 - No account required - use as guest
 
-### Premium Tier (99¢/month)
+### Premium Tier ($9.99/year)
 - Up to 50 question-answer pairs
 - CSV file import
 - Paste text import
@@ -61,6 +61,10 @@ APP_URL="http://localhost:5000"
 STRIPE_SECRET_KEY="sk_test_..."
 STRIPE_PUBLISHABLE_KEY="pk_test_..."
 ```
+
+Local dev note:
+- Email verification on server startup is skipped by default in development.
+- Set `EMAIL_VERIFY_ON_STARTUP="true"` in `.env` if you want to force SMTP verification locally.
 
 4. Start the development server:
 ```bash

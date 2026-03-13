@@ -52,7 +52,14 @@ node test-connection.js
 APP_URL=http://localhost:5000
 # Or for network access:
 APP_URL=http://192.168.1.191:5000
+
+# Optional (development)
+# EMAIL_VERIFY_ON_STARTUP=true
 ```
+
+Local dev note:
+- Email verification on server startup is skipped by default in development.
+- Set `EMAIL_VERIFY_ON_STARTUP=true` to force SMTP verification locally.
 
 ### For Render Deployment (Environment Variables)
 Must set these in Render Dashboard → Settings → Environment Variables:

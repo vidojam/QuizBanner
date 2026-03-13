@@ -107,7 +107,7 @@ export default function CheckoutForm({ onSuccess }: CheckoutFormProps) {
         ) : (
           <>
             <Lock className="w-4 h-4 mr-2" />
-            Pay 99¢
+            Pay $9.99
           </>
         )}
       </Button>
@@ -117,7 +117,7 @@ export default function CheckoutForm({ onSuccess }: CheckoutFormProps) {
           <Lock className="w-3 h-3" />
           <span>Secure payment by Stripe</span>
         </div>
-        <div>One-time payment for 1 month of premium access</div>
+        <div>One-time payment for 1 year of premium access</div>
       </div>
     </form>
   );

@@ -13,7 +13,7 @@ interface PlanSelectionProps {
 
 export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
   const { t, language } = useTranslation();
-  const premiumPlanPrice = language === 'es' ? '99¢/mes' : '99¢/month';
+  const premiumPlanPrice = language === 'es' ? '$9.99/año' : '$9.99/year';
 
   // Force re-render when language changes
   console.log('PlanSelection rendering with language:', language);
@@ -23,15 +23,14 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
       <AnimatedBanners />
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/20 p-4 relative z-10">
       <div className="max-w-4xl w-full space-y-8" key={`plan-content-${language}`}>
-        {/* Language Selector */}
-        <div className="flex justify-end mb-4">
-          <LanguageSelector />
-        </div>
-        
         {/* Header */}
         <div className="text-center space-y-6">
-          <div className="flex justify-center mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="w-32" />
             <Logo size="lg" className="shadow-2xl" />
+            <div className="w-32 flex justify-end">
+              <LanguageSelector />
+            </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
             {t('planSelectionTitle')}
@@ -112,6 +111,10 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
                   <span className="font-semibold">{t('pasteImport')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-green-500" />
+                  <span className="font-semibold">{t('aiGeneratedCustomQa')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />

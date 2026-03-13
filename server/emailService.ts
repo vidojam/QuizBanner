@@ -9,6 +9,11 @@ const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || '';
 const EMAIL_FROM = process.env.EMAIL_FROM || 'QuizBanner <onboarding@resend.dev>';
 const APP_URL = process.env.APP_URL || 'http://localhost:5000';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const isProduction = process.env.NODE_ENV === 'production';
+const EMAIL_TLS_REJECT_UNAUTHORIZED = process.env.EMAIL_TLS_REJECT_UNAUTHORIZED;
+const tlsRejectUnauthorized = EMAIL_TLS_REJECT_UNAUTHORIZED
+  ? EMAIL_TLS_REJECT_UNAUTHORIZED !== 'false'
+  : isProduction;
 
 // Determine which email service to use
 const useResend = !!RESEND_API_KEY;
@@ -22,7 +27,10 @@ const transporter = !useResend ? nodemailer.createTransport({
   auth: {
     user: EMAIL_USER,
     pass: EMAIL_PASSWORD,
-  }
+  },
+  tls: {
+    rejectUnauthorized: tlsRejectUnauthorized,
+  },
 }) : null;
 
 /**
@@ -181,7 +189,7 @@ export async function sendWelcomeEmail(email: string, firstName: string): Promis
                 <a href="${APP_URL}" class="button">Get Started</a>
               </p>
               
-              <p>Want more? Upgrade to Premium for 99¢/month to get:</p>
+              <p>Want more? Upgrade to Premium for $9.99/year to get:</p>
               <ul>
                 <li>Up to 50 question-answer pairs</li>
                 <li>CSV file import</li>
@@ -212,7 +220,7 @@ export async function sendWelcomeEmail(email: string, firstName: string): Promis
       
       Get started: ${APP_URL}
       
-      Want more? Upgrade to Premium for 99¢/month to get up to 50 questions, CSV import, and advanced features.
+      Want more? Upgrade to Premium for $9.99/year to get up to 50 questions, CSV import, and advanced features.
       
       © ${new Date().getFullYear()} QuizBanner. All rights reserved.
     `,
@@ -421,6 +429,9 @@ export async function verifyEmailConfig(): Promise<boolean> {
   try {
     await transporter.verify();
     console.log('✅ Email service is ready');
+    if (!tlsRejectUnauthorized) {
+      console.log('⚠️  EMAIL_TLS_REJECT_UNAUTHORIZED=false (development mode)');
+    }
     return true;
   } catch (error) {
     console.error('❌ Email service configuration error:', error);

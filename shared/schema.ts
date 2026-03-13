@@ -48,8 +48,8 @@ export const preferences = pgTable("preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
   defaultDuration: integer("default_duration").notNull().default(5),
-  bannerHeight: integer("banner_height").notNull().default(48),
-  fontSize: integer("font_size").notNull().default(24),
+  bannerHeight: integer("banner_height").notNull().default(72),
+  fontSize: integer("font_size").notNull().default(60),
   enableSoundNotifications: integer("enable_sound_notifications").notNull().default(0), // 0 = false, 1 = true
   shuffleQuestions: integer("shuffle_questions").notNull().default(0),
   enableSpacedRepetition: integer("enable_spaced_repetition").notNull().default(0),

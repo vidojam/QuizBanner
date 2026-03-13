@@ -35,7 +35,7 @@ const DEMO_CATEGORY_PREFIX = 'demo-';
 
 const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: string; answer: string }> }> = {
   tech: {
-    label: 'Tech',
+    label: 'Learn Acronyms',
     items: [
       { question: 'What is a CPU?', answer: 'Computer brain.' },
       { question: 'What is RAM?', answer: 'Short-term memory.' },
@@ -50,7 +50,7 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
     ],
   },
   javascript: {
-    label: 'JavaScript',
+    label: 'Learn Wine World Regions',
     items: [
       { question: 'Which keywords create vars?', answer: 'let and const.' },
       { question: 'What does === check?', answer: 'Value and type.' },
@@ -65,7 +65,7 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
     ],
   },
   movieStars: {
-    label: 'Movie Stars',
+    label: 'Iconic Movie Quotes',
     items: [
       { question: 'Iron Man actor?', answer: 'Robert Downey Jr.' },
       { question: 'Wonder Woman actor?', answer: 'Gal Gadot.' },
@@ -95,33 +95,33 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
     ],
   },
   cars2026: {
-    label: 'Cars 2026',
+    label: 'What Vitamins are for',
     items: [
-      { question: 'Good lease term in 2026?', answer: 'Usually 24-36 months.' },
-      { question: 'What is residual value?', answer: 'Car value at lease end.' },
-      { question: 'What raises lease cost?', answer: 'Low residual, high APR.' },
-      { question: 'What is MSRP?', answer: 'Sticker price of car.' },
-      { question: 'Repair or replace tires?', answer: 'Repair small punctures only.' },
-      { question: 'Lease includes repairs?', answer: 'Usually not wear items.' },
-      { question: 'Most reliable service habit?', answer: 'Follow factory schedule.' },
-      { question: 'Battery check for hybrids?', answer: 'At major service visits.' },
-      { question: 'Can you end lease early?', answer: 'Yes, with possible fees.' },
-      { question: 'Best pre-return lease step?', answer: 'Fix damage, clean car.' },
+      { question: 'What does vitamin C support?', answer: 'Immune function and skin health.' },
+      { question: 'What is vitamin D important for?', answer: 'Bone strength and calcium absorption.' },
+      { question: 'What do B vitamins help with?', answer: 'Energy metabolism and nerves.' },
+      { question: 'Why is vitamin A needed?', answer: 'Vision, skin, and immunity.' },
+      { question: 'What does vitamin E do?', answer: 'Acts as an antioxidant.' },
+      { question: 'What is vitamin K used for?', answer: 'Normal blood clotting and bone health.' },
+      { question: 'Do vitamins replace food?', answer: 'No, they supplement diet gaps.' },
+      { question: 'When take fat-soluble vitamins?', answer: 'With food containing fat.' },
+      { question: 'Can too many vitamins be harmful?', answer: 'Yes, excess can cause side effects.' },
+      { question: 'Best source of most vitamins?', answer: 'A varied balanced diet.' },
     ],
   },
   aiPrograms: {
-    label: '10 AI Programs',
+    label: 'What number was this United States President',
     items: [
-      { question: 'ChatGPT does what?', answer: 'Writes and explains text.' },
-      { question: 'Claude does what?', answer: 'Long-form writing help.' },
-      { question: 'Gemini does what?', answer: 'Search and reasoning tasks.' },
-      { question: 'Perplexity does what?', answer: 'Answers with web sources.' },
-      { question: 'Midjourney does what?', answer: 'Creates image art.' },
-      { question: 'DALL·E does what?', answer: 'Generates images from text.' },
-      { question: 'GitHub Copilot does what?', answer: 'Suggests code in IDE.' },
-      { question: 'Notion AI does what?', answer: 'Summarizes and drafts notes.' },
-      { question: 'Grammarly does what?', answer: 'Improves grammar and tone.' },
-      { question: 'Canva AI does what?', answer: 'Quick design generation.' },
+      { question: 'What number president was George Washington?', answer: '1st.' },
+      { question: 'What number president was Abraham Lincoln?', answer: '16th.' },
+      { question: 'What number president was Theodore Roosevelt?', answer: '26th.' },
+      { question: 'What number president was Franklin D. Roosevelt?', answer: '32nd.' },
+      { question: 'What number president was John F. Kennedy?', answer: '35th.' },
+      { question: 'What number president was Richard Nixon?', answer: '37th.' },
+      { question: 'What number president was Ronald Reagan?', answer: '40th.' },
+      { question: 'What number president was Bill Clinton?', answer: '42nd.' },
+      { question: 'What number president was Barack Obama?', answer: '44th.' },
+      { question: 'What number president was Joe Biden?', answer: '46th.' },
     ],
   },
 };
@@ -266,14 +266,29 @@ export default function Home() {
     updateQuestionMutation.mutate({ id, data: { question, answer } });
   };
 
-  const buildCustomDemoItems = (subject: string) => {
+  const buildCustomDemoItems = (subject: string, requestedCount: 10 | 25 | 50) => {
     const cleanSubject = subject.trim();
     const lowerSubject = cleanSubject.toLowerCase();
 
     const hasKeyword = (keywords: string[]) => keywords.some((keyword) => lowerSubject.includes(keyword));
 
+    const extendToCount = (seedItems: Array<{ question: string; answer: string }>) => {
+      if (seedItems.length >= requestedCount) {
+        return seedItems.slice(0, requestedCount);
+      }
+
+      const extendedItems = [...seedItems];
+      for (let i = seedItems.length + 1; i <= requestedCount; i++) {
+        extendedItems.push({
+          question: `${cleanSubject}: quick tip ${i}?`,
+          answer: `Focus on practical basics.`,
+        });
+      }
+      return extendedItems;
+    };
+
     if (hasKeyword(['code', 'coding', 'programming', 'javascript', 'python', 'react', 'typescript', 'developer'])) {
-      return [
+      return extendToCount([
         { question: `${cleanSubject}: first concept?`, answer: 'Start with syntax basics.' },
         { question: `${cleanSubject}: best daily practice?`, answer: 'Build small features daily.' },
         { question: `${cleanSubject}: debug first step?`, answer: 'Reproduce the bug clearly.' },
@@ -284,11 +299,11 @@ export default function Home() {
         { question: `${cleanSubject}: code quality tip?`, answer: 'Write clear function names.' },
         { question: `${cleanSubject}: interview prep?`, answer: 'Practice DS and APIs.' },
         { question: `${cleanSubject}: growth metric?`, answer: 'Ship features faster.' },
-      ];
+      ]);
     }
 
     if (hasKeyword(['car', 'cars', 'auto', 'vehicle', 'lease', 'repair', 'toyota', 'honda', 'bmw'])) {
-      return [
+      return extendToCount([
         { question: `${cleanSubject}: smart first check?`, answer: 'Review maintenance history.' },
         { question: `${cleanSubject}: lease sweet spot?`, answer: 'Usually 24-36 months.' },
         { question: `${cleanSubject}: cost saver?`, answer: 'Compare insurance quotes.' },
@@ -299,11 +314,11 @@ export default function Home() {
         { question: `${cleanSubject}: lease return prep?`, answer: 'Repair dents early.' },
         { question: `${cleanSubject}: resale booster?`, answer: 'Keep service records.' },
         { question: `${cleanSubject}: best habit?`, answer: 'Monthly visual inspection.' },
-      ];
+      ]);
     }
 
     if (hasKeyword(['health', 'fitness', 'nutrition', 'diet', 'wellness', 'exercise', 'workout'])) {
-      return [
+      return extendToCount([
         { question: `${cleanSubject}: healthy start?`, answer: 'Begin with simple habits.' },
         { question: `${cleanSubject}: daily target?`, answer: 'Move 30 minutes.' },
         { question: `${cleanSubject}: top nutrition tip?`, answer: 'Prioritize whole foods.' },
@@ -314,11 +329,11 @@ export default function Home() {
         { question: `${cleanSubject}: recovery tip?`, answer: 'Rest days matter.' },
         { question: `${cleanSubject}: motivation hack?`, answer: 'Set tiny milestones.' },
         { question: `${cleanSubject}: success sign?`, answer: 'More energy daily.' },
-      ];
+      ]);
     }
 
     if (hasKeyword(['finance', 'money', 'invest', 'investing', 'budget', 'stocks', 'crypto', 'tax'])) {
-      return [
+      return extendToCount([
         { question: `${cleanSubject}: first step?`, answer: 'Track monthly spending.' },
         { question: `${cleanSubject}: key safety habit?`, answer: 'Build emergency fund.' },
         { question: `${cleanSubject}: budget method?`, answer: 'Use 50/30/20 rule.' },
@@ -329,11 +344,11 @@ export default function Home() {
         { question: `${cleanSubject}: tax habit?`, answer: 'Save key receipts.' },
         { question: `${cleanSubject}: biggest mistake?`, answer: 'Emotional decisions.' },
         { question: `${cleanSubject}: progress metric?`, answer: 'Higher net worth.' },
-      ];
+      ]);
     }
 
     if (hasKeyword(['ai', 'artificial intelligence', 'machine learning', 'ml', 'llm'])) {
-      return [
+      return extendToCount([
         { question: `${cleanSubject}: core idea?`, answer: 'Systems learn patterns.' },
         { question: `${cleanSubject}: input quality rule?`, answer: 'Better prompts, better output.' },
         { question: `${cleanSubject}: top use case?`, answer: 'Summarize and draft fast.' },
@@ -344,10 +359,10 @@ export default function Home() {
         { question: `${cleanSubject}: prompt tip?`, answer: 'Be specific and short.' },
         { question: `${cleanSubject}: evaluation method?`, answer: 'Test with real cases.' },
         { question: `${cleanSubject}: success metric?`, answer: 'Time saved weekly.' },
-      ];
+      ]);
     }
 
-    return [
+    return extendToCount([
       { question: `What is ${cleanSubject}?`, answer: `${cleanSubject} basics explained.` },
       { question: `Why learn ${cleanSubject}?`, answer: `Useful skills for work.` },
       { question: `${cleanSubject} first step?`, answer: `Learn core terms first.` },
@@ -358,7 +373,7 @@ export default function Home() {
       { question: `${cleanSubject} advanced skill?`, answer: `Solve real problems.` },
       { question: `${cleanSubject} how to improve?`, answer: `Review and repeat.` },
       { question: `${cleanSubject} success metric?`, answer: `Faster, better results.` },
-    ];
+    ]);
   };
 
   const replaceDemoQuestions = async ({
@@ -430,8 +445,17 @@ export default function Home() {
     }
   };
 
-  const handleLoadCustomDemo = async (subject: string) => {
+  const handleLoadCustomDemo = async (subject: string, count: 10 | 25 | 50) => {
     if (demoPackLoading) {
+      return;
+    }
+
+    if (tier !== 'premium') {
+      toast({
+        title: "Premium feature",
+        description: "Custom Demo is available on the Premium Plan ($9.99/year).",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -449,7 +473,7 @@ export default function Home() {
 
     try {
       await replaceDemoQuestions({
-        items: buildCustomDemoItems(cleanSubject),
+        items: buildCustomDemoItems(cleanSubject, count),
         demoKey: 'custom',
         label: cleanSubject,
       });
@@ -722,9 +746,17 @@ export default function Home() {
       <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 relative z-10">
         <div className="max-w-5xl mx-auto p-6 md:p-8 space-y-8">
           <header className="space-y-4">
-            <div className="flex items-center justify-between">
-              <LanguageSelector />
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Logo size="lg" className="shadow-2xl" />
+                <div>
+                  <div className="text-xl font-bold text-foreground">
+                    {user?.tier === "premium" ? t('premiumMember') : t('freeTierLabel')}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 justify-end">
+                <LanguageSelector />
                 <Button
                   variant="ghost"
                   size="sm"
@@ -737,18 +769,6 @@ export default function Home() {
                   <LogOut className="w-4 h-4 mr-2" />
                   {t('logOut')}
                 </Button>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Logo size="lg" className="shadow-2xl" />
-                <div>
-                  <div className="text-xl font-bold text-foreground">
-                    {user?.tier === "premium" ? t('premiumMember') : t('freeTierLabel')}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
                 {user?.tier === 'free' && (
                   <Button 
                     size="sm"
@@ -898,6 +918,7 @@ export default function Home() {
                 onAdd={handleAddQuestion}
                 onLoadDemoPack={handleLoadDemoPack}
                 onLoadCustomDemo={handleLoadCustomDemo}
+                onUpgradeClick={() => navigate('/upgrade')}
                 demoPackLoading={demoPackLoading}
                 questionsCount={questions.length}
                 maxQuestions={user?.tier ? TIER_LIMITS[user.tier as keyof typeof TIER_LIMITS] : TIER_LIMITS.free}
@@ -913,6 +934,49 @@ export default function Home() {
                   onEdit={handleEditQuestion}
                 />
               </div>
+
+              <Card className="border-destructive">
+                <CardHeader>
+                  <CardTitle className="text-destructive">{t('dangerZone')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          className="w-full"
+                          disabled={questions.length === 0 || clearAllQuestionsMutation.isPending}
+                          data-testid="button-clear-all-questions-tab"
+                        >
+                          {clearAllQuestionsMutation.isPending ? t('clearing') : t('clearAllQuestions')}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent data-testid="dialog-clear-all-confirm-questions-tab">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t('areYouAbsoluteSure')}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t('deleteAllDescription')} {questions.length} {t('questionsFromAccount')}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel data-testid="button-cancel-clear-questions-tab">{t('cancel')}</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => clearAllQuestionsMutation.mutate()}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            data-testid="button-confirm-clear-questions-tab"
+                          >
+                            {t('deleteAllQuestionsButton')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {t('permanentlyRemovesDescription')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-6 mt-6">
@@ -1179,48 +1243,6 @@ export default function Home() {
                 </CardContent>
               </Card>
 
-              <Card className="border-destructive">
-                <CardHeader>
-                  <CardTitle className="text-destructive">{t('dangerZone')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          className="w-full"
-                          disabled={questions.length === 0 || clearAllQuestionsMutation.isPending}
-                          data-testid="button-clear-all"
-                        >
-                          {clearAllQuestionsMutation.isPending ? t('clearing') : t('clearAllQuestions')}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent data-testid="dialog-clear-all-confirm">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>{t('areYouAbsoluteSure')}</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            {t('deleteAllDescription')} {questions.length} {t('questionsFromAccount')}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel data-testid="button-cancel-clear">{t('cancel')}</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => clearAllQuestionsMutation.mutate()}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            data-testid="button-confirm-clear"
-                          >
-                            {t('deleteAllQuestionsButton')}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {t('permanentlyRemovesDescription')}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
             </TabsContent>
           </Tabs>
         </div>

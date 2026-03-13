@@ -2,13 +2,13 @@
 
 ## Overview
 
-QuizBanner now uses **passwordless Magic Link authentication** for premium users. After paying $0.99, users receive an email with a secure login link that grants access to their premium features on any device.
+QuizBanner now uses **passwordless Magic Link authentication** for premium users. After paying $9.99/year, users receive an email with a secure login link that grants access to their premium features on any device.
 
 ## How It Works
 
 ### Payment Flow
 
-1. **User pays $0.99** through Stripe checkout
+1. **User pays $9.99/year** through Stripe checkout
 2. **Payment success webhook** triggers automatically
 3. **Magic link is sent** to the email provided during checkout
 4. **User clicks link** in email to access premium features
@@ -16,7 +16,7 @@ QuizBanner now uses **passwordless Magic Link authentication** for premium users
 ### For Guest Premium Users
 
 ```
-Pay $0.99 → Provide email → Receive magic link → Click link → Instant access
+Pay $9.99/year → Provide email → Receive magic link → Click link → Instant access
 ```
 
 - No password needed
@@ -136,7 +136,7 @@ The Stripe webhook (`handlePaymentSucceeded`) now:
 ```
 1. User visits landing page
 2. Clicks "Premium" button
-3. Pays $0.99 via Stripe
+3. Pays $9.99/year via Stripe
 4. Receives email: "Payment Successful + Magic Link"
 5. Clicks link in email
 6. Instantly logged in with premium features
@@ -185,7 +185,14 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
 EMAIL_FROM=QuizBanner <noreply@quizbanner.com>
 APP_URL=http://localhost:5000
+
+# Optional (development)
+# EMAIL_VERIFY_ON_STARTUP=true
 ```
+
+Local dev note:
+- Email verification on server startup is skipped by default in development.
+- Set `EMAIL_VERIFY_ON_STARTUP=true` to force SMTP verification locally.
 
 ## Testing
 
