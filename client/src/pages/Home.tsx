@@ -389,9 +389,7 @@ export default function Home() {
     const targetDemoCount = user?.tier === 'free' ? 10 : items.length;
     const itemsToAdd = items.slice(0, Math.min(targetDemoCount, maxQuestions));
 
-    for (const existingQuestion of questions) {
-      await apiRequest('DELETE', `/api/questions/${existingQuestion.id}`);
-    }
+    await apiRequest('DELETE', '/api/questions');
 
     const baseOrder = 0;
 
