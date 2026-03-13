@@ -161,7 +161,7 @@ export default function QuestionForm({
           )}
           {!canUseLargeCustomDemo && (
             <div className="flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">Custom Demo is available on the Premium Plan ($9.99/year).</p>
+              <p className="text-[1.5rem] font-bold text-muted-foreground">Custom Demo is available on the Premium Plan ($9.99/year).</p>
               {onUpgradeClick && (
                 <Button
                   type="button"
@@ -175,7 +175,7 @@ export default function QuestionForm({
               )}
             </div>
           )}
-          <p className="text-xs text-muted-foreground">Short question/answer banners will be added instantly.</p>
+          <p className="text-[1.5rem] font-bold text-muted-foreground">Short question/answer banners will be added instantly.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">

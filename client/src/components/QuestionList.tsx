@@ -41,7 +41,7 @@ export default function QuestionList({ questions, onDelete, onEdit }: QuestionLi
     return (
       <Card>
         <CardContent className="p-12 text-center">
-          <p className="text-muted-foreground text-lg">
+          <p className="text-[2.25rem] font-bold text-muted-foreground">
             No questions added yet. Add your first question above to get started!
           </p>
         </CardContent>
