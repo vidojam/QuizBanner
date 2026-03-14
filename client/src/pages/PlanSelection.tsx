@@ -13,6 +13,7 @@ interface PlanSelectionProps {
 
 export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
   const { t, language } = useTranslation();
+  const premiumPlanPrice = language === 'es' ? '99¢/mes' : '99¢/month';
 
   // Force re-render when language changes
   console.log('PlanSelection rendering with language:', language);
@@ -78,7 +79,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                   size="lg" 
                   variant="outline"
                   onClick={() => onPlanSelected('free')}
-                  className="w-full text-3xl py-12 bg-blue-50 hover:bg-blue-100 border-blue-200"
+                  className="w-full text-3xl py-12 bg-blue-300 hover:bg-blue-300 border-blue-200"
                 >
                   Continue With Free Plan
                 </Button>
@@ -95,7 +96,7 @@ export default function PlanSelection({ onPlanSelected }: PlanSelectionProps) {
                 </div>
                 {t('premiumPlanTitle')}
               </CardTitle>
-              <div className="text-3xl font-bold">{t('premiumPlanPrice')}</div>
+              <div className="text-3xl font-bold">{premiumPlanPrice}</div>
               <p className="text-muted-foreground">{t('unlockFullPotential')}</p>
             </CardHeader>
             <CardContent className="space-y-4 flex-1 flex flex-col">

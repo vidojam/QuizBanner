@@ -135,9 +135,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // The email will be collected in the Stripe checkout form
       const receiptEmail = email || user?.email || undefined;
 
-      // Create payment intent for $2.99 (299 cents)
+      // Create payment intent for $0.99 (99 cents)
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: 299, // $2.99 in cents
+        amount: 99, // $0.99 in cents
         currency: 'usd',
         receipt_email: receiptEmail,
         metadata: {
@@ -145,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           guestId: guestId || '',
           email: receiptEmail || '',
           tier: 'premium',
-          duration: '12months',
+          duration: '1month',
           isGuest: isGuest.toString()
         }
       });

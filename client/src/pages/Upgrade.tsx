@@ -152,11 +152,11 @@ export default function Upgrade() {
 
               <div className="pt-4 border-t">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold">$2.99</span>
-                  <span className="text-muted-foreground">one-time</span>
+                  <span className="text-4xl font-bold">99¢</span>
+                  <span className="text-muted-foreground">per month</span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
-                  12 months of premium access
+                  Premium access billed monthly
                 </div>
               </div>
             </CardContent>

@@ -45,14 +45,14 @@ STRIPE_WEBHOOK_URL=https://yourdomain.com/api/stripe/webhook
 ### Payment Flow
 1. User clicks "Upgrade to Premium" 
 2. Frontend calls `/api/subscription/create-payment-intent`
-3. Server creates Stripe PaymentIntent for $2.99
+3. Server creates Stripe PaymentIntent for $0.99
 4. User completes payment with Stripe Elements
 5. Stripe sends webhook to `/api/stripe/webhook`
-6. Server verifies payment and activates 12-month subscription
+6. Server verifies payment and activates 1-month premium access
 
 ### Subscription Management
 1. **Payment Verification**: Stripe webhooks verify all payments
-2. **Expiry Tracking**: Database stores `subscription_expires_at` (12 months from payment)
+2. **Expiry Tracking**: Database stores `subscription_expires_at` (1 month from payment)
 3. **Auto-Downgrade**: Background task checks daily and downgrades expired users
 4. **Renewal Reminders**: System identifies users with <7 days remaining
 5. **Status Checks**: Every login checks subscription status and updates tier

@@ -248,7 +248,7 @@ export class DatabaseStorage implements IStorage {
   }): Promise<GuestPremium> {
     const now = new Date().toISOString();
     const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 12 months
+    expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 month
 
     const [created] = await db.insert(guestPremium).values({
       guestId: data.guestId,

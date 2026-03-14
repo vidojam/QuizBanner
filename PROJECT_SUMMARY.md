@@ -15,8 +15,8 @@ This is a learning reinforcement application that helps users memorize informati
 **Original Request:**
 - Implement user authentication system
 - Create two-tier system: Free (10 questions) and Premium (50 questions)
-- Premium tier: One-time payment for 12 months
-- Pricing: $1.99 (updated from initial $0.99)
+- Premium tier: One-time payment for 1 month of premium access
+- Pricing: $0.99/month
 - Add Premium button to landing page
 - Connect payments to JP Morgan Chase account (routing: 267084131, account: 1802301810)
 
@@ -53,7 +53,7 @@ This is a learning reinforcement application that helps users memorize informati
 
 #### 3. **Two-Tier System** ✅
 - **Free Tier:** 10 questions maximum
-- **Premium Tier:** 50 questions maximum ($1.99 for 12 months)
+- **Premium Tier:** 50 questions maximum ($0.99 for 1 month)
 
 **Implementation Details:**
 - Server-side enforcement: Cannot bypass via API calls
@@ -79,7 +79,7 @@ This is a learning reinforcement application that helps users memorize informati
 - Two call-to-action buttons:
   - "Get Started Free" (outline variant)
   - "Upgrade to Premium" (primary variant)
-- Premium card displays: "$1.99 - one-time payment for 12 months"
+- Premium card displays: "99¢ - one-time payment for 1 month"
 - User header shows avatar, email, and current tier
 
 **Files Modified:**
@@ -138,7 +138,7 @@ This is a learning reinforcement application that helps users memorize informati
 5. Set payout schedule (daily/weekly/monthly)
 
 **Step 3: Automatic Payouts**
-- Stripe automatically deposits all $1.99 payments to your Chase account
+- Stripe automatically deposits all $0.99 payments to your Chase account
 - Bank details stay encrypted in Stripe's vault
 - Never exposed in code or repository
 
@@ -243,10 +243,10 @@ All major features were reviewed and approved by architect agent:
   - `STRIPE_SECRET_KEY` (backend)
   - `VITE_STRIPE_PUBLIC_KEY` (frontend)
 - Implementation includes:
-  - Stripe Checkout for $1.99 payment
+  - Stripe Checkout for $0.99 payment
   - Automatic tier upgrade after successful payment
   - Webhook handler for `payment_intent.succeeded`
-  - 12-month access tracking in database
+  - 1-month access tracking in database
 
 **2. Premium Feature Restrictions**
 - CSV file import (premium only)

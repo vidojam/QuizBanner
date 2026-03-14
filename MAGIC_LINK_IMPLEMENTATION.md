@@ -46,7 +46,7 @@
 
 ### After Payment:
 ```
-1. User pays $2.99
+1. User pays $0.99
 2. Email received: "Welcome to Premium! 🎉"
 3. Click magic link in email
 4. Instantly logged in with premium access
