@@ -59,7 +59,7 @@ export default function QuestionForm({
       </CardHeader>
       <CardContent>
         <div className="space-y-3 mb-5">
-          <p className="text-sm font-medium">Wow in 30 seconds: add a free demo pack</p>
+          <p className="text-[1.5rem] font-bold text-red-600">Wow in 30 seconds, add a free demo pack</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             <Button
               type="button"
@@ -67,7 +67,7 @@ export default function QuestionForm({
               onClick={() => onLoadDemoPack?.('tech')}
               disabled={isMaxReached || demoPackLoading !== null}
               data-testid="button-demo-tech"
-              className={demoButtonClassName}
+              className={`${demoButtonClassName} border border-gray-700`}
             >
               {demoPackLoading === 'tech' ? 'Loading...' : 'Learn Acronyms'}
             </Button>
@@ -77,7 +77,7 @@ export default function QuestionForm({
               onClick={() => onLoadDemoPack?.('javascript')}
               disabled={isMaxReached || demoPackLoading !== null}
               data-testid="button-demo-javascript"
-              className={demoButtonClassName}
+              className={`${demoButtonClassName} border border-gray-700`}
             >
               {demoPackLoading === 'javascript' ? 'Loading...' : 'Learn Wine World Regions'}
             </Button>
@@ -87,7 +87,7 @@ export default function QuestionForm({
               onClick={() => onLoadDemoPack?.('movieStars')}
               disabled={isMaxReached || demoPackLoading !== null}
               data-testid="button-demo-movie-stars"
-              className={demoButtonClassName}
+              className={`${demoButtonClassName} border border-gray-700`}
             >
               {demoPackLoading === 'movieStars' ? 'Loading...' : 'Iconic Movie Quotes'}
             </Button>
@@ -97,7 +97,7 @@ export default function QuestionForm({
               onClick={() => onLoadDemoPack?.('aiBasics')}
               disabled={isMaxReached || demoPackLoading !== null}
               data-testid="button-demo-ai-basics"
-              className={demoButtonClassName}
+              className={`${demoButtonClassName} border border-gray-700`}
             >
               {demoPackLoading === 'aiBasics' ? 'Loading...' : 'Learn What is AI'}
             </Button>
@@ -107,7 +107,7 @@ export default function QuestionForm({
               onClick={() => onLoadDemoPack?.('cars2026')}
               disabled={isMaxReached || demoPackLoading !== null}
               data-testid="button-demo-cars-2026"
-              className={`${demoButtonClassName} sm:col-span-2 md:col-span-2`}
+              className={`${demoButtonClassName} sm:col-span-2 md:col-span-2 border border-gray-700`}
             >
               {demoPackLoading === 'cars2026' ? 'Loading...' : 'Learn What Vitamins are for'}
             </Button>
@@ -117,7 +117,7 @@ export default function QuestionForm({
               onClick={() => onLoadDemoPack?.('aiPrograms')}
               disabled={isMaxReached || demoPackLoading !== null}
               data-testid="button-demo-ai-programs"
-              className={`${demoButtonClassName} sm:col-span-2 md:col-span-2`}
+              className={`${demoButtonClassName} sm:col-span-2 md:col-span-2 border border-gray-700`}
             >
               {demoPackLoading === 'aiPrograms' ? 'Loading...' : 'Learn what number was this United States President'}
             </Button>
@@ -152,7 +152,7 @@ export default function QuestionForm({
                   onClick={() => onLoadCustomDemo?.(customSubject, Number(customCount) as 10 | 25 | 50)}
                   disabled={isMaxReached || demoPackLoading !== null || !customSubject.trim()}
                   data-testid="button-demo-custom"
-                  className={demoButtonClassName}
+                  className={`${demoButtonClassName} border border-gray-700`}
                 >
                   {demoPackLoading === 'custom' ? 'Loading...' : 'Custom Demo'}
                 </Button>
@@ -161,7 +161,7 @@ export default function QuestionForm({
           )}
           {!canUseLargeCustomDemo && (
             <div className="flex items-center gap-2">
-              <p className="text-[1.5rem] font-bold text-muted-foreground">Custom Demo is available on the Premium Plan ($9.99/year).</p>
+              <p className="text-[1.5rem] font-bold text-red-600">Custom Demo is available on the Premium Plan ($9.99/year).</p>
               {onUpgradeClick && (
                 <Button
                   type="button"
@@ -169,13 +169,15 @@ export default function QuestionForm({
                   size="sm"
                   onClick={onUpgradeClick}
                   data-testid="button-upgrade-custom-demo"
+                  className="border border-gray-400 rounded-md"
                 >
                   Continue With Premium Plan
                 </Button>
               )}
             </div>
           )}
-          <p className="text-[1.5rem] font-bold text-muted-foreground">Short question/answer banners will be added instantly.</p>
+          <hr className="my-4 border-gray-300" />
+          <p className="text-[1.5rem] font-bold text-red-600">Below you can add your own questions and answer to train yourself with banners</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
