@@ -67,11 +67,15 @@ export default function Upgrade() {
     createPaymentIntent();
   }, [toast]);
 
+
+  const [isUpgrading, setIsUpgrading] = useState(false);
+
   const handlePaymentSuccess = () => {
-    // Force a full page reload to ensure all user data is fresh
+    setIsUpgrading(true);
+    // Show loading, then reload
     setTimeout(() => {
       window.location.href = "/app";
-    }, 1000);
+    }, 1200);
   };
 
   return (
@@ -104,6 +108,13 @@ export default function Upgrade() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
+          {isUpgrading && (
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60">
+              <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
+              <div className="text-white text-lg font-semibold mb-2">Activating Premium...</div>
+              <div className="text-white text-sm">Please wait while we upgrade your account.</div>
+            </div>
+          )}
           {/* Features Card */}
           <Card>
             <CardHeader>
