@@ -37,36 +37,61 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
   tech: {
     label: 'Learn Acronyms',
     items: [
-      { question: 'What is a CPU?', answer: 'Computer brain.' },
-      { question: 'What is RAM?', answer: 'Short-term memory.' },
-      { question: 'What is an SSD?', answer: 'Fast storage drive.' },
-      { question: 'What is a GPU?', answer: 'Graphics processor.' },
-      { question: 'What is Wi-Fi?', answer: 'Wireless internet.' },
-      { question: 'What is Bluetooth?', answer: 'Short-range wireless.' },
-      { question: 'What is cloud storage?', answer: 'Files online.' },
-      { question: 'What is a browser?', answer: 'Web app viewer.' },
-      { question: 'What is 5G?', answer: 'Fast mobile network.' },
-      { question: 'What is a backup?', answer: 'Safety copy.' },
+      // English
+      { question: 'What does CPU stand for?', answer: 'Central Processing Unit.' },
+      { question: 'What does RAM stand for?', answer: 'Random Access Memory.' },
+      { question: 'What does SSD stand for?', answer: 'Solid State Drive.' },
+      { question: 'What does GPU stand for?', answer: 'Graphics Processing Unit.' },
+      { question: 'What does Wi-Fi stand for?', answer: 'Wireless Fidelity.' },
+      { question: 'What does HTML stand for?', answer: 'HyperText Markup Language.' },
+      { question: 'What does URL stand for?', answer: 'Uniform Resource Locator.' },
+      { question: 'What does API stand for?', answer: 'Application Programming Interface.' },
+      { question: 'What does LAN stand for?', answer: 'Local Area Network.' },
+      { question: 'What does OS stand for?', answer: 'Operating System.' },
+      // Spanish
+      { question: '¿Qué significa CPU?', answer: 'Unidad Central de Procesamiento.' },
+      { question: '¿Qué significa RAM?', answer: 'Memoria de Acceso Aleatorio.' },
+      { question: '¿Qué significa SSD?', answer: 'Unidad de Estado Sólido.' },
+      { question: '¿Qué significa GPU?', answer: 'Unidad de Procesamiento Gráfico.' },
+      { question: '¿Qué significa Wi-Fi?', answer: 'Fidelidad Inalámbrica.' },
+      { question: '¿Qué significa HTML?', answer: 'Lenguaje de Marcado de Hipertexto.' },
+      { question: '¿Qué significa URL?', answer: 'Localizador Uniforme de Recursos.' },
+      { question: '¿Qué significa API?', answer: 'Interfaz de Programación de Aplicaciones.' },
+      { question: '¿Qué significa LAN?', answer: 'Red de Área Local.' },
+      { question: '¿Qué significa SO?', answer: 'Sistema Operativo.' },
     ],
   },
   javascript: {
     label: 'Learn Wine World Regions',
     items: [
-      { question: 'Which keywords create vars?', answer: 'let and const.' },
-      { question: 'What does === check?', answer: 'Value and type.' },
-      { question: 'Add item to array?', answer: 'Use push().' },
-      { question: 'Join array as text?', answer: 'Use join().' },
-      { question: 'What is NaN?', answer: 'Not a number.' },
-      { question: 'String to number?', answer: 'Use Number().' },
-      { question: 'Array length?', answer: 'Use .length.' },
-      { question: 'Run code later?', answer: 'Use setTimeout().' },
-      { question: 'JSON text to object?', answer: 'JSON.parse().' },
-      { question: 'Object to JSON text?', answer: 'JSON.stringify().' },
+      // English and Spanish Q&A, will be filtered by language below
+      { question: 'What is the most famous wine region in France?', answer: 'Bordeaux.' },
+      { question: 'Which Italian region is known for Chianti wine?', answer: 'Tuscany.' },
+      { question: 'What region in Spain is famous for Rioja wine?', answer: 'La Rioja.' },
+      { question: 'Which country is known for the Marlborough wine region?', answer: 'New Zealand.' },
+      { question: 'What is the top wine region in California?', answer: 'Napa Valley.' },
+      { question: 'Which region in Argentina is famous for Malbec?', answer: 'Mendoza.' },
+      { question: 'What region in Australia is known for Shiraz?', answer: 'Barossa Valley.' },
+      { question: 'Which region in South Africa is famous for wine?', answer: 'Stellenbosch.' },
+      { question: 'What region in Germany is known for Riesling?', answer: 'Mosel.' },
+      { question: 'Which region in Portugal is famous for Port wine?', answer: 'Douro Valley.' },
+      // Spanish
+      { question: '¿Cuál es la región vinícola más famosa de Francia?', answer: 'Burdeos.' },
+      { question: '¿Qué región italiana es conocida por el vino Chianti?', answer: 'Toscana.' },
+      { question: '¿Qué región de España es famosa por el vino Rioja?', answer: 'La Rioja.' },
+      { question: '¿Qué país es conocido por la región vinícola Marlborough?', answer: 'Nueva Zelanda.' },
+      { question: '¿Cuál es la principal región vinícola de California?', answer: 'Valle de Napa.' },
+      { question: '¿Qué región de Argentina es famosa por el Malbec?', answer: 'Mendoza.' },
+      { question: '¿Qué región de Australia es conocida por el Shiraz?', answer: 'Valle de Barossa.' },
+      { question: '¿Qué región de Sudáfrica es famosa por el vino?', answer: 'Stellenbosch.' },
+      { question: '¿Qué región de Alemania es conocida por el Riesling?', answer: 'Mosela.' },
+      { question: '¿Qué región de Portugal es famosa por el vino de Oporto?', answer: 'Valle del Duero.' },
     ],
   },
   movieStars: {
     label: 'Iconic Movie Quotes',
     items: [
+      // English
       { question: 'Iron Man actor?', answer: 'Robert Downey Jr.' },
       { question: 'Wonder Woman actor?', answer: 'Gal Gadot.' },
       { question: 'Titanic male lead?', answer: 'Leonardo DiCaprio.' },
@@ -77,11 +102,23 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
       { question: 'Black Widow actor?', answer: 'Scarlett Johansson.' },
       { question: 'Thor actor?', answer: 'Chris Hemsworth.' },
       { question: 'Spider-Man (MCU)?', answer: 'Tom Holland.' },
+      // Spanish
+      { question: '¿Actor de Iron Man?', answer: 'Robert Downey Jr.' },
+      { question: '¿Actriz de Mujer Maravilla?', answer: 'Gal Gadot.' },
+      { question: '¿Protagonista masculino de Titanic?', answer: 'Leonardo DiCaprio.' },
+      { question: '¿Actriz de Barbie?', answer: 'Margot Robbie.' },
+      { question: '¿Actor de John Wick?', answer: 'Keanu Reeves.' },
+      { question: '¿Actor de Deadpool?', answer: 'Ryan Reynolds.' },
+      { question: '¿Actor de Joker (2019)?', answer: 'Joaquin Phoenix.' },
+      { question: '¿Actriz de Black Widow?', answer: 'Scarlett Johansson.' },
+      { question: '¿Actor de Thor?', answer: 'Chris Hemsworth.' },
+      { question: '¿Actor de Spider-Man (MCU)?', answer: 'Tom Holland.' },
     ],
   },
   aiBasics: {
     label: 'What is AI',
     items: [
+      // English
       { question: 'What is AI?', answer: 'Software that learns patterns.' },
       { question: 'What is ML?', answer: 'AI that learns from data.' },
       { question: 'What is NLP?', answer: 'AI for language tasks.' },
@@ -92,11 +129,23 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
       { question: 'What is a prompt?', answer: 'Instruction for an AI.' },
       { question: 'Can AI make mistakes?', answer: 'Yes, always verify output.' },
       { question: 'Best AI use at work?', answer: 'Draft, summarize, brainstorm.' },
+      // Spanish
+      { question: '¿Qué es la IA?', answer: 'Software que aprende patrones.' },
+      { question: '¿Qué es el ML?', answer: 'IA que aprende de datos.' },
+      { question: '¿Qué es el PLN?', answer: 'IA para tareas de lenguaje.' },
+      { question: '¿Qué es la visión por computadora?', answer: 'IA que interpreta imágenes.' },
+      { question: '¿Qué es un modelo?', answer: 'Un sistema de predicción entrenado.' },
+      { question: '¿Qué son los datos de entrenamiento?', answer: 'Ejemplos usados para aprender.' },
+      { question: '¿Qué es la inferencia?', answer: 'El modelo hace una predicción.' },
+      { question: '¿Qué es un prompt?', answer: 'Instrucción para una IA.' },
+      { question: '¿Puede la IA cometer errores?', answer: 'Sí, siempre verifica el resultado.' },
+      { question: '¿Mejor uso de IA en el trabajo?', answer: 'Redactar, resumir, dar ideas.' },
     ],
   },
   cars2026: {
     label: 'What Vitamins are for',
     items: [
+      // English
       { question: 'What does vitamin C support?', answer: 'Immune function and skin health.' },
       { question: 'What is vitamin D important for?', answer: 'Bone strength and calcium absorption.' },
       { question: 'What do B vitamins help with?', answer: 'Energy metabolism and nerves.' },
@@ -107,11 +156,23 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
       { question: 'When take fat-soluble vitamins?', answer: 'With food containing fat.' },
       { question: 'Can too many vitamins be harmful?', answer: 'Yes, excess can cause side effects.' },
       { question: 'Best source of most vitamins?', answer: 'A varied balanced diet.' },
+      // Spanish
+      { question: '¿Para qué sirve la vitamina C?', answer: 'Función inmune y salud de la piel.' },
+      { question: '¿Por qué es importante la vitamina D?', answer: 'Fortaleza ósea y absorción de calcio.' },
+      { question: '¿Para qué ayudan las vitaminas B?', answer: 'Metabolismo energético y nervios.' },
+      { question: '¿Por qué se necesita la vitamina A?', answer: 'Visión, piel e inmunidad.' },
+      { question: '¿Qué hace la vitamina E?', answer: 'Actúa como antioxidante.' },
+      { question: '¿Para qué se usa la vitamina K?', answer: 'Coagulación sanguínea y salud ósea.' },
+      { question: '¿Las vitaminas reemplazan la comida?', answer: 'No, solo complementan la dieta.' },
+      { question: '¿Cuándo tomar vitaminas liposolubles?', answer: 'Con alimentos que contengan grasa.' },
+      { question: '¿Pueden ser dañinas demasiadas vitaminas?', answer: 'Sí, el exceso puede causar efectos secundarios.' },
+      { question: '¿Mejor fuente de la mayoría de vitaminas?', answer: 'Una dieta variada y equilibrada.' },
     ],
   },
   aiPrograms: {
     label: 'What number was this United States President',
     items: [
+      // English
       { question: 'What number president was George Washington?', answer: '1st.' },
       { question: 'What number president was Abraham Lincoln?', answer: '16th.' },
       { question: 'What number president was Theodore Roosevelt?', answer: '26th.' },
@@ -122,6 +183,17 @@ const DEMO_PACKS: Record<DemoPackKey, { label: string; items: Array<{ question: 
       { question: 'What number president was Bill Clinton?', answer: '42nd.' },
       { question: 'What number president was Barack Obama?', answer: '44th.' },
       { question: 'What number president was Joe Biden?', answer: '46th.' },
+      // Spanish
+      { question: '¿Qué número de presidente fue George Washington?', answer: '1º.' },
+      { question: '¿Qué número de presidente fue Abraham Lincoln?', answer: '16º.' },
+      { question: '¿Qué número de presidente fue Theodore Roosevelt?', answer: '26º.' },
+      { question: '¿Qué número de presidente fue Franklin D. Roosevelt?', answer: '32º.' },
+      { question: '¿Qué número de presidente fue John F. Kennedy?', answer: '35º.' },
+      { question: '¿Qué número de presidente fue Richard Nixon?', answer: '37º.' },
+      { question: '¿Qué número de presidente fue Ronald Reagan?', answer: '40º.' },
+      { question: '¿Qué número de presidente fue Bill Clinton?', answer: '42º.' },
+      { question: '¿Qué número de presidente fue Barack Obama?', answer: '44º.' },
+      { question: '¿Qué número de presidente fue Joe Biden?', answer: '46º.' },
     ],
   },
 };
@@ -427,8 +499,24 @@ export default function Home() {
     setDemoPackLoading(pack);
 
     try {
+      let items = DEMO_PACKS[pack].items;
+      // Filter demo packs by language for all packs with Spanish/English Q&A
+      if ([
+        'tech',
+        'javascript',
+        'movieStars',
+        'aiBasics',
+        'cars2026',
+        'aiPrograms',
+      ].includes(pack)) {
+        if (language === 'es') {
+          items = items.filter(item => item.question.startsWith('¿'));
+        } else {
+          items = items.filter(item => !item.question.startsWith('¿'));
+        }
+      }
       await replaceDemoQuestions({
-        items: DEMO_PACKS[pack].items,
+        items,
         demoKey: pack,
         label: DEMO_PACKS[pack].label,
       });
