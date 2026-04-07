@@ -20,7 +20,7 @@ export const translations = {
     // Questions section
     premiumInfo: "💡 Premium mode allows for adding questions and answers quicker with CSV file or paste option for up to 10 for free plan and up to 50 questions and answers for premium plan in Q: & A: format",
     enterQuestionsText: "Enter, view and edit questions and answers below",
-    addQuestionButton: "Add Question",
+    // addQuestionButton duplicate removed
     questionPlaceholder: "Enter your question...",
     answerPlaceholder: "Enter the answer...",
     categoryPlaceholder: "Category (optional)",
@@ -58,8 +58,9 @@ export const translations = {
     import: "Import",
     
     // Messages
+    noQuestionsAdded: "No questions added yet. Add your first question above to get started!",
     noQuestions: "No questions yet. Add some questions to get started!",
-    questionLimit: "Question limit reached",
+    // questionLimit duplicate removed
     
     // Language selector
     language: "Language",
@@ -79,7 +80,7 @@ export const translations = {
     startPremium: "Start Premium",
     mostPopular: "Most Popular",
     continueFreePlan: "Continue with Free Plan",
-    continuePremiumPlan: "Continue With Premium",
+    // continuePremiumPlan duplicate removed
     perfectForStarting: "Perfect for getting started",
     unlockFullPotential: "Unlock full potential",
     upTo10Questions: "Up to 10 questions",
@@ -156,7 +157,24 @@ export const translations = {
     permanentlyRemovesDescription: "Permanently removes all questions from your database. This cannot be undone.",
     importFromExcelDescription: "Import from Excel or Google Sheets. A: question and b: answer format.",
     copyPasteDescription: "Copy and paste questions directly - no file needed, in A: question and B: answer format.",
-    loadFromFileDescription: "Load questions from a previously exported file A: question and B: answer format."
+    loadFromFileDescription: "Load questions from a previously exported file A: question and B: answer format.",
+
+    // Custom keys for QuestionForm and demo pack UI
+    addQuestionHeader: "Add New Question with Answer for Banners ({count}/{max})",
+    demoPackTitle: "Wow in 30 seconds, add a free demo pack",
+    learnAcronyms: "Learn Acronyms",
+    learnWineWorldRegions: "Learn Wine World Regions",
+    iconicMovieQuotes: "Iconic Movie Quotes",
+    learnWhatIsAI: "Learn What is AI",
+    learnVitamins: "Learn What Vitamins are for",
+    learnUSPresidentNumber: "Learn what number was this United States President",
+    customDemoPremiumMsg: "Custom Demo is available on the Premium Plan ($9.99/year).",
+    continuePremiumPlan: "Continue With Premium",
+    addBelowInfo: "Below you can add your own questions and answer to train yourself with banners",
+    questionLabel: "Question",
+    answerLabel: "Answer",
+    addQuestionButton: "Add Question",
+    questionLimit: "Maximum of {max} questions reached"
   },
   
   es: {
@@ -218,6 +236,7 @@ export const translations = {
     import: "Importar",
     
     // Messages
+    noQuestionsAdded: "Aún no hay preguntas. ¡Agrega tu primera pregunta arriba para comenzar!",
     noQuestions: "Aún no hay preguntas. ¡Agrega algunas preguntas para comenzar!",
     questionLimit: "Límite de preguntas alcanzado",
     
@@ -292,12 +311,29 @@ export const translations = {
     
     // Dialog boxes
     quickImport: "Importación Rápida",
-    pasteMultipleQuestions: "Pegar Múltiples Preguntas (formato P: y R:)",
+    // pasteMultipleQuestions duplicate removed
     pasteQuestionsAndAnswers: "Pegar Preguntas y Respuestas",
     pasteFormatDescription: "Pega tus preguntas y respuestas usando el formato mostrado abajo. Puedes importar hasta",
     importQuestions: "Importar Preguntas",
-    quickImportDescription: "Copia y pega preguntas directamente - no se necesita archivo. Usa P: para preguntas y R: para respuestas.",
-    yourQuestions: "Tus Preguntas",
+    // quickImportDescription duplicate removed
+    // yourQuestions duplicate removed
+
+    // Custom keys for QuestionForm and demo pack UI
+    addQuestionHeader: "Agregar nueva pregunta y respuesta para banners ({count}/{max})",
+    demoPackTitle: "Sorpréndete en 30 segundos, agrega un paquete de demostración gratis",
+    learnAcronyms: "Aprende Acrónimos",
+    learnWineWorldRegions: "Aprende Regiones Vinícolas del Mundo",
+    iconicMovieQuotes: "Frases Icónicas de Películas",
+    learnWhatIsAI: "Aprende Qué es la IA",
+    learnVitamins: "Aprende para qué sirven las Vitaminas",
+    learnUSPresidentNumber: "Aprende qué número fue este presidente de Estados Unidos",
+    customDemoPremiumMsg: "La demostración personalizada está disponible en el Plan Premium ($9.99/año).",
+    addBelowInfo: "Abajo puedes agregar tus propias preguntas y respuestas para entrenarte con banners",
+    questionLabel: "Pregunta",
+    answerLabel: "Respuesta",
+    // continuePremiumPlan duplicate removed
+    // addQuestionButton duplicate removed
+    // questionLimit duplicate removed
     displayMode: "Modo de Visualización",
     screensaverOnly: "Solo Salvapantallas",
     alwaysOnTop: "Siempre Visible",

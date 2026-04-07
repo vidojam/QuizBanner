@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,16 +51,18 @@ export default function QuestionForm({
   const canUseLargeCustomDemo = maxQuestions > 10;
   const demoButtonClassName = "text-[1.3125rem] font-bold whitespace-normal leading-tight h-auto min-h-12 py-2 justify-start text-left";
 
+  const { t, language } = useTranslation();
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">
-          Add New Question with Answer for Banners ({questionsCount}/{maxQuestions})
+          {t('addQuestionHeader', { count: questionsCount, max: maxQuestions })}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-3 mb-5">
-          <p className="text-[1.5rem] font-bold text-red-600">Wow in 30 seconds, add a free demo pack</p>
+          <p className="text-[1.5rem] font-bold text-red-600">{t('demoPackTitle')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             <Button
               type="button"
@@ -69,7 +72,7 @@ export default function QuestionForm({
               data-testid="button-demo-tech"
               className={`${demoButtonClassName} border border-gray-700`}
             >
-              {demoPackLoading === 'tech' ? 'Loading...' : 'Learn Acronyms'}
+              {demoPackLoading === 'tech' ? t('loading') : t('learnAcronyms')}
             </Button>
             <Button
               type="button"
@@ -79,7 +82,7 @@ export default function QuestionForm({
               data-testid="button-demo-javascript"
               className={`${demoButtonClassName} border border-gray-700`}
             >
-              {demoPackLoading === 'javascript' ? 'Loading...' : 'Learn Wine World Regions'}
+              {demoPackLoading === 'javascript' ? t('loading') : t('learnWineWorldRegions')}
             </Button>
             <Button
               type="button"
@@ -89,7 +92,7 @@ export default function QuestionForm({
               data-testid="button-demo-movie-stars"
               className={`${demoButtonClassName} border border-gray-700`}
             >
-              {demoPackLoading === 'movieStars' ? 'Loading...' : 'Iconic Movie Quotes'}
+              {demoPackLoading === 'movieStars' ? t('loading') : t('iconicMovieQuotes')}
             </Button>
             <Button
               type="button"
@@ -99,7 +102,7 @@ export default function QuestionForm({
               data-testid="button-demo-ai-basics"
               className={`${demoButtonClassName} border border-gray-700`}
             >
-              {demoPackLoading === 'aiBasics' ? 'Loading...' : 'Learn What is AI'}
+              {demoPackLoading === 'aiBasics' ? t('loading') : t('learnWhatIsAI')}
             </Button>
             <Button
               type="button"
@@ -109,7 +112,7 @@ export default function QuestionForm({
               data-testid="button-demo-cars-2026"
               className={`${demoButtonClassName} sm:col-span-2 md:col-span-2 border border-gray-700`}
             >
-              {demoPackLoading === 'cars2026' ? 'Loading...' : 'Learn What Vitamins are for'}
+              {demoPackLoading === 'cars2026' ? t('loading') : t('learnVitamins')}
             </Button>
             <Button
               type="button"
@@ -119,7 +122,7 @@ export default function QuestionForm({
               data-testid="button-demo-ai-programs"
               className={`${demoButtonClassName} sm:col-span-2 md:col-span-2 border border-gray-700`}
             >
-              {demoPackLoading === 'aiPrograms' ? 'Loading...' : 'Learn what number was this United States President'}
+              {demoPackLoading === 'aiPrograms' ? t('loading') : t('learnUSPresidentNumber')}
             </Button>
           </div>
           {canUseLargeCustomDemo && (
@@ -161,7 +164,7 @@ export default function QuestionForm({
           )}
           {!canUseLargeCustomDemo && (
             <div className="flex items-center gap-2">
-              <p className="text-[1.5rem] font-bold text-red-600">Custom Demo is available on the Premium Plan ($9.99/year).</p>
+              <p className="text-[1.5rem] font-bold text-red-600">{t('customDemoPremiumMsg')}</p>
               {onUpgradeClick && (
                 <Button
                   type="button"
@@ -171,23 +174,23 @@ export default function QuestionForm({
                   data-testid="button-upgrade-custom-demo"
                   className="border border-gray-400 rounded-md"
                 >
-                  Continue With Premium Plan
+                  {t('continuePremiumPlan')}
                 </Button>
               )}
             </div>
           )}
           <hr className="my-4 border-gray-300" />
-          <p className="text-[1.5rem] font-bold text-red-600">Below you can add your own questions and answer to train yourself with banners</p>
+          <p className="text-[1.5rem] font-bold text-red-600">{t('addBelowInfo')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
           <div className="space-y-2">
-            <Label htmlFor="question">Question</Label>
+            <Label htmlFor="question">{t('questionLabel')}</Label>
             <Textarea
               id="question"
               data-testid="input-question"
               autoComplete="off"
-              placeholder="Enter your question here..."
+              placeholder={t('questionPlaceholder')}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               disabled={isMaxReached}
@@ -196,12 +199,12 @@ export default function QuestionForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="answer">Answer</Label>
+            <Label htmlFor="answer">{t('answerLabel')}</Label>
             <Textarea
               id="answer"
               data-testid="input-answer"
               autoComplete="off"
-              placeholder="Enter the answer here..."
+              placeholder={t('answerPlaceholder')}
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               disabled={isMaxReached}
@@ -216,11 +219,11 @@ export default function QuestionForm({
             className="w-full"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Question
+            {t('addQuestionButton')}
           </Button>
           {isMaxReached && (
             <p className="text-sm text-muted-foreground text-center">
-              Maximum of {maxQuestions} questions reached
+              {t('questionLimit', { max: maxQuestions })}
             </p>
           )}
         </form>

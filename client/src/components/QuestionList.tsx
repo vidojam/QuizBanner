@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,12 +38,13 @@ export default function QuestionList({ questions, onDelete, onEdit }: QuestionLi
     setEditAnswer("");
   };
 
+  const { t } = useTranslation();
   if (questions.length === 0) {
     return (
       <Card>
         <CardContent className="p-12 text-center">
           <p className="text-[1.5rem] font-bold text-green-600">
-            No questions added yet. Add your first question above to get started!
+            {t('noQuestionsAdded')}
           </p>
         </CardContent>
       </Card>
